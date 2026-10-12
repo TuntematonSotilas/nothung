@@ -1,7 +1,7 @@
 # Game modes
 
 > Every way the player can play, and how modes connect.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-12
 
 ## Overview
 
@@ -54,3 +54,14 @@ flowchart LR
 - **Challenges**: puzzles ("win this turn").
 - **Gauntlet**: chain of AI duels with escalating difficulty, roguelike-lite.
 - **Daily duel**: offline seed-based daily challenge.
+
+## Multiplayer (planned for v2)
+
+Not part of v1.0 (single player vs AI only). Mentioned here so v1.0 choices don't block it later.
+
+> **Decision (2026-10-12):** v2 multiplayer = **online duel** against another player (friend invite and/or matchmaking). No local pass-and-play on a single device.
+
+Points to define when v2 is designed:
+- Accounts, collection and anti-cheat (the v1.0 collection is stored only on the device).
+- Fairness: whether online duels use the player's collection or pre-built / fully unlocked decks.
+- Turn timer (none in v1.0) and disconnection handling.

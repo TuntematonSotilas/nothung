@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, frames, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-12
 
 Prices and licences change — check them before buying.
 
@@ -31,7 +31,7 @@ Why: the text must be translated into 4 languages and must reflect runtime stats
 | **UI mockups, screen flows** | **Figma** (free tier) | Penpot (open source) | Mock up the duel screen and the card layout before building in Godot |
 | Paper prototype cards (playtest) | nanDECK (Windows, free) | Spreadsheet + mail merge | Generates printable cards from a CSV — useful before any art exists |
 
-**Hardware:** a graphics tablet (Wacom, XP-Pen, Huion — entry models are fine) or an iPad with a stylus. Drawing with a mouse is not realistic for ~120 illustrations.
+**Hardware:** a graphics tablet (Wacom, XP-Pen, Huion — entry models are fine) or an iPad with a stylus. Drawing with a mouse is not realistic for ~80 illustrations.
 
 ## Public-domain reference & material
 

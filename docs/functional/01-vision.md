@@ -1,7 +1,7 @@
 # Vision
 
 > What the game is, who it is for, and what is in or out of scope.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-12
 
 ## Elevator pitch
 
@@ -37,12 +37,12 @@ A 1v1 collectible card game for Android in which the player relives Wagner's *Ri
 - Campaign: 4 chapters (one per opera)
 - Quick match vs AI with difficulty levels
 - Deck builder and card collection
-- ~120 cards across 4–6 factions
+- ~80 cards across 4 factions + Neutral; 20-card decks
 - Localisation: English (source language), German, Spanish, French
 
 ### Out of scope (v1.0)
 
-- Online multiplayer / PvP
+- Online multiplayer (PvP duels) — planned for **v2**, see [05-game-modes](05-game-modes.md#multiplayer-planned-for-v2)
 - Accounts, cloud backend, leaderboards
 - iOS / desktop builds
 - Real-money purchases and ads (the game is free)

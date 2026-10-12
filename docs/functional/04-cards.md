@@ -1,7 +1,7 @@
 # Cards
 
 > Card anatomy, types, keywords, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-12
 
 ## Card anatomy
 
@@ -62,16 +62,18 @@
 
 | Rarity | Copies per deck | Share of collection |
 |--------|-----------------|---------------------|
-| Common | 3 | ~50 % |
+| Common | 2 | ~45 % |
 | Rare | 2 | ~30 % |
-| Epic | 2 | ~15 % |
-| Legendary | 1 | ~5 % (named characters, the Ring, Nothung…) |
+| Epic | 1 | ~15 % |
+| Legendary | 1 | ~10 % (named characters, the Ring, Nothung…) |
 
 ## Deckbuilding rules
 
-- Exactly **30 cards**.
+> **Decision (2026-10-12):** Decks have **20 cards** (not 30). With matches of 8–10 turns a player sees ~14 cards, i.e. ~70 % of the deck → consistent games where the deck's strategy shows. Copy limits lowered accordingly so a deck always has at least 10 different cards.
+
+- Exactly **20 cards**.
 - One **Leader**; cards must be from the Leader's faction or Neutral.
-- Copy limits per rarity as above.
+- Copy limits per rarity as above (max 2, Epic and Legendary 1).
 - Starter decks provided for each faction (see [06-progression](06-progression.md)).
 
 > **Decision (2026-10-09):** No dual-faction decks in v1.0 — one faction + Neutral only.
@@ -80,12 +82,14 @@
 
 | Faction | Units | Spells | Artifacts | Total |
 |---------|-------|--------|-----------|-------|
-| Gods | 14 | 6 | 2 | 22 |
-| Nibelungs | 12 | 5 | 5 | 22 |
-| Wälsungs & Heroes | 14 | 6 | 2 | 22 |
-| Valkyries | 14 | 6 | 2 | 22 |
-| Neutral | 20 | 8 | 4 | 32 |
-| **Total** | | | | **~120** |
+| Gods | 10 | 4 | 1 | 15 |
+| Nibelungs | 9 | 3 | 3 | 15 |
+| Wälsungs & Heroes | 10 | 3 | 2 | 15 |
+| Valkyries | 10 | 4 | 1 | 15 |
+| Neutral | 13 | 5 | 2 | 20 |
+| **Total** | | | | **~80** |
+
+Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card deck — enough for several distinct decks per faction. More cards can come with post-launch expansions (e.g. Giants and Gibichungs as factions).
 
 ## Example cards (to validate the format)
 

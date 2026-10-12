@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-12
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -24,7 +24,7 @@ Match length is measured with AI vs AI simulations ([technical/09-testing.md](..
 
 ## Match setup
 
-1. Each player chooses a deck (30 cards) and its Leader.
+1. Each player chooses a deck (20 cards) and its Leader.
 2. Decks are shuffled. A coin flip decides who goes first.
 3. Each player draws **4 cards**; the second player draws **5** and gets one **Rhinegold token** (catch-up resource: +1 Gold once).
 4. **Mulligan:** each player may put back any number of cards once and redraw that many.

@@ -6,7 +6,7 @@
 
 ## Context
 
-The game will have ~120 cards across 4 factions + Neutral. Card definitions must be easy to read, compare and balance, reviewable in git, and loaded by Godot as typed `CardData` resources ([technical/03-data-model.md](../technical/03-data-model.md)).
+The game will have ~80 cards at launch across 4 factions + Neutral, growing with expansions. Card definitions must be easy to read, compare and balance, reviewable in git, and loaded by Godot as typed `CardData` resources ([technical/03-data-model.md](../technical/03-data-model.md)).
 
 ## Decision
 
