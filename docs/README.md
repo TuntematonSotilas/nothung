@@ -1,12 +1,13 @@
-# Documentation — The Ring of the Nibelung (card game)
+# Documentation — Nothung: The Ring Card Game
 
 > Entry point for all project documentation.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-13
 
 ## Project at a glance
 
 | Item       | Choice                                                   |
 |------------|----------------------------------------------------------|
+| Name       | **Nothung: The Ring Card Game** ([details](functional/01-vision.md#name)) |
 | Genre      | Trading/collectible card game — 1v1 duel                 |
 | Theme      | Richard Wagner's *Der Ring des Nibelungen* (4 operas)    |
 | Mode       | Single player vs AI, fully offline                       |

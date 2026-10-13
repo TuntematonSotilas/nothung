@@ -1,7 +1,7 @@
 # Game engine
 
 > The rules engine: state, turn flow, actions, effect resolution. Implements [functional/03-game-rules.md](../functional/03-game-rules.md).
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-13
 
 ## Responsibilities
 
@@ -52,13 +52,19 @@ stateDiagram-v2
 | Action | Payload |
 |--------|---------|
 | `MulliganAction` | card uids to replace |
-| `PlayCardAction` | card uid, optional board slot, optional target |
+| `PlayCardAction` | card uid, optional board slot, optional target (for a Relic: the bearer unit — required) |
 | `AttackAction` | attacker uid, target uid (unit or leader) |
 | `UseLeaderAbilityAction` | optional target |
 | `EndTurnAction` | – |
 | `ConcedeAction` | – |
 
 Each action is a small serialisable object → enables replays, bug reports, and AI search.
+
+### Validation rules worth noting
+
+- **Relics** ([rules](../functional/03-game-rules.md#relics-equipment)): the target must be a unit controlled by the player, without a Relic, matching `CardData.bearer` (subtype or card id). `get_legal_actions()` only offers valid bearers, so the UI highlights them and the AI never tries an illegal one.
+- **Conditional forging** (e.g. *Nothung (broken)* requires Siegfried): expressed as an ability condition (`[controls(siegfried)]`), checked like any other condition.
+- **Ring bonus**: full vs reduced bonus is a condition on the holder (`[controls(alberich)]`), evaluated at the start of the holder's turn.
 
 ## Effect resolution
 
@@ -77,6 +83,6 @@ Each action is a small serialisable object → enables replays, bug reports, and
 
 ## Events
 
-`GameEvent` subclasses: `CardDrawn`, `CardPlayed`, `UnitSummoned`, `DamageDealt`, `UnitDestroyed`, `GoldChanged`, `TurnStarted`, `TurnEnded`, `RingCursed`, `MatchEnded`…
+`GameEvent` subclasses: `CardDrawn`, `CardPlayed`, `UnitSummoned`, `DamageDealt`, `UnitDestroyed`, `GoldChanged`, `TurnStarted`, `TurnEnded`, `RelicAttached`, `RelicDetached` (bearer died / Relic shattered), `RingTaken`, `RingCursed`, `MatchEnded`…
 
 Events carry only what the receiving player is allowed to see (hidden information filter applied before emission to the human player's view).

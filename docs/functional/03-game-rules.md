@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-12
+> Status: Draft · Last updated: 2026-10-13
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -75,6 +75,15 @@ stateDiagram-v2
 - A unit at 0 Health is destroyed and goes to the graveyard.
 - **Guard** units must be attacked before other targets.
 
+## Relics (equipment)
+
+A **Relic** is an artifact that is attached to a unit instead of going to the artifact zone (Nothung, Tarnhelm…).
+
+- When you play a Relic, choose a unit **you control** that meets its **Bearer** requirement (e.g. *Bearer (Wälsung)*). No valid unit → the Relic can't be played. A Relic without a Bearer requirement can go on any of your units.
+- A unit can carry **at most 1 Relic**. Attached Relics do not count toward the 3-artifact limit.
+- The Relic's bonus applies to its bearer only.
+- When the bearer leaves the board, the Relic goes to the graveyard, unless its text says otherwise (e.g. *Nothung* shatters back into *Nothung (broken)*).
+
 ## Leader
 
 - Each Leader has Life 20 and a **Leader ability** (costs Gold, once per turn).
@@ -82,10 +91,16 @@ stateDiagram-v2
 
 ## The Ring (signature mechanic)
 
-The Ring is a special neutral legendary artifact that enters play only through specific cards.
-- Its holder gains a strong bonus each turn (e.g. +2 Gold or draw a card).
-- **Curse:** at the end of each of their turns, the holder loses Life equal to the number of turns they have held it, **capped at 3 per turn**.
-- Certain effects can **steal** the Ring. Returning it to the Rhine (a specific card) removes it from the game.
+The Ring is a special neutral legendary artifact that enters play only through specific cards. It is held by a **player** (not attached to a unit).
+
+> **Decision (2026-10-13):** Any player can hold the Ring and every holder suffers the curse, but only **Alberich** — who renounced love to forge it — unlocks its full power (see [canon notes](02-lore-and-setting.md#canon-notes-libretto)).
+
+- **Bonus at the start of the holder's turn** (draft values):
+  - **Full power** if the holder controls **Alberich** (as Leader or as a unit on the board): +2 Gold **and** draw 1 card.
+  - **Reduced power** otherwise: +1 Gold.
+- **Curse (every holder, Alberich included):** at the end of each of their turns, the holder loses Life equal to the number of turns they have held it, **capped at 3 per turn**. The count restarts when the Ring changes hands.
+- **Creating the Ring:** only Nibelung cards bring the Ring into play (renunciation of love).
+- **Stealing:** certain effects take the Ring from its holder (Wotan seizing it, Fafner claiming his payment, Hagen's treachery…). Returning it to the Rhine (a specific card) removes it from the game.
 
 > **Decision (2026-10-09):** The Ring is not present by default; it enters play only through specific cards in a deck.
 

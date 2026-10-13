@@ -1,7 +1,6 @@
-# ring_card_game
-The Ring of the Nibelung (card game)
+# Nothung: The Ring Card Game
 
-A single-player collectible card game for Android, themed on Richard Wagner's *Der Ring des Nibelungen*. Built with Godot 4 and GDScript.
+A single-player collectible card game for Android, themed on Richard Wagner's *Der Ring des Nibelungen*. Built with Godot 4.7.2 and GDScript.
 
 ## Documentation
 

@@ -1,7 +1,7 @@
 # Glossary
 
 > Shared vocabulary for game terms (used in docs, code and UI) and lore terms.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-13
 
 ## Game terms
 
@@ -23,6 +23,9 @@
 | **Götterdämmerung** | End-game clock: from turn 10, each Leader takes increasing damage at the start of its turn |
 | **Leitmotif** | Synergy tag linking related cards |
 | **Curse** | Drawback attached to the Ring and cursed cards |
+| **Relic** | Artifact attached to one of your units (equipment), e.g. Nothung, Tarnhelm |
+| **Bearer** | The unit carrying a Relic; *Bearer (X)* restricts which units can carry it |
+| **Spear-breaker** | Siegfried's skill: double damage against Gods (he shatters Wotan's spear) |
 
 ## Lore terms
 

@@ -21,9 +21,13 @@ Follow the official guide: *Exporting for Android* in the Godot docs for the pin
 | `Android Debug` | `.apk` | Install on device for testing (one-click deploy from the editor) |
 | `Android Release` | `.aab` (Gradle build) | Google Play upload |
 
+- App name (`application/config/name` and Android launcher label): **Nothung** — the launcher has little room; the store listing uses the full *Nothung: The Ring Card Game*.
+- Package name: `<reverse-domain>.nothung` (e.g. `fr.<publisher>.nothung`). **It can never change once published on Google Play.**
 - Architectures: `arm64-v8a` (required); `armeabi-v7a` optional for old devices.
 - Permissions: none beyond defaults (no Internet needed — disable `INTERNET` in release if possible).
 - Target SDK: as required by Google Play at release time.
+
+> **Open question:** Publisher identifier for the package name (personal domain / developer name) — must be fixed before the first Play upload.
 
 ## Signing & secrets
 

@@ -28,6 +28,10 @@ Readability at phone size is the priority: one clear subject per illustration, h
 | Gibichungs | Purple | Goblet |
 | Neutral | Grey-green | Rhine wave |
 
+### Logo
+
+Game logo for *Nothung: The Ring Card Game* built around the sword Nothung (e.g. the sword, broken or reforged, forming or crossing the title), so the name reads at a glance. Must also work as the adaptive Android app icon (sword alone, without text).
+
 ### Card frames
 
 Frame varies by type (unit / spell / artifact) and rarity (gem colour). The Ring and cursed cards get a distinct dark-gold frame.

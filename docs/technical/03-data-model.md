@@ -1,7 +1,7 @@
 # Data model
 
 > How cards, decks and effects are represented as data. Implements [functional/04-cards.md](../functional/04-cards.md).
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-13
 
 ## Principles
 
@@ -27,6 +27,7 @@ enum Rarity { COMMON, RARE, EPIC, LEGENDARY }
 @export var attack: int                  # units only
 @export var health: int                  # units only
 @export var keywords: Array[StringName]  # &"guard", &"charge"…
+@export var bearer: Array[StringName]    # Relics only: allowed subtypes or card ids (&"walsung"); empty = any unit
 @export var abilities: Array[AbilityData]
 @export var leitmotifs: Array[StringName]
 @export var art: Texture2D
@@ -56,6 +57,8 @@ classDiagram
       +int active_player
       +Array~PlayerState~ players
       +RandomNumberGenerator rng
+      +int ring_holder
+      +int ring_turns_held
       +duplicate_state() GameState
     }
     class PlayerState {
@@ -76,6 +79,7 @@ classDiagram
       +int health
       +Array~StatusEffect~ statuses
       +bool exhausted
+      +CardInstance relic
     }
     GameState "1" --> "2" PlayerState
     PlayerState --> CardInstance
@@ -84,6 +88,8 @@ classDiagram
 
 - `uid` is unique per match (cards with the same `CardData` are distinguishable).
 - `duplicate_state()` performs a deep copy for AI simulation.
+- `relic`: the Relic attached to this unit (`null` if none; max 1 — [Relic rules](../functional/03-game-rules.md#relics-equipment)). An attached Relic is not in any zone while attached.
+- `ring_holder`: index of the player holding the Ring, `-1` if it is not in play; `ring_turns_held` drives the curse and resets when the Ring changes hands ([The Ring](../functional/03-game-rules.md#the-ring-signature-mechanic)).
 
 ## Card authoring pipeline
 
@@ -96,13 +102,15 @@ Why Markdown: readable on GitHub and in VS Code, easy to diff and review, the wh
 One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`, `cards/valkyries.md`, `cards/neutral.md`), one table row per card:
 
 ```markdown
-| id | name | type | subtypes | rarity | cost | atk | hp | keywords | abilities | leitmotifs | flavour |
-|----|------|------|----------|--------|------|-----|----|----------|-----------|------------|---------|
-| alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | on_play: gain_gold(2); on_play[holds_ring]: draw(1) | gold, ring | *(libretto quote)* |
-| loge_fire | Loge's Fire | spell | | rare | 3 | | | | on_play: damage(all_enemy_units, 2) | fire | |
+| id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
+|----|------|------|----------|--------|------|-----|----|----------|--------|-----------|------------|---------|
+| alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | | on_play: gain_gold(2); on_play[holds_ring]: draw(1) | gold, ring | *(libretto quote)* |
+| loge_fire | Loge's Fire | spell | | rare | 3 | | | | | on_play: damage(all_enemy_units, 2) | fire | |
+| nothung | Nothung | artifact | relic, weapon | legendary | | | | | walsung | static: buff(bearer, atk 3); on_bearer_death: shatter(nothung_broken) | sword | |
 ```
 
 - `faction` comes from the file name.
+- `bearer` is filled for Relics only (subtypes or card ids, comma-separated); empty = any unit.
 - `name` and `flavour` are the **English** source text; the converter writes them into the `en` column of the localisation file. German, Spanish and French are translated there.
 - `abilities` uses a small syntax: `trigger[condition]: effect(args); …`. Every trigger, condition, effect and keyword must exist in the engine; unknown names are errors.
 - Rules text shown on the card is **generated from `keywords` + `abilities`**, so it can never disagree with the actual behaviour.
