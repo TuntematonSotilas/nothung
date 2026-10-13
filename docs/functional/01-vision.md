@@ -32,18 +32,9 @@ Checks to complete before release:
 
 ## Target audience
 
-- Players of digital card games (Hearthstone, Gwent, Marvel Snap, Legends of Runeterra) looking for an offline, single-player experience.
+- Players of digital collectible card games looking for an offline, single-player experience.
 - Mythology / opera enthusiasts curious about the *Ring* story.
 - Age rating target: PEGI 12 (fantasy violence).
-
-## Reference games
-
-| Game | What we take from it |
-|------|----------------------|
-| Hearthstone | Readable board, mana curve, hero power |
-| Gwent | Rows / lanes, narrative campaign (Thronebreaker) |
-| Marvel Snap | Short matches, mobile-first UI |
-| Slay the Spire | Single-player pacing, clear card text |
 
 ## Scope
 

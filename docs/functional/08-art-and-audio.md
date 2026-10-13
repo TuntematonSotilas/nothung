@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-13
 
 ## Art direction
 
@@ -16,17 +16,35 @@ Candidate directions:
 
 Readability at phone size is the priority: one clear subject per illustration, high contrast silhouettes.
 
-### Faction colour & symbol (draft)
+### Card colour system
+
+> **Decision (2026-10-13):** Card colour encodes the **faction**, not the type. Type is shown by the **frame shape**, rarity by the **gem**. Each visual cue carries one piece of information.
+
+| Visual cue | Encodes | Values |
+|------------|---------|--------|
+| **Frame colour** | Faction | See faction palette below |
+| **Frame shape** | Type | **Unit**: rectangular frame with Attack ⚔ and Health ♥ stones · **Spell**: rounded, parchment-like frame · **Artifact**: octagonal frame · **Relic**: octagonal frame + "Bearer" ribbon |
+| **Gem** (top right) | Rarity | Common grey · Rare blue · Epic purple · Legendary gold |
+
+Why faction rather than type: decks are one faction + Neutral, so colour tells at a glance which side a card belongs to (collection, deck builder, enemy board). With only 3 types, shape is enough to tell them apart.
+
+**Thematic exception:** the Ring and **Cursed** cards use a **dark-gold** frame whatever their faction. Dark gold is reserved for them and used by no faction.
+
+**Accessibility:** every faction also has an **icon**, shown on the frame next to the type line, so cards can be identified without relying on colour (colour-blind players).
+
+### Faction palette (draft)
 
 | Faction | Colour | Symbol |
 |---------|--------|--------|
 | Gods | Blue / silver | Spear |
-| Nibelungs | Dark gold / black | Anvil |
-| Giants | Brown / stone | Club |
+| Nibelungs | Purple / charcoal (Tarnhelm sorcery, Nibelheim) | Anvil |
 | Wälsungs & Heroes | Red | Sword |
 | Valkyries | White / steel | Winged helm |
-| Gibichungs | Purple | Goblet |
-| Neutral | Grey-green | Rhine wave |
+| Neutral | Grey / parchment | Rhine wave |
+| *Reserved — Giants (expansion)* | *Brown / stone* | *Club* |
+| *Reserved — Gibichungs (expansion)* | *Deep green* | *Goblet* |
+
+*Nibelungs moved from "dark gold / black" to purple so they don't clash with the dark-gold Ring / Cursed frame. Exact hex values to be set with the art direction (mood board).*
 
 ### Logo
 
@@ -34,7 +52,7 @@ Game logo for *Nothung: The Ring Card Game* built around the sword Nothung (e.g.
 
 ### Card frames
 
-Frame varies by type (unit / spell / artifact) and rarity (gem colour). The Ring and cursed cards get a distinct dark-gold frame.
+Frames follow the [card colour system](#card-colour-system): 4 shapes (unit, spell, artifact, relic) × 5 faction colours + the dark-gold Ring / Cursed variant. Produced as separate layers so Godot assembles them at runtime ([tools/art-tools.md](../tools/art-tools.md)).
 
 ## Audio
 
