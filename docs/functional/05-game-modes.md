@@ -15,7 +15,7 @@
 ## Tutorial
 
 - Integrated into the *Rheingold* prologue: the player plays Wotan against Alberich.
-- Teaches step by step: playing a unit, Gold, attacking, Leader ability, keywords, the Ring.
+- Teaches step by step: playing a unit, Energy, attacking, Leader ability, keywords, the Ring.
 - Scripted hands and AI moves (deterministic).
 
 ## Campaign
@@ -44,7 +44,7 @@ flowchart LR
 A Quest is a short gamebook-style sequence that breaks the rhythm between duels (monster hunt, treasure hunt, journey, riddles).
 
 - **3–6 steps**; each step = one illustration + a short text + **2–3 choices**.
-- Choices branch toward **2–3 endings**. Each ending gives a different reward (card, Hoard or cosmetic — see [06-progression](06-progression.md#rewards)).
+- Choices branch toward **2–3 endings**. Each ending gives a different reward (card, Rhinegold or cosmetic — see [06-progression](06-progression.md#rewards)).
 - **No failure:** every ending completes the Quest and the campaign moves on.
 - **Replayable** from the chapter map, which shows the endings found and the ones still missing. Each ending's reward is granted once.
 - **Canon:** the main path follows the libretto. A branch that departs from it is presented as a "what if" and never changes the story that follows ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).

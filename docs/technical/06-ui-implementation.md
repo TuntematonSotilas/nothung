@@ -16,7 +16,7 @@
 ## Scene composition
 
 - One scene per screen under `scenes/screens/`, swapped by the `SceneRouter` autoload (with a fade transition).
-- Reusable components under `scenes/components/`: `CardView`, `HandView`, `BoardView`, `LeaderView`, `GoldBar`, `CardZoomPopup`.
+- Reusable components under `scenes/components/`: `CardView`, `HandView`, `BoardView`, `LeaderView`, `EnergyBar`, `CardZoomPopup`.
 - UI built with `Control` nodes and containers; a shared `Theme` resource in `ui/theme/` for fonts, colours, styleboxes.
 
 ## CardView

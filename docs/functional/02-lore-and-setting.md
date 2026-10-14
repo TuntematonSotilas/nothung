@@ -23,7 +23,7 @@
 | Faction | Members | Play style (draft) |
 |---------|---------|--------------------|
 | **Gods (Æsir)** | Wotan, Fricka, Donner, Froh, Freia, Loge | Control, contracts/pacts, powerful but bound by law |
-| **Nibelungs** | Alberich, Mime, Nibelung dwarves | Gold economy, forging artifacts, swarm |
+| **Nibelungs** | Alberich, Mime, Nibelung dwarves | Energy economy, forging artifacts, swarm |
 | **Wälsungs & Heroes** | Siegmund, Sieglinde, Siegfried | Aggression, growing units, weapon synergies |
 | **Valkyries** | Brünnhilde, the 8 sisters | Resurrecting fallen units, flying |
 | *Neutral* | Rhinemaidens, Norns, Erda, Woodbird · Giants (Fasolt, Fafner) · Gibichungs (Gunther, Gutrune, Hagen) | Utility, fate / foresight, big Giant units, Gibichung deception |

@@ -7,7 +7,7 @@
 
 | Data | File | Written when |
 |------|------|--------------|
-| Player profile: collection, Hoard, unlocks, achievements | `user://profile.json` | After each reward / change |
+| Player profile: collection, Rhinegold, unlocks, achievements | `user://profile.json` | After each reward / change |
 | Decks | `user://profile.json` (section `decks`) | On deck save |
 | Campaign progress | `user://profile.json` (section `campaign`) | After each campaign duel or Quest ending |
 | Settings | `user://settings.cfg` (`ConfigFile`) | On change |
@@ -23,8 +23,8 @@ On Android `user://` maps to the app's private internal storage.
 
 ```json
 {
-  "version": 1,
-  "hoard": 320,
+  "version": 2,
+  "rhinegold": 320,
   "collection": { "alberich_lord": 1, "fafner": 1, "loge_fire": 3 },
   "decks": [
     { "name": "Hoard of Nibelheim", "leader": "alberich", "cards": ["alberich_lord", "..."] }
@@ -38,11 +38,12 @@ On Android `user://` maps to the app's private internal storage.
 
 - Atomic writes: write to `profile.json.tmp`, then rename over `profile.json`; keep `profile.json.bak`.
 - On load error: fall back to `.bak`, then to a fresh profile (and log it).
-- Unknown card IDs in a save (card removed) are converted to Hoard instead of crashing.
+- Unknown card IDs in a save (card removed) are converted to Rhinegold instead of crashing.
 
 ## Versioning & migration
 
 - `version` field at the root. `SaveManager` runs migrations `v1 → v2 → …` sequentially on load.
+- The `v1 → v2` migration renames the progression balance from `hoard` to `rhinegold` without changing its value.
 - Every change to the save schema requires a migration function + a unit test with a sample old save.
 
 ## Resume an interrupted match

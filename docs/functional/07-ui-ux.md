@@ -37,12 +37,12 @@ flowchart TD
 
 | Screen | Key elements |
 |--------|--------------|
-| Main menu | Campaign, Quick match, Collection, Settings; Hoard counter |
+| Main menu | Campaign, Quick match, Collection, Settings; Rhinegold counter |
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |
 | Mulligan | Opening hand, tap to mark cards, confirm |
-| **Duel** | Turn counter + Götterdämmerung countdown (from turn 7), enemy Leader + Life (top), enemy board, own board, own hand (bottom fan), Gold counter, end-turn button, Leader ability button, graveyard/deck counters |
+| **Duel** | Turn counter + Götterdämmerung countdown (from turn 7), enemy Leader + Life (top), enemy board, own board, own hand (bottom fan), Energy counter, end-turn button, Leader ability button, graveyard/deck counters |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
 | Settings | Audio volumes, language, animation speed, reset progress |
@@ -56,7 +56,7 @@ flowchart TD
 │ ─────────── artifacts ────── │
 │ ▢ ▢ ▢ ▢ ▢ ▢   your board     │
 │ [Your Leader ♥20] [Ability]  │
-│ Gold ●●●●○○        [END TURN]│
+│ Energy ●●●●○○      [END TURN]│
 │   ╭──╮╭──╮╭──╮╭──╮╭──╮       │
 │   hand (fanned, scrollable)  │
 └──────────────────────────────┘

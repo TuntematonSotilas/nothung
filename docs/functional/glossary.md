@@ -11,9 +11,9 @@
 | **Quest** | Non-combat campaign stage: a short narrative with choices leading to one of several endings — see [05-game-modes](05-game-modes.md#quests-non-combat-stages) |
 | **Leader** | The character representing a player; has Life and a Leader ability |
 | **Life** | Leader hit points; 0 = defeat |
-| **Gold** | In-match resource used to play cards |
-| **Hoard** | Meta currency earned outside matches, used in the Forge |
-| **Forge** | Collection screen where cards are crafted with Hoard |
+| **Energy** | In-match resource used to play cards and Leader abilities |
+| **Rhinegold** | Progression currency earned outside matches and spent in the Forge |
+| **Forge** | Collection screen where cards are crafted with Rhinegold |
 | **Unit / Spell / Artifact** | Card types — see [04-cards](04-cards.md#card-types) |
 | **Board** | Zone where units are in play |
 | **Graveyard** | Zone for destroyed units and used spells |

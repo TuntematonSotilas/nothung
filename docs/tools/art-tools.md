@@ -17,7 +17,7 @@ CardView = frame (by type / rarity) + artwork + faction icon + gem
 Why: the text must be translated into 4 languages and must reflect runtime stats (a buffed unit shows 5/6, not 3/4). So artists deliver:
 - **Illustrations** without text (one per card),
 - **Frame pieces** (per type and rarity) as separate layers,
-- **Icons** (factions, keywords, Gold, Life).
+- **Icons** (factions, keywords, Energy, Life).
 
 ## Recommended tools
 

@@ -44,7 +44,7 @@ extends Resource
 @export var effects: Array[EffectData]   # executed in order
 ```
 
-`EffectData` subclasses (one per effect kind): `DealDamageEffectData`, `DrawCardsEffectData`, `GainGoldEffectData`, `SummonEffectData`, `BuffEffectData`, `ResurrectEffectData`, `TransformEffectData`…
+`EffectData` subclasses (one per effect kind): `DealDamageEffectData`, `DrawCardsEffectData`, `GainEnergyEffectData`, `SummonEffectData`, `BuffEffectData`, `ResurrectEffectData`, `TransformEffectData`…
 
 Other resources: `LeaderData` (life, ability), `DeckData` (leader id + list of card ids), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards), `CampaignQuestData` (non-combat stage: steps, each with an illustration, a text key and choices pointing to the next step or to an ending; reward per ending — [Quests](../functional/05-game-modes.md#quests-non-combat-stages)). Quest texts go in the localisation file, like card names.
 
@@ -63,8 +63,8 @@ classDiagram
     }
     class PlayerState {
       +int life
-      +int gold
-      +int max_gold
+      +int energy
+      +int max_energy
       +Zone deck
       +Zone hand
       +Zone board
@@ -104,7 +104,7 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 ```markdown
 | id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
 |----|------|------|----------|--------|------|-----|----|----------|--------|-----------|------------|---------|
-| alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | | on_play: gain_gold(2); on_play[holds_ring]: draw(1) | gold, ring | *(libretto quote)* |
+| alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | | on_play: gain_energy(2); on_play[holds_ring]: draw(1) | energy, ring | *(libretto quote)* |
 | loge_fire | Loge's Fire | spell | | rare | 3 | | | | | on_play: damage(all_enemy_units, 2) | fire | |
 | nothung | Nothung | artifact | relic, weapon | legendary | | | | | walsung | static: buff(bearer, atk 3); on_bearer_death: shatter(nothung_broken) | sword | |
 ```

@@ -38,7 +38,7 @@ stateDiagram-v2
     [*] --> Setup
     Setup --> Mulligan
     Mulligan --> TurnStart
-    TurnStart --> Main: refill gold, draw, triggers
+    TurnStart --> Main: refill Energy, draw, triggers
     Main --> Main: PlayCard / Attack / LeaderAbility
     Main --> TurnEnd: EndTurnAction
     TurnEnd --> TurnStart: switch active player
@@ -83,6 +83,6 @@ Each action is a small serialisable object → enables replays, bug reports, and
 
 ## Events
 
-`GameEvent` subclasses: `CardDrawn`, `CardPlayed`, `UnitSummoned`, `DamageDealt`, `UnitDestroyed`, `GoldChanged`, `TurnStarted`, `TurnEnded`, `RelicAttached`, `RelicDetached` (bearer died / Relic shattered), `RingTaken`, `RingCursed`, `MatchEnded`…
+`GameEvent` subclasses: `CardDrawn`, `CardPlayed`, `UnitSummoned`, `DamageDealt`, `UnitDestroyed`, `EnergyChanged`, `TurnStarted`, `TurnEnded`, `RelicAttached`, `RelicDetached` (bearer died / Relic shattered), `RingTaken`, `RingCursed`, `MatchEnded`…
 
 Events carry only what the receiving player is allowed to see (hidden information filter applied before emission to the human player's view).

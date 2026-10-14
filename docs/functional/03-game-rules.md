@@ -26,7 +26,7 @@ Match length is measured with AI vs AI simulations ([technical/09-testing.md](..
 
 1. Each player chooses a deck (20 cards) and its Leader.
 2. Decks are shuffled. A coin flip decides who goes first.
-3. Each player draws **4 cards**; the second player draws **5** and gets one **Rhinegold token** (catch-up resource: +1 Gold once).
+3. Each player draws **4 cards**; the second player draws **5** and gets one **Energy token** (catch-up resource: +1 Energy once).
 4. **Mulligan:** each player may put back any number of cards once and redraw that many.
 
 ## Zones
@@ -42,25 +42,25 @@ Match length is measured with AI vs AI simulations ([technical/09-testing.md](..
 
 > **Decision (2026-10-09):** Single board row per player (no front / back line) — readability in portrait.
 
-## Resource: Gold
+## Resource: Energy
 
-- Each player has a **Gold** pool. At the start of their turn, max Gold increases by 1 (up to 10) and the pool refills.
-- Cards cost Gold to play.
-- *Theme hook:* some cards (Nibelungs) produce extra Gold or let you "hoard" unspent Gold.
+- Each player has an **Energy** pool. At the start of their turn, max Energy increases by 1 (up to 10) and the pool refills.
+- Cards cost Energy to play.
+- *Theme hook:* some cards (Nibelungs) produce extra Energy or let you store unspent Energy.
 
 ## Turn phases
 
 ```mermaid
 stateDiagram-v2
     [*] --> Start
-    Start --> Draw: refresh Gold, "start of turn" triggers, Götterdämmerung damage
+    Start --> Draw: refresh Energy, "start of turn" triggers, Götterdämmerung damage
     Draw --> Main: draw 1 card
     Main --> Main: play card / attack / Leader ability
     Main --> End: player taps End Turn
     End --> [*]: "end of turn" triggers, pass turn
 ```
 
-1. **Start** — max Gold +1, refill Gold, "start of turn" effects, then [Götterdämmerung](#götterdämmerung-turn-limit) damage if active.
+1. **Start** — max Energy +1, refill Energy, "start of turn" effects, then [Götterdämmerung](#götterdämmerung-turn-limit) damage if active.
 2. **Draw** — draw 1 card (nothing happens if the deck is empty).
 3. **Main** — in any order: play cards, attack with ready units, activate the Leader ability (once per turn).
 4. **End** — "end of turn" effects; turn passes.
@@ -86,8 +86,8 @@ A **Relic** is an artifact that is attached to a unit instead of going to the ar
 
 ## Leader
 
-- Each Leader has Life 20 and a **Leader ability** (costs Gold, once per turn).
-- Example: *Wotan — "Spear of Treaties" (2 Gold): give a unit Guard.*
+- Each Leader has Life 20 and a **Leader ability** (costs Energy, once per turn).
+- Example: *Wotan — "Spear of Treaties" (2 Energy): give a unit Guard.*
 
 ## The Ring (signature mechanic)
 
@@ -96,8 +96,8 @@ The Ring is a special neutral legendary artifact that enters play only through s
 > **Decision (2026-10-13):** Any player can hold the Ring and every holder suffers the curse, but only **Alberich** — who renounced love to forge it — unlocks its full power (see [canon notes](02-lore-and-setting.md#canon-notes-libretto)).
 
 - **Bonus at the start of the holder's turn** (draft values):
-  - **Full power** if the holder controls **Alberich** (as Leader or as a unit on the board): +2 Gold **and** draw 1 card.
-  - **Reduced power** otherwise: +1 Gold.
+  - **Full power** if the holder controls **Alberich** (as Leader or as a unit on the board): +2 Energy **and** draw 1 card.
+  - **Reduced power** otherwise: +1 Energy.
 - **Curse (every holder, Alberich included):** at the end of each of their turns, the holder loses Life equal to the number of turns they have held it, **capped at 3 per turn**. The count restarts when the Ring changes hands.
 - **Creating the Ring:** only Nibelung cards bring the Ring into play (renunciation of love).
 - **Stealing:** certain effects take the Ring from its holder (Wotan seizing it, Fafner claiming his payment, Hagen's treachery…). Returning it to the Rhine (a specific card) removes it from the game.

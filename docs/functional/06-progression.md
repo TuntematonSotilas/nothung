@@ -18,18 +18,18 @@
 | Source | Reward |
 |--------|--------|
 | Campaign duel (first win) | Specific cards / Leader (fixed, story-related) |
-| Campaign Quest (each ending, first time) | Card, Hoard or cosmetic ([Quests](05-game-modes.md#quests-non-combat-stages)) |
+| Campaign Quest (each ending, first time) | Card, Rhinegold or cosmetic ([Quests](05-game-modes.md#quests-non-combat-stages)) |
 | Campaign chapter complete | Legendary card + faction starter deck |
-| Quick match win | Gold coins (meta currency) |
-| Achievements | Gold coins, card backs, cosmetic frames |
+| Quick match win | Rhinegold |
+| Achievements | Rhinegold, card backs, cosmetic frames |
 
 ## Meta currency
 
-> Distinct from in-match Gold. Proposal name: **Hoard**.
+> Distinct from in-match Energy. The progression currency is **Rhinegold**.
 
 - Earned in quick matches and achievements.
-- Spent in the **Forge**: craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values).
-- Duplicate extra copies above the deck limit are automatically converted to Hoard.
+- Spent in the **Forge** to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values).
+- Duplicate extra copies above the deck limit are automatically converted to Rhinegold.
 
 > **Decision (2026-10-09):** Direct crafting only — no random card packs.
 
@@ -43,4 +43,4 @@
 
 - Card backs, board skins (Rhine depths, Valhalla, Nibelheim, Gibichung hall), Leader portraits.
 
-> **Decision (2026-10-09):** Cosmetics are not sold — the game is entirely free ([01-vision](01-vision.md#scope)). They are unlocked through achievements, campaign progress or Hoard.
+> **Decision (2026-10-09):** Cosmetics are not sold — the game is entirely free ([01-vision](01-vision.md#scope)). They are unlocked through achievements, campaign progress or Rhinegold.

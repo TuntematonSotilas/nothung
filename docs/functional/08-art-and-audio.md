@@ -77,7 +77,7 @@ Frames follow the [card colour system](#card-colour-system): 4 shapes (unit, spe
 - Wagner's scores are public domain, **but recordings are not**: performances are protected by performers' and producers' rights. Use only:
   - our own arrangements of the public-domain scores (written as MIDI, then rendered to audio — see [audio tools](../tools/audio-tools.md)), or
   - recordings explicitly licensed for reuse (e.g. CC0 / public-domain recordings, to be verified individually).
-- Use **leitmotifs** as short stingers: Rhinegold motif when gaining Gold, Valhalla motif for Gods, Ride motif for Valkyries, Sword motif for Nothung, curse motif when the Ring hurts its holder.
+- Use **leitmotifs** as short stingers: Rhinegold motif when earning Rhinegold, Valhalla motif for Gods, Ride motif for Valkyries, Sword motif for Nothung, curse motif when the Ring hurts its holder.
 - Background loops per board / chapter.
 
 ### Sound effects

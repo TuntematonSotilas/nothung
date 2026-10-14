@@ -35,7 +35,7 @@ func choose_action(state: GameState, legal: Array[Action]) -> Action
 score = w_life   * (my_life - enemy_life)
       + w_board  * (sum my unit value - sum enemy unit value)
       + w_hand   * (my hand size - enemy hand size)
-      + w_gold   * unused_gold_penalty
+      + w_energy * unused_energy_penalty
       + w_ring   * ring_value(turns_held)
       + lethal bonus / lethal-threat penalty
 ```
@@ -53,7 +53,7 @@ Unit value ≈ `attack + health` + keyword bonuses. Weights live in `AIProfile` 
 ## Campaign personalities
 
 `AIProfile` overrides per boss, e.g.:
-- *Alberich*: prioritises Gold and the Ring.
+- *Alberich*: prioritises Energy and the Ring.
 - *Fafner*: defensive, keeps Guard units.
 - *Hagen*: targets the strongest enemy unit.
 

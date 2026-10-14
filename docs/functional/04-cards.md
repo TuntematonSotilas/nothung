@@ -22,7 +22,7 @@
 | Field | Required | Notes |
 |-------|----------|-------|
 | Name | ✔ | Unique per card |
-| Cost | ✔ | 0–10 Gold |
+| Cost | ✔ | 0–10 Energy |
 | Type | ✔ | See below |
 | Subtype | – | God, Dwarf, Giant, Wälsung, Hero, Valkyrie, Relic, Weapon… (used by synergies and Bearer requirements) |
 | Faction | ✔ | Or Neutral |
@@ -51,7 +51,7 @@
 | **Charge** | Can attack the turn it is played |
 | **Flying** | Can only be blocked/attacked by Flying or Ranged units *(if lanes/blocking are adopted)* |
 | **Valhalla** | When destroyed, can be resurrected by Valkyrie effects (marks heroic units) |
-| **Forge X** | Spend X extra Gold when playing to upgrade the card |
+| **Forge X** | Spend X extra Energy when playing to upgrade the card |
 | **Leitmotif (Y)** | Bonus if you played another card with motif Y this turn |
 | **Cursed** | Holder suffers a drawback (Ring and related cards) |
 | **Invisible** | Cannot be targeted until it attacks (Tarnhelm) |
@@ -97,7 +97,7 @@ Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card 
 
 | Name | Cost | Type | Faction | Stats | Text |
 |------|------|------|---------|-------|------|
-| Alberich, Lord of the Nibelungs | 4 | Unit — Dwarf | Nibelungs | 3/4 | On play: gain 2 Gold. If you hold the Ring, draw a card. |
+| Alberich, Lord of the Nibelungs | 4 | Unit — Dwarf | Nibelungs | 3/4 | On play: gain 2 Energy. If you hold the Ring, draw a card. |
 | Fafner | 8 | Unit — Giant | Neutral | 8/8 | Guard. Cannot attack the turn after it attacks. |
 | Ride of the Valkyries | 5 | Spell | Valkyries | – | Return up to 2 Valhalla units from your graveyard to the board. |
 | Loge's Fire | 3 | Spell | Gods | – | Deal 2 damage to all enemy units. |
@@ -119,6 +119,6 @@ These cards follow the [canon notes](02-lore-and-setting.md#canon-notes-libretto
 | Tarnhelm | 3 | Artifact — Relic | Neutral | – | Bearer gains **Invisible**. If worn by **Alberich**: the first time he would be destroyed, return him to your hand instead (the toad). By **Fafner**: +3/+3 and **Guard** (the dragon). By **Siegfried**: he may ignore **Guard** when attacking (Gunther's form). |
 | Siegfried | 6 | Unit — Wälsung, Hero | Heroes | 5/5 | **Valhalla.** **Spear-breaker:** deals double damage to God units and to a God Leader. |
 | Siegmund | 4 | Unit — Wälsung, Hero | Heroes | 4/3 | **Valhalla.** On play: if *Nothung* is in your artifact zone or graveyard, attach it to Siegmund. |
-| The Ring | 0 | Artifact | Neutral | – | Created by Nibelung cards only. Held by a player. Start of your turn: +1 Gold — or, if you control **Alberich**, +2 Gold and draw 1. **Cursed** (see [The Ring](03-game-rules.md#the-ring-signature-mechanic)). |
+| The Ring | 0 | Artifact | Neutral | – | Created by Nibelung cards only. Held by a player. Start of your turn: +1 Energy — or, if you control **Alberich**, +2 Energy and draw 1. **Cursed** (see [The Ring](03-game-rules.md#the-ring-signature-mechanic)). |
 
 *Tarnhelm is Neutral so that Nibelung (Alberich), Heroes (Siegfried) and Neutral (Fafner) decks can all use it.*
