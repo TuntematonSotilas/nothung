@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, frames, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-12
+> Status: Draft · Last updated: 2026-10-14
 
 Prices and licences change — check them before buying.
 
@@ -32,6 +32,42 @@ Why: the text must be translated into 4 languages and must reflect runtime stats
 | Paper prototype cards (playtest) | nanDECK (Windows, free) | Spreadsheet + mail merge | Generates printable cards from a CSV — useful before any art exists |
 
 **Hardware:** a graphics tablet (Wacom, XP-Pen, Huion — entry models are fine) or an iPad with a stylus. Drawing with a mouse is not realistic for ~80 illustrations.
+
+## Paper-to-digital workflow
+
+Recommended pipeline for hand-drawn illustrations: **ink on paper → scan → clean and colour in Krita**.
+
+### Drawing on paper
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| Drawing area | **20 × 15 cm** (4:3) on A4 | Same ratio as the 1024 × 768 export; ~4–5× the final size |
+| Safe margin | ~1 cm inside the area, no key elements | The card frame may crop the edges; room to adjust framing |
+| Paper | Smooth Bristol / 180–250 g drawing paper | Ink doesn't bleed |
+| Sketch | Non-photo **blue pencil** | Removed after scanning, no erasing needed |
+| Ink | Fineliner **0.5–0.8 mm** for outlines, 0.3 mm minimum | The art is shown ~300–400 px wide on a phone (~12× reduction): thin lines disappear |
+
+**Readability check:** look at the drawing at thumbnail size (~4 cm wide) before finishing it. If the silhouette doesn't read, colour won't fix it.
+
+### Scanning
+
+- **Flatbed scanner** (an entry model such as Canon LiDE is enough) rather than a phone photo: even lighting, no distortion. Free software: NAPS2 or Windows Scan.
+- **600 dpi, colour** (keeps the blue pencil separable), saved as **PNG or TIFF — never JPEG**. Result ≈ 4700 × 3500 px; this is the master file.
+- Phone apps (Microsoft Lens, Adobe Scan) are fine for tests only — quality is inconsistent across a full set.
+
+### Cleaning and colouring in Krita
+
+1. **Clean:** desaturate, or keep only the red channel (makes the blue pencil vanish), then *Filter → Adjust → Levels* for pure white and deep black.
+2. **Isolate line art:** *Filter → Colors → Color to Alpha* on white, or set the line layer to **Multiply**. The lines stay on a transparent layer above the colours.
+3. **Flats:** the **Colorize Mask** tool fills the closed areas automatically — a big time saver over ~80 cards.
+4. **Shading and light** on layers between the flats and the line art.
+5. **Export:** keep the `.kra` as source, export PNG at 1024 × 768 ([export specs](#export-specs-for-godot)).
+
+**Consistency across the set:** use a Krita **template** (canvas at size, safe-margin guide, named layers) and a fixed **palette**: muted tones plus the [faction colours](../functional/08-art-and-audio.md#faction-palette-draft) as accents.
+
+### Alternative: colour on paper
+
+Ink + watercolour washes, as Rackham did — a perfect fit for the "Romantic painting" direction. Downsides: no undo, colour scan needs colour correction, harder to keep ~80 cards consistent. **To decide:** test both workflows on 2–3 cards before committing.
 
 ## Public-domain reference & material
 
