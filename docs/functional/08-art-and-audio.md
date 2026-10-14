@@ -24,7 +24,7 @@ Readability at phone size is the priority: one clear subject per illustration, h
 |------------|---------|--------|
 | **Frame colour** | Faction | See faction palette below |
 | **Frame shape** | Type | **Unit**: rectangular frame with Attack ⚔ and Health ♥ stones · **Spell**: rounded, parchment-like frame · **Artifact**: octagonal frame · **Relic**: octagonal frame + "Bearer" ribbon |
-| **Gem** (top right) | Rarity | Common grey · Rare blue · Epic purple · Legendary gold |
+| **Gem** (top right) | Rarity | Common grey · Rare blue · Epic purple · Legendary gold (see [gem colours](#gem-colours)) |
 
 Why faction rather than type: decks are one faction + Neutral, so colour tells at a glance which side a card belongs to (collection, deck builder, enemy board). With only 3 types, shape is enough to tell them apart.
 
@@ -34,17 +34,33 @@ Why faction rather than type: decks are one faction + Neutral, so colour tells a
 
 ### Faction palette (draft)
 
-| Faction | Colour | Symbol |
-|---------|--------|--------|
-| Gods | Blue / silver | Spear |
-| Nibelungs | Purple / charcoal (Tarnhelm sorcery, Nibelheim) | Anvil |
-| Wälsungs & Heroes | Red | Sword |
-| Valkyries | White / steel | Winged helm |
-| Neutral | Grey / parchment | Rhine wave |
-| *Reserved — Giants (expansion)* | *Brown / stone* | *Club* |
-| *Reserved — Gibichungs (expansion)* | *Deep green* | *Goblet* |
+Muted, slightly desaturated tones to match the Romantic direction (aged pigments, not saturated UI colours). Each faction has a **frame** colour (main fill) and a **trim** colour (borders, ornaments, type line). Hues are spread around the colour wheel, and the two light frames (Valkyries, Neutral) are told apart by temperature (cool vs warm).
 
-*Nibelungs moved from "dark gold / black" to purple so they don't clash with the dark-gold Ring / Cursed frame. Exact hex values to be set with the art direction (mood board).*
+| Faction | Colour | Frame | Trim | Card text | Symbol |
+|---------|--------|-------|------|-----------|--------|
+| Gods | Blue / silver | `#2E4A7D` | `#B8C4D6` | Light | Spear |
+| Nibelungs | Purple / charcoal (Tarnhelm sorcery, Nibelheim) | `#4E3366` | `#2B2930` | Light | Anvil |
+| Wälsungs & Heroes | Red | `#8B2323` | `#B07D4F` (bronze) | Light | Sword |
+| Valkyries | White / steel | `#DDE2E8` | `#6F7C8A` | Dark | Winged helm |
+| Neutral | Grey / parchment | `#A39A86` | `#DCCFAE` | Dark | Rhine wave |
+| **Ring / Cursed** (any faction) | Dark gold | `#7A5A14` | `#C9A33A` | Light | — |
+| *Reserved — Giants (expansion)* | *Brown / stone* | *`#6B5A4C`* | *`#9C9286`* | *Light* | *Club* |
+| *Reserved — Gibichungs (expansion)* | *Deep green* | *`#2D5641`* | *`#A8B59A`* | *Light* | *Goblet* |
+
+Shared text colours: **Light** = `#F4EFE4` (warm off-white), **Dark** = `#1C1A17` (ink). Every frame meets a WCAG contrast ratio of at least **5.5:1** with its text colour (target ≥ 4.5:1).
+
+*Nibelungs moved from "dark gold / black" to purple so they don't clash with the dark-gold Ring / Cursed frame. Values are a starting point: adjust them on the mood board, keeping the contrast target and the hue spacing.*
+
+### Gem colours
+
+| Rarity | Gem |
+|--------|-----|
+| Common | `#9A9A9A` |
+| Rare | `#3A7BD5` |
+| Epic | `#8E44AD` |
+| Legendary | `#E0B33A` |
+
+Gems are brighter than frames so they stand out as small jewels. Legendary gold is bright and saturated, unlike the dark-gold Ring / Cursed frame.
 
 ### Logo
 
