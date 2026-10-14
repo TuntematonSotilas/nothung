@@ -46,7 +46,7 @@ extends Resource
 
 `EffectData` subclasses (one per effect kind): `DealDamageEffectData`, `DrawCardsEffectData`, `GainGoldEffectData`, `SummonEffectData`, `BuffEffectData`, `ResurrectEffectData`, `TransformEffectData`…
 
-Other resources: `LeaderData` (life, ability), `DeckData` (leader id + list of card ids), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards).
+Other resources: `LeaderData` (life, ability), `DeckData` (leader id + list of card ids), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards), `CampaignQuestData` (non-combat stage: steps, each with an illustration, a text key and choices pointing to the next step or to an ending; reward per ending — [Quests](../functional/05-game-modes.md#quests-non-combat-stages)). Quest texts go in the localisation file, like card names.
 
 ## Runtime model (RefCounted)
 

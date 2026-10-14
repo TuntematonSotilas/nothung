@@ -1,7 +1,7 @@
 # Game modes
 
 > Every way the player can play, and how modes connect.
-> Status: Draft · Last updated: 2026-10-12
+> Status: Draft · Last updated: 2026-10-14
 
 ## Overview
 
@@ -20,7 +20,7 @@
 
 ## Campaign
 
-Four chapters, each with 5–8 duels following the opera's story.
+Four chapters, each with 5–8 stages following the opera's story: mostly **duels**, plus 1–2 **[Quests](#quests-non-combat-stages)** (non-combat stages) per chapter.
 
 - Each duel has a **fixed opponent** (character + preconstructed deck) and optionally **special rules** (e.g. "Fafner's lair: the enemy Leader starts with 35 Life").
 - Story is told between duels with illustrated text panels (no voice acting in v1.0).
@@ -35,7 +35,27 @@ flowchart LR
     G --> E[Epilogue<br/>Ring returns to the Rhine]
 ```
 
-> **Decision (2026-10-09):** Linear campaign in v1.0 — duels follow the story order. A node map with optional side duels (e.g. Mime's riddle game) is a post-launch idea.
+> **Decision (2026-10-09):** Linear campaign in v1.0 — stages (duels and Quests) follow the story order. A node map with optional side duels is a post-launch idea.
+
+### Quests (non-combat stages)
+
+> **Decision (2026-10-14):** The campaign includes **Quests**: narrative stages with choices, no duel. They give **rewards only** and have no effect on later duels, so duel balancing stays independent. Mime's riddle game, previously a post-launch idea, becomes a Quest.
+
+A Quest is a short gamebook-style sequence that breaks the rhythm between duels (monster hunt, treasure hunt, journey, riddles).
+
+- **3–6 steps**; each step = one illustration + a short text + **2–3 choices**.
+- Choices branch toward **2–3 endings**. Each ending gives a different reward (card, Hoard or cosmetic — see [06-progression](06-progression.md#rewards)).
+- **No failure:** every ending completes the Quest and the campaign moves on.
+- **Replayable** from the chapter map, which shows the endings found and the ones still missing. Each ending's reward is granted once.
+- **Canon:** the main path follows the libretto. A branch that departs from it is presented as a "what if" and never changes the story that follows ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).
+
+| Chapter | Quest | Theme |
+|---------|-------|-------|
+| *Das Rheingold* | **The Nibelheim hoard** | Treasure hunt: Wotan and Loge search Alberich's forges for the gold and the Tarnhelm |
+| *Die Walküre* | **Flight through the forest** | Sieglinde escapes Hunding's hunt, choosing paths and hiding places |
+| *Siegfried* | **The Wanderer's wager** | Riddle game: Mime and the Wanderer stake their heads on three questions |
+| *Siegfried* | **Tracking Fafner** | Monster hunt: following the Woodbird's song to Neidhöhle, the dragon's cave |
+| *Götterdämmerung* | **The Rhine journey** | The Rhinemaidens ask Siegfried for the Ring (canon ending: he refuses) |
 
 ## Quick match
 

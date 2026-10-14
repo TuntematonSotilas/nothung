@@ -1,7 +1,7 @@
 # Persistence
 
 > What is saved on the device, in which format, and how saves evolve across versions.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-14
 
 ## What is saved
 
@@ -9,7 +9,7 @@
 |------|------|--------------|
 | Player profile: collection, Hoard, unlocks, achievements | `user://profile.json` | After each reward / change |
 | Decks | `user://profile.json` (section `decks`) | On deck save |
-| Campaign progress | `user://profile.json` (section `campaign`) | After each campaign duel |
+| Campaign progress | `user://profile.json` (section `campaign`) | After each campaign duel or Quest ending |
 | Settings | `user://settings.cfg` (`ConfigFile`) | On change |
 | Match in progress (post-launch) | `user://current_match.json` (seed + action list) | After each action |
 
@@ -29,7 +29,7 @@ On Android `user://` maps to the app's private internal storage.
   "decks": [
     { "name": "Hoard of Nibelheim", "leader": "alberich", "cards": ["alberich_lord", "..."] }
   ],
-  "campaign": { "rheingold": { "completed": true, "duels_won": ["rg_01", "rg_02"] } },
+  "campaign": { "rheingold": { "completed": true, "duels_won": ["rg_01", "rg_02"], "quest_endings": { "rg_q1": ["hoard_found"] } } },
   "achievements": ["renunciation_of_love"]
 }
 ```

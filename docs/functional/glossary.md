@@ -1,13 +1,14 @@
 # Glossary
 
 > Shared vocabulary for game terms (used in docs, code and UI) and lore terms.
-> Status: Draft · Last updated: 2026-10-13
+> Status: Draft · Last updated: 2026-10-14
 
 ## Game terms
 
 | Term | Definition |
 |------|------------|
 | **Duel / Match** | One game between two players |
+| **Quest** | Non-combat campaign stage: a short narrative with choices leading to one of several endings — see [05-game-modes](05-game-modes.md#quests-non-combat-stages) |
 | **Leader** | The character representing a player; has Life and a Leader ability |
 | **Life** | Leader hit points; 0 = defeat |
 | **Gold** | In-match resource used to play cards |

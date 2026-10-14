@@ -1,7 +1,7 @@
 # Progression
 
 > How the player grows their collection and what keeps them playing — all offline.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-14
 
 ## Principles
 
@@ -18,6 +18,7 @@
 | Source | Reward |
 |--------|--------|
 | Campaign duel (first win) | Specific cards / Leader (fixed, story-related) |
+| Campaign Quest (each ending, first time) | Card, Hoard or cosmetic ([Quests](05-game-modes.md#quests-non-combat-stages)) |
 | Campaign chapter complete | Legendary card + faction starter deck |
 | Quick match win | Gold coins (meta currency) |
 | Achievements | Gold coins, card backs, cosmetic frames |
