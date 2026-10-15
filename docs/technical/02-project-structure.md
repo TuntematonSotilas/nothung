@@ -1,7 +1,7 @@
 # Project structure
 
 > Folder layout of the repository and the Godot project, plus naming conventions.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-15
 
 ## Repository
 
@@ -60,14 +60,6 @@ res://
 
 ## Naming conventions
 
-Follows the official Godot style guide.
+See [08-coding-standards](08-coding-standards.md#naming) — single reference for files, classes, IDs and translation keys. In short: files `snake_case`, classes `PascalCase` (`deal_damage_effect.gd` → `DealDamageEffect`).
 
-| Element | Convention | Example |
-|---------|-----------|---------|
-| Folders & files | `snake_case` | `card_view.tscn`, `deal_damage_effect.gd` |
-| `class_name` | `PascalCase` | `class_name DealDamageEffect` |
-| Card IDs | `snake_case`, stable, never reused | `alberich_lord`, `nothung_broken` |
-| Scene root node | Same as file, PascalCase | `CardView` |
-| Translation keys | `UPPER_SNAKE` with prefix | `CARD_ALBERICH_LORD_NAME`, `UI_END_TURN` |
-
-One script = one `class_name` = one file. Scene scripts sit next to their `.tscn`.
+Scene scripts sit next to their `.tscn`.
