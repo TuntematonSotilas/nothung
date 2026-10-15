@@ -1,7 +1,7 @@
 # Glossary
 
 > Shared vocabulary for game terms (used in docs, code and UI) and lore terms.
-> Status: Draft · Last updated: 2026-10-14
+> Status: Draft · Last updated: 2026-10-15
 
 ## Game terms
 
@@ -18,8 +18,9 @@
 | **Board** | Zone where units are in play |
 | **Graveyard** | Zone for destroyed units and used spells |
 | **Banished** | Removed from the game permanently |
-| **Mulligan** | Redrawing part of the opening hand |
-| **Keyword** | Short named ability (Guard, Charge…) |
+| **Ability** | Umbrella term for anything a card or Leader does: traits, triggers, Leader ability |
+| **Redraw** | Putting back part of the opening hand and drawing that many, once, before the first turn (genre term: *mulligan*). Screen: **Opening hand** |
+| **Trait** | Short named ability with a fixed effect (Guard, Charge…) — see [04-cards](04-cards.md#traits-initial-list) |
 | **Trigger** | Ability that fires on an event (On play, On death…) |
 | **Götterdämmerung** | End-game clock: from turn 10, each Leader takes increasing damage at the start of its turn |
 | **Leitmotif** | Synergy tag linking related cards |
@@ -27,6 +28,8 @@
 | **Relic** | Artifact attached to one of your units (equipment), e.g. Nothung, Tarnhelm |
 | **Bearer** | The unit carrying a Relic; *Bearer (X)* restricts which units can carry it |
 | **Spear-breaker** | Siegfried's skill: double damage against Gods (he shatters Wotan's spear) |
+
+> **Decision (2026-10-15):** Player-facing terms are **Trait** (not "keyword") and **Redraw** / **Opening hand** (not "mulligan"). Code and data keep their internal names (`keywords` field, `MulliganAction`); only the displayed text changes, through localisation.
 
 ## Lore terms
 

@@ -37,7 +37,7 @@ grep -rn "Open question" docs/
 | 1 | [Vision](functional/01-vision.md) | Pitch, pillars, audience, scope | Draft |
 | 2 | [Lore & setting](functional/02-lore-and-setting.md) | Operas, characters, factions, artifacts | Draft |
 | 3 | [Game rules](functional/03-game-rules.md) | Match flow, zones, resources, combat, victory | Draft |
-| 4 | [Cards](functional/04-cards.md) | Card anatomy, types, keywords, rarities, deck rules | Draft |
+| 4 | [Cards](functional/04-cards.md) | Card anatomy, types, traits, rarities, deck rules | Draft |
 | 5 | [Game modes](functional/05-game-modes.md) | Campaign, quick match, deck builder, tutorial | Draft |
 | 6 | [Progression](functional/06-progression.md) | Collection, unlocks, rewards | Draft |
 | 7 | [UI / UX](functional/07-ui-ux.md) | Screen flow, gestures, accessibility | Draft |

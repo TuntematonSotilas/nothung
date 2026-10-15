@@ -1,7 +1,7 @@
 # Game modes
 
 > Every way the player can play, and how modes connect.
-> Status: Draft · Last updated: 2026-10-14
+> Status: Draft · Last updated: 2026-10-15
 
 ## Overview
 
@@ -15,7 +15,7 @@
 ## Tutorial
 
 - Integrated into the *Rheingold* prologue: the player plays Wotan against Alberich.
-- Teaches step by step: playing a unit, Energy, attacking, Leader ability, keywords, the Ring.
+- Teaches step by step: playing a unit, Energy, attacking, Leader ability, traits, the Ring.
 - Scripted hands and AI moves (deterministic).
 
 ## Campaign
@@ -64,7 +64,7 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 
 ## Deck builder
 
-- Browse collection with filters (faction, cost, type, rarity, keyword, owned/not owned).
+- Browse collection with filters (faction, cost, type, rarity, trait, owned/not owned).
 - Create, rename, duplicate, delete decks; live validation of deck rules.
 - Mana-curve chart and card-type breakdown.
 - Number of deck slots: 12 (proposal).

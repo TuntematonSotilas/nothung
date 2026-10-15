@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, frames, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-14
+> Status: Draft · Last updated: 2026-10-15
 
 Prices and licences change — check them before buying.
 
@@ -17,7 +17,7 @@ CardView = frame (by type / rarity) + artwork + faction icon + gem
 Why: the text must be translated into 4 languages and must reflect runtime stats (a buffed unit shows 5/6, not 3/4). So artists deliver:
 - **Illustrations** without text (one per card),
 - **Frame pieces** (per type and rarity) as separate layers,
-- **Icons** (factions, keywords, Energy, Life).
+- **Icons** (factions, traits, Energy, Life).
 
 ## Recommended tools
 

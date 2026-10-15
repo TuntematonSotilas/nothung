@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-14
+> Status: Draft · Last updated: 2026-10-15
 
 ## Platform constraints
 
@@ -25,7 +25,7 @@ flowchart TD
     Campaign --> ChapterMap --> StoryPanel --> DeckSelect
     ChapterMap --> Quest --> Results
     QuickMatch --> DeckSelect
-    DeckSelect --> Mulligan --> Duel
+    DeckSelect --> OpeningHand --> Duel
     Duel --> Pause
     Duel --> Results
     Results --> MainMenu
@@ -41,7 +41,7 @@ flowchart TD
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |
-| Mulligan | Opening hand, tap to mark cards, confirm |
+| Opening hand | Starting cards, tap to mark cards to replace, **Redraw** button, then confirm; flavour line "The Norns weave your fate…" |
 | **Duel** | Turn counter + Götterdämmerung countdown (from turn 7), enemy Leader + Life (top), enemy board, own board, own hand (bottom fan), Energy counter, end-turn button, Leader ability button, graveyard/deck counters |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
@@ -66,7 +66,7 @@ flowchart TD
 
 | Action | Gesture |
 |--------|---------|
-| Inspect card | Long press → zoomed card with full text and keyword tooltips |
+| Inspect card | Long press → zoomed card with full text and trait tooltips |
 | Play card | Drag from hand onto board (or onto a target) |
 | Attack | Drag from own unit to target; valid targets highlighted |
 | Cancel | Release outside a valid target |

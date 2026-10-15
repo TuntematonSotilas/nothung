@@ -1,7 +1,7 @@
 # Cards
 
-> Card anatomy, types, keywords, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-13
+> Card anatomy, types, traits, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
+> Status: Draft · Last updated: 2026-10-15
 
 ## Card anatomy
 
@@ -12,7 +12,7 @@
 │        [ artwork ]      │
 │                         │
 │ Unit — God      Gods ☉  │  type — subtype · faction
-│ Guard.                  │  keywords
+│ Guard.                  │  traits
 │ On play: draw a card.   │  rules text
 │ "Ending! Ending!"       │  flavour text (italic)
 │ ⚔ 3              ♥ 5    │  attack · health
@@ -28,7 +28,7 @@
 | Faction | ✔ | Or Neutral |
 | Rarity | ✔ | See below |
 | Attack / Health | units only | |
-| Keywords | – | See below |
+| Traits | – | See below |
 | Rules text | – | Must be generated / validated from the card's effects |
 | Flavour text | – | Libretto quote or paraphrase |
 | Artwork | ✔ | |
@@ -43,9 +43,9 @@
 | **Artifact — Relic** | Equipment: attached to one of your units instead of the artifact zone ([Relic rules](03-game-rules.md#relics-equipment)) |
 | **Leader** | Not in the deck; chosen at deck creation; provides Life and Leader ability |
 
-## Keywords (initial list)
+## Traits (initial list)
 
-| Keyword | Effect |
+| Trait | Effect |
 |---------|--------|
 | **Guard** | Enemies must attack this unit first |
 | **Charge** | Can attack the turn it is played |
@@ -58,7 +58,7 @@
 | **Fated** | Effect triggers when the Norns' prophecy condition is met |
 | **Bearer (X)** | Relic only: can be attached only to a unit of subtype or name X (e.g. *Bearer (Wälsung)*) |
 
-> **Decision (2026-10-09):** At most **10 keywords** in v1.0, so rules text stays short on a phone screen. The list above is now **full (10/10)**: any new keyword must replace one.
+> **Decision (2026-10-09):** At most **10 traits** in v1.0, so rules text stays short on a phone screen. The list above is now **full (10/10)**: any new trait must replace one.
 
 ## Rarities
 
