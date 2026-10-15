@@ -39,7 +39,7 @@ flowchart LR
 
 ### Quests (non-combat stages)
 
-> **Decision (2026-10-14):** The campaign includes **Quests**: narrative stages with choices, no duel. They give **rewards only** and have no effect on later duels, so duel balancing stays independent. Mime's riddle game, previously a post-launch idea, becomes a Quest.
+> **Decision (2026-10-14, confirmed 2026-10-15):** The v1.0 campaign includes **Quests**: narrative stages with choices, no duel. They give **rewards only** and have no effect on later duels, so duel balancing stays independent. Mime's riddle game, previously a post-launch idea, becomes a Quest.
 
 A Quest is a short gamebook-style sequence that breaks the rhythm between duels (monster hunt, treasure hunt, journey, riddles).
 

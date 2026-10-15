@@ -49,7 +49,7 @@
 |---------|--------|
 | **Guard** | Enemies must attack this unit first |
 | **Charge** | Can attack the turn it is played |
-| **Flying** | Can only be blocked/attacked by Flying or Ranged units *(if lanes/blocking are adopted)* |
+| **Flying** | Ignores Guard: can attack any target even when the enemy has Guard units (Valkyries, the dragon…) |
 | **Valhalla** | When destroyed, can be resurrected by Valkyrie effects (marks heroic units) |
 | **Forge X** | Spend X extra Energy when playing to upgrade the card |
 | **Leitmotif (Y)** | Bonus if you played another card with motif Y this turn |
@@ -57,6 +57,8 @@
 | **Invisible** | Cannot be targeted until it attacks (Tarnhelm) |
 | **Fated** | Effect triggers when the Norns' prophecy condition is met |
 | **Bearer (X)** | Relic only: can be attached only to a unit of subtype or name X (e.g. *Bearer (Wälsung)*) |
+
+> **Decision (2026-10-15):** With a single board row ([03-game-rules](03-game-rules.md)), there is no blocking: **Flying = ignores Guard**.
 
 > **Decision (2026-10-09):** At most **10 traits** in v1.0, so rules text stays short on a phone screen. The list above is now **full (10/10)**: any new trait must replace one.
 

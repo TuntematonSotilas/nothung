@@ -104,7 +104,7 @@ The Ring is a special neutral legendary artifact that enters play only through s
 
 > **Decision (2026-10-09):** The Ring is not present by default; it enters play only through specific cards in a deck.
 
-> **Open question:** With 20 Life the curse is proportionally harsher (1+2+3+3 = 9 Life over 4 turns). Tune bonus vs curse in playtests.
+> **Decision (2026-10-15):** Keep the curse values (1+2+3+3 = 9 Life over 4 turns, capped at 3 per turn) as the starting point; tune bonus vs curse from playtests and AI vs AI simulations ([09-testing](../technical/09-testing.md)).
 
 ## Götterdämmerung (turn limit)
 
@@ -115,7 +115,7 @@ The end-game clock, themed on the burning of Valhalla.
 - The UI shows a countdown from turn 7 so the player can anticipate it.
 - It replaces deck-out *fatigue*: drawing from an empty deck simply draws nothing.
 
-> **Open question:** Turn 10 or turn 8? Decide from measured match length.
+> **Decision (2026-10-15):** Start at **turn 10**; move it earlier (e.g. turn 8) only if measured match length exceeds the [target](#target-match-length). The countdown stays 3 turns before the start.
 
 ## Victory and defeat
 

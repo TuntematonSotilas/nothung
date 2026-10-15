@@ -1,18 +1,15 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-13
+> Status: Draft · Last updated: 2026-10-15
 
 ## Art direction
 
 Tools and export specs: [tools/art-tools.md](../tools/art-tools.md).
 
-> **Open question:** Choose one direction and produce a mood board.
+> **Decision (2026-10-15):** **Romantic painting** — inspired by Arthur Rackham's *Ring* illustrations (1910–11) and 19th-century German Romanticism: ink line art, muted palette, gold highlights. Next step: a mood board, which also validates the [faction palette](#faction-palette-draft).
 
-Candidate directions:
-1. **Romantic painting** — inspired by Arthur Rackham's *Ring* illustrations (1910–11) and 19th-century German Romanticism. Muted palette, gold highlights.
-2. **Stylised stained glass / woodcut** — strong outlines, readable at small size, cheaper to produce consistently.
-3. **Art nouveau** — ornate card frames, flat colour fills.
+Directions considered and set aside: stylised stained glass / woodcut (strong outlines, cheap to produce) and Art nouveau (ornate frames, flat colours).
 
 Readability at phone size is the priority: one clear subject per illustration, high contrast silhouettes.
 

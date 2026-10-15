@@ -1,7 +1,7 @@
 # Vision
 
 > What the game is, who it is for, and what is in or out of scope.
-> Status: Draft · Last updated: 2026-10-13
+> Status: Draft · Last updated: 2026-10-15
 
 ## Name
 
@@ -60,4 +60,4 @@ Checks to complete before release:
 
 - A full match is playable end-to-end against the AI with no rule bugs.
 - Average match length 5–7 min (8–10 turns per player).
-- Runs at 60 fps on a mid-range Android phone (target device TBD).
+- Runs at 60 fps on a mid-range Android phone: reference class = ~3-year-old mid-range (Snapdragon 7-series or equivalent, 4 GB RAM), plus one low-end device for smoke tests.
