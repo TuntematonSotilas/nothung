@@ -1,7 +1,7 @@
 # Testing
 
 > Test strategy and tooling.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-15
 
 ## Framework
 
@@ -30,6 +30,7 @@
 
 - Tests create matches with a fixed seed and stacked decks (`Match.create_for_test(deck_order_a, deck_order_b)`).
 - A replay test re-applies a saved action list and compares the final state hash.
+- **Resume tests** ([07-persistence](07-persistence.md#resume-an-interrupted-match)): save `current_match.json` at random points of scripted matches, rebuild, and check the state hash equals the live one; a file with a wrong `content_hash` or an illegal action is rejected cleanly.
 
 ## Running headless
 
@@ -50,7 +51,7 @@ Threaded AI ([05-ai-opponent](05-ai-opponent.md#threading)) is tested in **synch
 - [ ] Install on reference device + one low-end device + one tall-aspect (20:9+) device
 - [ ] Complete tutorial
 - [ ] Play one match per difficulty
-- [ ] Kill app mid-match / mid-save → profile intact
+- [ ] Kill app mid-match / mid-save → profile intact, match resumes at the same state (incl. during the AI's turn)
 - [ ] Rotate / background / resume
 - [ ] Back button on every screen
 - [ ] Switch language to each of DE, ES, FR → no text overflow, no missing key

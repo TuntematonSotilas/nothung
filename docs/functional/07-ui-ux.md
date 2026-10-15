@@ -22,6 +22,7 @@ flowchart TD
     MainMenu --> QuickMatch
     MainMenu --> Collection
     MainMenu --> Settings
+    MainMenu -->|interrupted match| Duel
     Campaign --> ChapterMap --> StoryPanel --> DeckSelect
     ChapterMap --> Quest --> Results
     QuickMatch --> DeckSelect
@@ -37,7 +38,7 @@ flowchart TD
 
 | Screen | Key elements |
 |--------|--------------|
-| Main menu | Campaign, Quick match, Collection, Settings; Rhinegold counter |
+| Main menu | Campaign, Quick match, Collection, Settings; Rhinegold counter; **Resume match** prompt (Resume / Abandon) when a match was interrupted ([persistence](../technical/07-persistence.md#resume-an-interrupted-match)) |
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |

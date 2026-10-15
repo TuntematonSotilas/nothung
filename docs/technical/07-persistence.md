@@ -1,7 +1,7 @@
 # Persistence
 
 > What is saved on the device, in which format, and how saves evolve across versions.
-> Status: Draft · Last updated: 2026-10-14
+> Status: Draft · Last updated: 2026-10-15
 
 ## What is saved
 
@@ -11,7 +11,7 @@
 | Decks | `user://profile.json` (section `decks`) | On deck save |
 | Campaign progress | `user://profile.json` (section `campaign`) | After each campaign duel or Quest ending |
 | Settings | `user://settings.cfg` (`ConfigFile`) | On change |
-| Match in progress (post-launch) | `user://current_match.json` (seed + action list) | After each action |
+| Match in progress | `user://current_match.json` (seed + decks + action list) | After each action, and when the app goes to background |
 
 On Android `user://` maps to the app's private internal storage.
 
@@ -50,7 +50,44 @@ On Android `user://` maps to the app's private internal storage.
 
 Because the engine is deterministic, a match is saved as **seed + decks + list of actions** and replayed on resume. This also serves as the format for bug reports.
 
-> **Decision (2026-10-09):** Resume is **post-launch**. In v1.0 an interrupted match is lost (counted neither as a win nor a loss). The deterministic engine keeps the door open: the replay format above is still used for bug reports.
+> **Decision (2026-10-15):** Resume is **in v1.0** (replaces the 2026-10-09 decision that postponed it). On a phone, a call, a notification or Android killing the app in background must not cost the player their match.
+
+### What is saved
+
+```json
+{
+  "version": 1,
+  "content_hash": "3f9a…",
+  "mode": "campaign",
+  "campaign_duel": "rg_03",
+  "difficulty": "normal",
+  "seed": 184467,
+  "decks": [
+    { "leader": "wotan", "cards": ["wotan_spear", "..."] },
+    { "leader": "alberich", "cards": ["alberich_lord", "..."] }
+  ],
+  "actions": [ { "type": "redraw", "player": 0, "cards": [3, 7] }, { "type": "play_card", "player": 0, "uid": 12 } ]
+}
+```
+
+- **Decks are snapshots** (card IDs), not references to the player's deck slots: editing a deck later can't change a saved match.
+- **AI moves are recorded as actions** like the player's. Replay never re-runs the AI search, so it doesn't depend on thread timing or on AI tuning changes.
+- `content_hash` is a hash of the card data at match start. Card stats can change in an update; replaying old actions on new data could diverge.
+
+### When it is written
+
+- After each action applied by the `Match` (atomic write, same as the profile).
+- On `NOTIFICATION_APPLICATION_PAUSED` (app sent to background) and `NOTIFICATION_WM_CLOSE_REQUEST`, in case an action was applied but not yet flushed.
+- **Deleted** when the match ends (win, loss or the player quits from the pause menu).
+
+### Resume flow
+
+1. At launch, `SaveManager` finds `current_match.json` → the main menu shows a **Resume match** prompt (Resume / Abandon).
+2. **Resume:** rebuild the `Match` from seed + decks, re-apply every action **without animations**, then open the duel screen on the resulting state. If the AI's turn was interrupted, the AI simply starts thinking again.
+3. **Abandon:** delete the file. The match counts neither as a win nor a loss (no reward, no penalty).
+4. **Cannot resume** (`content_hash` differs after an update, unknown card ID, an action is rejected as illegal during replay): delete the file, show a short message ("This match can't be resumed after the update"), and keep a copy as `current_match.failed.json` for bug reports.
+
+An unfinished **Quest** is lighter: the profile stores the current Quest ID and step (`campaign.<chapter>.quest_in_progress`), and the Quest restarts at that step.
 
 ## Backup
 
