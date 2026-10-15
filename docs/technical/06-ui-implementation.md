@@ -19,6 +19,12 @@
 - Reusable components under `scenes/components/`: `CardView`, `HandView`, `BoardView`, `LeaderView`, `EnergyBar`, `CardZoomPopup`.
 - UI built with `Control` nodes and containers; a shared `Theme` resource in `ui/theme/` for fonts, colours, styleboxes.
 
+## Splash
+
+- `scenes/screens/splash.tscn` is the project's startup scene.
+- Displays the game name and subtitle with a vector sword emblem; it uses no external assets.
+- It remains on screen until the Title screen and scene routing are implemented.
+
 ## CardView
 
 - Displays a `CardInstance` (runtime stats) or a `CardData` (collection).
