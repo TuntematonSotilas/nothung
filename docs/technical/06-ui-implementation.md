@@ -22,6 +22,7 @@
 ## Splash
 
 - `scenes/screens/splash.tscn` is the project's startup scene.
+- The default Godot boot splash is disabled: `application/boot_splash/show_image=false` in `project.godot`, and `splash_screen/disable_godot_boot_splash=true` in the Android export preset. Both boot backgrounds use the clear colour (`#0E0F12`), so the launch goes straight from a dark screen to the Nothung splash. On Android 12+, the system still shows its own launch screen (app icon on that background) for a moment; it can't be removed.
 - Displays the game name and subtitle with a vector sword emblem; it uses no external assets.
 - It remains on screen until the Title screen and scene routing are implemented.
 

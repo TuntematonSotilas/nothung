@@ -13,6 +13,8 @@ config_version=5
 config/name="Nothung"
 run/main_scene="res://scenes/screens/splash.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/show_image=false
+boot_splash/bg_color=Color(0.055, 0.059, 0.071, 1)
 
 [display]
 
