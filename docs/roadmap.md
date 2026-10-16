@@ -13,8 +13,8 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 |---|-----------|------------|--------|
 | 0 | [Foundations](#0--foundations) | Tests run headless from the command line | Done |
 | 1 | [Rules engine](#1--rules-engine-headless) | A scripted match runs to the end in a test | Done |
-| 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | To do |
-| 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | To do |
+| 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | Done |
+| 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | In progress |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | To do |
 | 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | To do |
 | 6 | [Campaign](#6--campaign) | Prologue + chapter 1 playable | To do |
@@ -66,13 +66,13 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 3 — Playable match
 
-- [ ] Duel screen layout (portrait) ([UI / UX](functional/07-ui-ux.md#duel-screen-layout-portrait-draft))
+- [x] Duel screen layout (portrait) ([UI / UX](functional/07-ui-ux.md#duel-screen-layout-portrait-draft))
 - [ ] `CardView` with placeholder art (frame colour by faction, gem, generated rules text)
-- [ ] Hand, board, Leader, Energy and Life views driven by `Match` events
-- [ ] Input: drag-and-drop + tap-tap mode; long press → zoom
-- [ ] Opening hand screen with Redraw
-- [ ] Easy AI on a worker thread ([AI opponent](technical/05-ai-opponent.md))
-- [ ] Results screen
+- [x] Hand, board, Leader, Energy and Life views driven by `Match` events
+- [ ] Input: drag-and-drop + tap-tap mode; long press → zoom (tap-to-select is implemented)
+- [x] Opening hand screen with Redraw
+- [x] Easy AI on a worker thread ([AI opponent](technical/05-ai-opponent.md))
+- [x] Results screen
 - [ ] **Play a full match on the phone**
 
 ## 4 — AI & balancing

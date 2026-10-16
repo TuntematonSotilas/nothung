@@ -1,7 +1,7 @@
 # AI opponent
 
 > How the computer opponent chooses its moves. Supports [functional/05-game-modes.md](../functional/05-game-modes.md).
-> Status: Draft · Last updated: 2026-10-09
+> Status: In progress · Last updated: 2026-10-16
 
 ## Requirements
 
@@ -24,7 +24,7 @@ func choose_action(state: GameState, legal: Array[Action]) -> Action
 
 ## Approach (incremental)
 
-1. **v0 — Random legal**: for testing the engine.
+1. **v0 — Legal-action priority (implemented as Easy)**: pick a play, then an ability, then an attack, otherwise end the turn.
 2. **v1 — Greedy heuristic**: for each legal action, simulate on a copy of the state, score with an evaluation function, pick the best. Repeat until `EndTurn` is best.
 3. **v2 — Turn planning**: search sequences of actions within the turn (beam search / limited depth), still with a heuristic evaluation.
 4. *(Optional)* **v3 — Determinised MCTS** for Hard difficulty.
@@ -59,16 +59,14 @@ Unit value ≈ `attack + health` + keyword bonuses. Weights live in `AIProfile` 
 
 ## Threading
 
-> **Decision (2026-10-09):** The AI search runs on a worker thread from the start (`WorkerThreadPool`). See [ADR-0003](../adr/0003-ai-on-worker-thread.md).
+> **Decision (2026-10-09):** AI runs off the main thread. The first bounded Easy selector uses a dedicated `Thread`; see [ADR-0003](../adr/0003-ai-on-worker-thread.md) for the implementation update.
 
 Rules that make this safe:
 
-1. The main thread gives the AI a **deep copy** of the `GameState` (`duplicate_state()`), with hidden information masked. The AI never touches the live `Match`.
-2. The copy is owned by the worker thread only; nothing else reads or writes it.
-3. `CardData` / `AIProfile` resources are shared but **read-only** at runtime.
-4. The AI returns only an `Action`. The result is handed back to the main thread (`call_deferred`), which applies it with `Match.apply()` — the live state is only ever mutated on the main thread.
-5. No Node, signal emission to the scene tree, or autoload access from inside the AI code.
-6. The task can be cancelled (flag checked in the search loop) if the player quits the duel.
-7. A time budget (e.g. 800 ms) stops the search and returns the best action found so far.
+1. The current Easy AI receives only serialized records from `Match.get_legal_actions()`. It does not inspect the live `Match`, game state, hidden hand or deck.
+2. Legal-action records are immutable input to the worker; the AI returns one record.
+3. The main thread rebuilds the `Action` and applies it with `Match.apply()` — the live state is only mutated on the main thread.
+4. No Node, signal emission to the scene tree, or autoload access from inside the AI code.
+5. Current selection is bounded by the number of legal actions and takes less than a second; search cancellation and a deeper time budget are not needed for this first heuristic.
 
-For debugging and tests, the AI can also run **synchronously** on the calling thread (same code, no `WorkerThreadPool`).
+For debugging and tests, the selector can also run **synchronously** on the calling thread (same `choose_action()` function).

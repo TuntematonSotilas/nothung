@@ -5,13 +5,19 @@ const EMBLEM_GLOW: Color = Color(Palette.ACCENT, 0.12)
 
 @onready var background: ColorRect = %Background
 @onready var content: VBoxContainer = %Content
+@onready var start_button: Button = %StartButton
 
 
 func _ready() -> void:
 	background.color = Palette.BG
 	content.modulate.a = 0.0
+	start_button.pressed.connect(_on_start_pressed)
 	var fade_in: Tween = create_tween()
 	fade_in.tween_property(content, "modulate:a", 1.0, 1.0)
+
+
+func _on_start_pressed() -> void:
+	SceneRouter.go_to("res://scenes/screens/duel.tscn")
 
 
 func _draw() -> void:

@@ -33,6 +33,19 @@ func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
 	assert_int(engine.get_state().phase).is_equal(GameState.Phase.REDRAW)
 
 
+func test_easy_ai_selects_a_legal_action_on_a_worker_thread() -> void:
+	var candidates: Array[Dictionary] = [
+		{"type": "end_turn", "player": 1},
+		{"type": "attack", "player": 1, "attacker_uid": 10, "target_uid": -1, "target_player": 0},
+		{"type": "play_card", "player": 1, "card_uid": 20, "target_uid": -1, "target_player": -1},
+	]
+	var worker: Thread = Thread.new()
+	assert_int(worker.start(EasyAI.choose_action.bind(candidates))).is_equal(OK)
+	var selected: Dictionary = worker.wait_to_finish()
+	assert_str(String(selected["type"])).is_equal("play_card")
+	assert_int(int(selected["card_uid"])).is_equal(20)
+
+
 func test_invalid_actions_do_not_mutate_state() -> void:
 	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 54)
 	var before := engine.state_hash()

@@ -49,3 +49,7 @@ bash addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode -a res://tests
 ```
 
 Details: [testing](docs/technical/09-testing.md#running-headless).
+
+### 5. Play a duel
+
+Run the project in Godot and press **Start Match** on the splash screen. The first playable build pairs the Gods starter deck (Wotan) against the Nibelungs starter deck (Alberich); select cards/targets by tapping and use **End Turn** to pass to the Easy AI.

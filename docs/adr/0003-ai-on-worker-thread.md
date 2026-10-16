@@ -12,6 +12,8 @@ The AI must choose actions within ~1 s on a mid-range Android phone without ever
 
 The AI search runs on a worker thread (`WorkerThreadPool`) from the start, on a deep copy of the game state. Only the resulting `Action` crosses back to the main thread, where it is applied. A synchronous mode (same code, no thread) exists for tests and debugging.
 
+> **Implementation update (2026-10-16):** The first Easy opponent uses a dedicated `Thread` rather than `WorkerThreadPool`: its bounded legal-action selection returns a value directly through `wait_to_finish()`, avoiding shared result state. The AI receives serialized legal actions rather than a game-state copy. Deeper search can move to the pool if it needs task scheduling/cancellation.
+
 ## Alternatives considered
 
 | Option | Pros | Cons |

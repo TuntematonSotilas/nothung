@@ -56,3 +56,9 @@ theme_type_variation = &"LabelMuted"
 theme_override_font_sizes/font_size = 18
 text = "UI_SPLASH_TAGLINE"
 horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="ContentCenter/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ButtonPrimary"
+text = "UI_START_MATCH"

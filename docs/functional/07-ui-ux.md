@@ -80,6 +80,8 @@ flowchart TD
 - AI turn is visible step by step; speed configurable (1×, 2×, instant).
 - Log of the last actions accessible from the duel screen.
 
+> **Playable match (2026-10-16):** the initial duel is launched from the splash screen and uses tap-to-select/tap-target controls. Drag-and-drop, card zoom, and a physical Android play-through remain outstanding.
+
 ## Accessibility
 
 - Text size option; colour-blind safe faction colours (don't rely on colour alone — use icons).
