@@ -1,7 +1,7 @@
 # Build & release
 
 > Producing Android builds, signing, publishing on Google Play, and CI.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-16
 
 ## Local setup
 
@@ -22,6 +22,7 @@ Follow the official guide: *Exporting for Android* in the Godot docs for the pin
 | `Android Release` | `.aab` (Gradle build) | Google Play upload |
 
 - App name (`application/config/name` and Android launcher label): **Nothung** — the launcher has little room; the store listing uses the full *Nothung: The Ring Card Game*.
+- Launcher icons (`launcher_icons/*`): `res://assets/app_icon/` — `icon_192.png` (legacy), `icon_foreground_432.png`, `icon_background_432.png`, `icon_monochrome_432.png` (adaptive). The PNGs are exported from the SVG sources next to them with Inkscape (`inkscape icon_foreground.svg -w 432 -o icon_foreground_432.png`); re-export after any SVG change. `icon.svg` is also the project icon (`application/config/icon`).
 - Package name: **`io.github.tuntematonsotilas.nothung`**. **It can never change once published on Google Play.**
 - Architectures: `arm64-v8a` (required); `armeabi-v7a` optional for old devices.
 - Permissions: none beyond defaults (no Internet needed — disable `INTERNET` in release if possible).
@@ -62,7 +63,8 @@ Internal testing → Closed testing (friends/playtesters) → Open testing → P
 
 ## Store requirements checklist
 
-- [ ] App icon (adaptive), feature graphic, screenshots (phone)
+- [x] App icon (adaptive)
+- [ ] Feature graphic, screenshots (phone), 512 × 512 store icon (export `icon.svg`)
 - [ ] Short / full description and screenshots (EN, DE, ES, FR)
 - [ ] Privacy policy URL (even with no data collection)
 - [ ] Data safety form (no data collected)

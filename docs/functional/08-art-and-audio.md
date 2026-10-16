@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-16
 
 ## Art direction
 
@@ -58,6 +58,41 @@ Shared text colours: **Light** = `#F4EFE4` (warm off-white), **Dark** = `#1C1A17
 | Legendary | `#E0B33A` |
 
 Gems are brighter than frames so they stand out as small jewels. Legendary gold is bright and saturated, unlike the dark-gold Ring / Cursed frame.
+
+### UI palette
+
+> **Decision (2026-10-16):** Dark UI built on the splash colours: near-black background, warm off-white text, **gold of Nothung** as the single accent. Implemented in `game/ui/theme/` ([06-ui-implementation](../technical/06-ui-implementation.md#theme)).
+
+| Token | Hex | Use | Contrast on `bg` / `surface_raised` |
+|-------|-----|-----|-------------------------------------|
+| `bg` | `#0E0F12` | Screen background, boot splash | — |
+| `surface` | `#181A20` | Panels, board, popup menus | — |
+| `surface_raised` | `#22252D` | Buttons | — |
+| `border` | `#343844` | Borders, separators | — |
+| `text` | `#E8E0CC` | Main text | 14.6 / 11.6 |
+| `text_muted` | `#A1A3A8` | Secondary text | 7.6 / 6.1 |
+| `text_disabled` | `#7E8190` | Disabled elements only | 5.0 / 4.0 |
+| `accent` | `#C7A863` | Primary buttons, selection, focus, emblem (hover `#D4B97A`, pressed `#B0914E`) | 8.4 / 6.7 |
+| `ink` | `#1C1A17` | Text on `accent` | 7.6 on accent |
+| `life` | `#E46A5E` | Life, damage, destructive actions | 6.0 / 4.8 |
+| `energy` | `#5BA8CC` | Energy (Rhine blue) | 7.2 / 5.8 |
+| `heal` | `#5FA873` | Healing, buffs, success | 6.7 / 5.4 |
+
+- The UI gold is paler and duller than the Ring / Cursed frame gold and the Legendary gem: it is for the interface, never for a card frame.
+- Life, Energy and heal are always paired with an icon or a number (colour-blind players).
+- Menus, dropdowns and popups use the theme too (`surface` panel, `text`), never the engine defaults.
+
+### App icon
+
+> **Decision (2026-10-16):** **Nothung through the Ring** — a vertical sword whose blade passes through the Ring (behind at the top, in front at the bottom). It carries the whole title and stays readable at 48 px. Geometric vector drawing, original to the project. Files: `game/assets/app_icon/` ([10-build-and-release](../technical/10-build-and-release.md#export-presets)).
+
+Android adaptive icon, built from the [logo](#logo) (sword alone, no text):
+
+| Layer | Colour |
+|-------|--------|
+| Background | `bg` `#0E0F12` → `surface` `#181A20` (subtle vertical gradient) — same as the boot screen, so launch looks seamless |
+| Foreground | Sword in `accent` gold `#C7A863`, highlights in `text` `#E8E0CC`; keep it inside the 66 dp safe zone (of 108 dp) |
+| Monochrome (Android 13+ themed icons) | Sword silhouette, single colour — Android tints it |
 
 ### Logo
 

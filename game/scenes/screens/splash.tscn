@@ -19,6 +19,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+unique_name_in_owner = true
 color = Color(0.055, 0.059, 0.071, 1)
 
 [node name="ContentCenter" type="CenterContainer" parent="."]
@@ -38,21 +39,20 @@ alignment = 1
 
 [node name="GameTitle" type="Label" parent="ContentCenter/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.91, 0.88, 0.8, 1)
 theme_override_font_sizes/font_size = 64
 text = "NOTHUNG"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="ContentCenter/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.78, 0.66, 0.39, 1)
+theme_type_variation = &"LabelAccent"
 theme_override_font_sizes/font_size = 24
 text = "THE RING CARD GAME"
 horizontal_alignment = 1
 
 [node name="Tagline" type="Label" parent="ContentCenter/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.63, 0.64, 0.66, 1)
+theme_type_variation = &"LabelMuted"
 theme_override_font_sizes/font_size = 18
 text = "INSPIRED BY DER RING DES NIBELUNGEN"
 horizontal_alignment = 1

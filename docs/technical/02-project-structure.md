@@ -1,7 +1,7 @@
 # Project structure
 
 > Folder layout of the repository and the Godot project, plus naming conventions.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-16
 
 ## Repository
 
@@ -47,6 +47,7 @@ res://
 │   ├── theme/                  # Godot Theme resources, fonts, styleboxes
 │   └── icons/
 ├── assets/
+│   ├── app_icon/               # App icon: SVG sources + PNG layers for the Android export
 │   ├── art/cards/
 │   ├── art/boards/
 │   ├── audio/music/

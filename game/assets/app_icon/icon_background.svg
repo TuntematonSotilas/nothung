@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="432" height="432" viewBox="0 0 432 432">
+  <!-- Adaptive icon background layer (108 dp). Colours: UI palette bg / surface_raised + accent glow. -->
+  <defs>
+    <radialGradient id="bg" cx="216" cy="200" r="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22252D"/>
+      <stop offset="1" stop-color="#0E0F12"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="216" cy="206" r="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C7A863" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#C7A863" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="432" height="432" fill="url(#bg)"/>
+  <rect width="432" height="432" fill="url(#glow)"/>
+</svg>

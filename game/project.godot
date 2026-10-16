@@ -13,8 +13,9 @@ config_version=5
 config/name="Nothung"
 run/main_scene="res://scenes/screens/splash.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-boot_splash/show_image=false
 boot_splash/bg_color=Color(0.055, 0.059, 0.071, 1)
+boot_splash/show_image=false
+config/icon="res://assets/app_icon/icon.svg"
 
 [display]
 
@@ -25,6 +26,10 @@ window/size/window_height_override=960
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
+
+[gui]
+
+theme/custom="res://ui/theme/main_theme.tres"
 
 [rendering]
 

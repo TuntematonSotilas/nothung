@@ -19,6 +19,12 @@
 - Reusable components under `scenes/components/`: `CardView`, `HandView`, `BoardView`, `LeaderView`, `EnergyBar`, `CardZoomPopup`.
 - UI built with `Control` nodes and containers; a shared `Theme` resource in `ui/theme/` for fonts, colours, styleboxes.
 
+## Theme
+
+- `ui/theme/main_theme.tres` is the project theme (`gui/theme/custom` in `project.godot`): every `Control` inherits it, popups and menus included.
+- `ui/theme/palette.gd` (`class_name Palette`) holds the same colours as constants for scripts (`Palette.LIFE`, `Palette.ACCENT`…). Source of truth: [UI palette](../functional/08-art-and-audio.md#ui-palette). A `.tres` can't reference script constants, so a colour change must be made in both files.
+- Variations instead of per-node overrides: `LabelAccent`, `LabelMuted`, `ButtonPrimary` (set with `theme_type_variation`). Avoid `theme_override_colors` in scenes.
+
 ## Splash
 
 - `scenes/screens/splash.tscn` is the project's startup scene.

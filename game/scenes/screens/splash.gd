@@ -1,12 +1,14 @@
 extends Control
 
-const EMBLEM_COLOR: Color = Color(0.78, 0.66, 0.39, 0.9)
-const EMBLEM_GLOW: Color = Color(0.78, 0.66, 0.39, 0.12)
+const EMBLEM_COLOR: Color = Color(Palette.ACCENT, 0.9)
+const EMBLEM_GLOW: Color = Color(Palette.ACCENT, 0.12)
 
+@onready var background: ColorRect = %Background
 @onready var content: VBoxContainer = %Content
 
 
 func _ready() -> void:
+	background.color = Palette.BG
 	content.modulate.a = 0.0
 	var fade_in: Tween = create_tween()
 	fade_in.tween_property(content, "modulate:a", 1.0, 1.0)
