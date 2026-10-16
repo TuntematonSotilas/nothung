@@ -1,7 +1,7 @@
 # Data model
 
 > How cards, decks and effects are represented as data. Implements [functional/04-cards.md](../functional/04-cards.md).
-> Status: Draft · Last updated: 2026-10-13
+> Status: Draft · Last updated: 2026-10-16
 
 ## Principles
 
@@ -30,7 +30,7 @@ enum Rarity { COMMON, RARE, EPIC, LEGENDARY }
 @export var bearer: Array[StringName]    # Relics only: allowed subtypes or card ids (&"walsung"); empty = any unit
 @export var abilities: Array[AbilityData]
 @export var leitmotifs: Array[StringName]
-@export var art: Texture2D
+@export var art: Texture2D               # optional until the art track fills it
 # name / rules text / flavour come from translation keys derived from `id`
 ```
 
@@ -40,13 +40,15 @@ extends Resource
 
 @export var trigger: StringName          # &"on_play", &"on_death", &"start_of_turn"…
 @export var condition: ConditionData     # optional
-@export var target: TargetData           # who is affected
-@export var effects: Array[EffectData]   # executed in order
+@export var cost: int                    # used by a Leader ability
+@export var effects: Array[EffectData]   # ordered, each effect carries its target
 ```
 
-`EffectData` subclasses (one per effect kind): `DealDamageEffectData`, `DrawCardsEffectData`, `GainEnergyEffectData`, `SummonEffectData`, `BuffEffectData`, `ResurrectEffectData`, `TransformEffectData`…
+`EffectData` is a typed Resource with a `Kind`, `Target`, numeric values, an optional keyword and an optional `CardData` reference. Supported kinds are damage, draw, energy, summon, heal, buff, transform, resurrect, Ring create/steal/return, and forge. `ConditionData` supports `controls(card_id)` and `holds_ring`.
 
-Other resources: `LeaderData` (life, ability), `DeckData` (leader id + list of card ids), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards), `CampaignQuestData` (non-combat stage: steps, each with an illustration, a text key and choices pointing to the next step or to an ending; reward per ending — [Quests](../functional/05-game-modes.md#quests-non-combat-stages)). Quest texts go in the localisation file, like card names.
+Other resources: `LeaderData` (life, ability), `DeckData` (leader + ordered card definitions), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards), `CampaignQuestData` (non-combat stage: steps, each with an illustration, a text key and choices pointing to the next step or to an ending; reward per ending — [Quests](../functional/05-game-modes.md#quests-non-combat-stages)). Quest texts go in the localisation file, like card names.
+
+The rules-engine Resources are implemented in `game/data/cards/` and `game/data/{leaders,decks}/`: `CardData`, `AbilityData`, `ConditionData`, `EffectData`, `LeaderData`, and `DeckData`. For the initial engine milestone, `DeckData.cards` contains `CardData` references (the Markdown card pipeline and ID-to-resource database are milestone 2); authored definitions are treated as immutable during a match. `CardData.is_ring`, `attachable`, `bearer`, relic bonuses, `bonus_damage_faction`, and `shatters_into` encode signature artifact and combat cases in data; the Ring's named Alberich bonus is a game-specific rule.
 
 ## Runtime model (RefCounted)
 
@@ -55,6 +57,7 @@ classDiagram
     class GameState {
       +int turn
       +int active_player
+      +Phase phase
       +Array~PlayerState~ players
       +RandomNumberGenerator rng
       +int ring_holder
@@ -65,11 +68,13 @@ classDiagram
       +int life
       +int energy
       +int max_energy
+      +int turns_taken
       +Zone deck
       +Zone hand
       +Zone board
       +Zone artifacts
       +Zone graveyard
+      +Zone banished
     }
     class CardInstance {
       +int uid
@@ -77,8 +82,9 @@ classDiagram
       +int owner
       +int attack
       +int health
-      +Array~StatusEffect~ statuses
+      +Array~StringName~ statuses
       +bool exhausted
+      +bool can_attack
       +CardInstance relic
     }
     GameState "1" --> "2" PlayerState
@@ -90,6 +96,7 @@ classDiagram
 - `duplicate_state()` performs a deep copy for AI simulation.
 - `relic`: the Relic attached to this unit (`null` if none; max 1 — [Relic rules](../functional/03-game-rules.md#relics-equipment)). An attached Relic is not in any zone while attached.
 - `ring_holder`: index of the player holding the Ring, `-1` if it is not in play; `ring_turns_held` drives the curse and resets when the Ring changes hands ([The Ring](../functional/03-game-rules.md#the-ring-signature-mechanic)).
+- `duplicate_state()` copies zones, instances, statuses, attached Relics and RNG state; immutable definitions remain shared.
 
 ## Card authoring pipeline
 

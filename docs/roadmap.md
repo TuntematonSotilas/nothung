@@ -12,7 +12,7 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | # | Milestone | Done when… | Status |
 |---|-----------|------------|--------|
 | 0 | [Foundations](#0--foundations) | Tests run headless from the command line | Done |
-| 1 | [Rules engine](#1--rules-engine-headless) | A scripted match runs to the end in a test | To do |
+| 1 | [Rules engine](#1--rules-engine-headless) | A scripted match runs to the end in a test | Done |
 | 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | To do |
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | To do |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | To do |
@@ -36,7 +36,7 @@ flowchart LR
 - [x] Splash screen; default Godot boot splash disabled ([UI implementation](technical/06-ui-implementation.md#splash))
 - [x] UI theme + palette ([UI implementation](technical/06-ui-implementation.md#theme))
 - [x] App icon and Android export preset, package `io.github.tuntematonsotilas.nothung` ([build & release](technical/10-build-and-release.md#export-presets))
-- [x] Install gdUnit4 (v6.2.2, pinned) and first tests: 19 passing ([testing](technical/09-testing.md))
+- [x] Install gdUnit4 (v6.2.2, pinned) and headless test suite ([testing](technical/09-testing.md))
 - [x] Folder skeleton (`core/`, `ai/`, `autoload/`, `data/`, `tests/`…) ([project structure](technical/02-project-structure.md))
 - [x] Autoloads: `SceneRouter` (fade, history, back button), `SaveManager` (atomic JSON, backup, migrations), `Settings` (ConfigFile, language)
 - [x] Localisation setup: CSV with EN source + DE / ES / FR columns, language setting; splash texts translated
@@ -46,15 +46,15 @@ flowchart LR
 
 No `Node` dependency; everything tested ([game engine](technical/04-game-engine.md), [data model](technical/03-data-model.md)).
 
-- [ ] `CardData`, `AbilityData`, `EffectData` resources; `LeaderData`, `DeckData`
-- [ ] `GameState`, `PlayerState`, `Zone`, `CardInstance`; seeded RNG; `duplicate_state()`
-- [ ] `Match` API: setup, opening hand + Redraw, turn phases, legal actions
-- [ ] Actions: play card, attack, Leader ability, end turn
-- [ ] Energy, combat, traits (Guard, Charge, Flying…), triggers
-- [ ] Relics and Bearer rules
-- [ ] The Ring (bonus, curse, stealing) and Götterdämmerung
-- [ ] Victory / defeat / draw
-- [ ] Integration test: full scripted match + replay with state hash ([determinism helpers](technical/09-testing.md#determinism-helpers))
+- [x] `CardData`, `AbilityData`, `ConditionData`, `EffectData` resources; `LeaderData`, `DeckData`
+- [x] `GameState`, `PlayerState`, `Zone`, `CardInstance`; seeded RNG; `duplicate_state()`
+- [x] `Match` API: setup, opening hand + Redraw, turn phases, legal actions
+- [x] Actions: play card, attack, Leader ability, end turn
+- [x] Energy, combat, traits (Guard, Charge, Flying, Valhalla), triggers and data-driven effects
+- [x] Relic bearer restrictions, conditional forging and shattering when a bearer dies
+- [x] The Ring (bonus, curse, stealing) and Götterdämmerung
+- [x] Victory / defeat / draw
+- [x] Integration test: full scripted match + recorded-action replay with state hash ([determinism helpers](technical/09-testing.md#determinism-helpers))
 
 ## 2 — Card pipeline
 

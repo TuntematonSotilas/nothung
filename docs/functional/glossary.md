@@ -19,7 +19,7 @@
 | **Graveyard** | Zone for destroyed units and used spells |
 | **Banished** | Removed from the game permanently |
 | **Ability** | Umbrella term for anything a card or Leader does: traits, triggers, Leader ability |
-| **Redraw** | Putting back part of the opening hand and drawing that many, once, before the first turn (genre term: *mulligan*). Screen: **Opening hand** |
+| **Redraw** | Putting back part of the opening hand and drawing that many, once, before the first turn. Screen: **Opening hand** |
 | **Trait** | Short named ability with a fixed effect (Guard, Charge…) — see [04-cards](04-cards.md#traits-initial-list) |
 | **Trigger** | Ability that fires on an event (On play, On death…) |
 | **Götterdämmerung** | End-game clock: from turn 10, each Leader takes increasing damage at the start of its turn |
@@ -29,7 +29,7 @@
 | **Bearer** | The unit carrying a Relic; *Bearer (X)* restricts which units can carry it |
 | **Spear-breaker** | Siegfried's skill: double damage against Gods (he shatters Wotan's spear) |
 
-> **Decision (2026-10-15):** Player-facing terms are **Trait** (not "keyword") and **Redraw** / **Opening hand** (not "mulligan"). Code and data keep their internal names (`keywords` field, `MulliganAction`); only the displayed text changes, through localisation.
+> **Decision (2026-10-15):** The game uses **Trait** (not "keyword") and **Redraw** / **Opening hand**. Code and data use the same terms where they are player-facing concepts.
 
 ## Lore terms
 
