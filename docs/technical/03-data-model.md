@@ -117,14 +117,14 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 
 ### Converter
 
-- Written in GDScript (one language for the whole project), run with headless Godot from the command line and from CI; exact command documented in the tool's header once written.
+- Written in GDScript (one language for the whole project), run with headless Godot from the command line; exact command documented in the tool's header once written.
 - Parses every `cards/*.md`, validates (see below), writes `game/data/cards/<faction>/<id>.tres` and updates the English localisation entries.
 - Generated `.tres` files are committed (the Godot project opens without running the tool) but **never edited by hand**.
-- CI re-runs the converter and fails if it produces a diff (source and generated files out of sync).
+- A check mode re-runs the converter and fails if it produces a diff (source and generated files out of sync); run it before committing.
 
 ## Validation
 
-The converter, plus a debug-only check at startup and in CI, verifies every card:
+The converter, plus a debug-only check at startup and in the tests, verifies every card:
 - unique `id`, translation keys present, art assigned,
 - units have attack/health, spells have at least one ability,
 - referenced effects/targets are valid.

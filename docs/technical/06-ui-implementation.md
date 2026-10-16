@@ -45,7 +45,7 @@
 - Drag-and-drop: custom implementation (more control than `_get_drag_data`) that draws a targeting arrow and highlights legal targets from `Match.get_legal_actions()`.
 - Tap-tap alternative mode for accessibility.
 - Long press (≥ 400 ms) → `CardZoomPopup`.
-- Android back button: `NOTIFICATION_WM_GO_BACK_REQUEST` handled by `SceneRouter`.
+- Android back button: `NOTIFICATION_WM_GO_BACK_REQUEST` handled by `SceneRouter`: back to the previous screen (`SceneRouter.go_to()` keeps a history), or quit when there is none. `application/config/quit_on_go_back=false` so Godot does not quit on its own.
 
 ## Animation pipeline
 
@@ -67,7 +67,9 @@ sequenceDiagram
 
 ## Localisation
 
-- `localization/strings.csv` (keys + `en`, `de`, `es`, `fr` columns; `en` is the source language), imported as Godot translations.
+- `localization/strings.csv` (keys + `en`, `de`, `es`, `fr` columns; `en` is the source language), imported as Godot translations (the generated `.translation` files are git-ignored and rebuilt on import). A test fails if any key lacks a language.
+- Language: `Settings.language`; empty = the device language if supported, otherwise English.
+- The brand texts (*Nothung*, *The Ring Card Game*) stay in English in every language.
 - All visible text via `tr("KEY")`; card texts via keys built from the card ID.
 - Rules text with numbers uses `tr(...).format({...})`.
 - Test long-text languages (German, then French and Spanish) for card text overflow; card text uses auto-shrinking `Label`/`RichTextLabel`.

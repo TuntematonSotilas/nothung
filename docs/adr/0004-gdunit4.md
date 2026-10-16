@@ -6,11 +6,11 @@
 
 ## Context
 
-The rules engine, card data, AI and save migrations need automated tests that run in the editor and headless in CI ([technical/09-testing.md](../technical/09-testing.md)).
+The rules engine, card data, AI and save migrations need automated tests that run in the editor and headless from the command line ([technical/09-testing.md](../technical/09-testing.md)).
 
 ## Decision
 
-Use **gdUnit4**, installed as an addon in `game/addons/gdUnit4/`, with a version compatible with Godot 4.7.2, pinned.
+Use **gdUnit4**, installed as an addon in `game/addons/gdUnit4/`, with a version compatible with Godot 4.7.2, pinned in `tools/install_gdunit4.sh` (the addon folder itself is git-ignored — see [testing](../technical/09-testing.md#framework)).
 
 ## Alternatives considered
 
@@ -22,5 +22,5 @@ Use **gdUnit4**, installed as an addon in `game/addons/gdUnit4/`, with a version
 ## Consequences
 
 - Test suites extend `GdUnitTestSuite`, files named `test_*.gd` under `game/tests/`.
-- CI runs the gdUnit4 command-line runner headless and publishes its reports.
+- The gdUnit4 command-line runner runs headless locally and writes JUnit / HTML reports.
 - `game/addons/` is excluded from linting.

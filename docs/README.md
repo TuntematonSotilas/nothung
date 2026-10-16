@@ -1,7 +1,7 @@
 # Documentation — Nothung: The Ring Card Game
 
 > Entry point for all project documentation.
-> Status: Draft · Last updated: 2026-10-13
+> Status: Draft · Last updated: 2026-10-16
 
 ## Project at a glance
 
@@ -14,7 +14,7 @@
 | Platform   | Android (phones, portrait)                               |
 | Price      | Entirely free — no IAP, no ads                           |
 | Languages  | English (source), German, Spanish, French                |
-| Engine     | Godot 4.7.2                                              |
+| Engine     | Godot 4.7.2 ([installation](../README.md#installation))   |
 | Language   | GDScript (statically typed)                              |
 
 ## How the docs are organised
@@ -23,6 +23,7 @@
 - **[technical/](technical/)** — *how* it is built: architecture, data model, engine, build. Each file links back to the functional section it implements.
 - **[adr/](adr/)** — Architecture Decision Records: one file per significant, hard-to-reverse decision.
 - **[tools/](tools/README.md)** — recommended software for producing art and audio.
+- **[roadmap.md](roadmap.md)** — development milestones and progress.
 
 Pending decisions are written as `> **Open question:** …` in every file. List them all with:
 
@@ -57,7 +58,7 @@ grep -rn "Open question" docs/
 | 7  | [Persistence](technical/07-persistence.md) | Save data, versioning | Draft |
 | 8  | [Coding standards](technical/08-coding-standards.md) | GDScript conventions | Draft |
 | 9  | [Testing](technical/09-testing.md) | Test framework, strategy | Draft |
-| 10 | [Build & release](technical/10-build-and-release.md) | Android export, Play Store, CI | Draft |
+| 10 | [Build & release](technical/10-build-and-release.md) | Android export, Play Store | Draft |
 
 ## Architecture Decision Records
 

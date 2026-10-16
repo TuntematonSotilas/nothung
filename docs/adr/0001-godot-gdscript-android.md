@@ -10,7 +10,7 @@ We are building a single-player, offline card game for mobile. We need an engine
 
 ## Decision
 
-- Engine: **Godot 4.7.2**, pinned for the editor, export templates and CI; upgrades go through a new ADR.
+- Engine: **Godot 4.7.2**, pinned for the editor and export templates; upgrades go through a new ADR.
 - Scripting language: **GDScript** with mandatory static typing.
 - Target platform for v1.0: **Android** only.
 

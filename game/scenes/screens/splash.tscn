@@ -40,19 +40,19 @@ alignment = 1
 [node name="GameTitle" type="Label" parent="ContentCenter/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
-text = "NOTHUNG"
+text = "UI_APP_NAME"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="ContentCenter/Content"]
 layout_mode = 2
 theme_type_variation = &"LabelAccent"
 theme_override_font_sizes/font_size = 24
-text = "THE RING CARD GAME"
+text = "UI_APP_SUBTITLE"
 horizontal_alignment = 1
 
 [node name="Tagline" type="Label" parent="ContentCenter/Content"]
 layout_mode = 2
 theme_type_variation = &"LabelMuted"
 theme_override_font_sizes/font_size = 18
-text = "INSPIRED BY DER RING DES NIBELUNGEN"
+text = "UI_SPLASH_TAGLINE"
 horizontal_alignment = 1

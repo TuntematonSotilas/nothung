@@ -10,8 +10,7 @@ ring_card_game/
 ├── docs/                  # This documentation
 ├── cards/                 # Card source of truth: one Markdown table per faction (gods.md, nibelungs.md…)
 ├── game/                  # Godot project root (project.godot lives here)
-├── tools/                 # Scripts: Markdown → .tres card converter, CI helpers
-├── .github/workflows/     # CI
+├── tools/                 # Scripts: install_gdunit4.sh, Markdown → .tres card converter
 ├── README.md
 └── LICENSE
 ```

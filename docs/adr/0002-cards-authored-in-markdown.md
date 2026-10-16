@@ -12,7 +12,7 @@ The game will have ~80 cards at launch across 4 factions + Neutral, growing with
 
 - The source of truth for cards is **one Markdown table per faction** in `cards/<faction>.md`.
 - A GDScript converter in `tools/`, run with headless Godot, generates `game/data/cards/<faction>/<id>.tres` and the English localisation entries.
-- Generated `.tres` files are committed but never edited by hand; CI fails if regenerating them produces a diff.
+- Generated `.tres` files are committed but never edited by hand; the converter's check mode fails if regenerating them produces a diff (run before committing).
 - Card abilities use a small text syntax (`trigger[condition]: effect(args)`), validated by the converter.
 
 ## Alternatives considered

@@ -74,8 +74,8 @@ Single reference for naming in the project (code, files, data). Follows the offi
 
 ## Linting & formatting
 
-> **Decision (2026-10-09):** `gdtoolkit` (`gdlint` + `gdformat`) runs in CI; a PR fails on lint errors or unformatted files.
+> **Decision (2026-10-09):** `gdtoolkit` (`gdlint` + `gdformat`) is run locally before committing: no commit with lint errors or unformatted files.
 
-- Install: `pip install "gdtoolkit==4.*"` — pin the exact version in CI and check it parses Godot 4.7 syntax.
+- Install: `pip install "gdtoolkit==4.*"` — pin the exact version and check it parses Godot 4.7 syntax.
 - Run locally before pushing: `gdformat game/ tools/` then `gdlint game/ tools/`.
 - Lint config in `gdlintrc` at the repo root; exclude `game/addons/` (third-party code such as gdUnit4).

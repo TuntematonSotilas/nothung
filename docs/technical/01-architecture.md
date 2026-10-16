@@ -13,7 +13,7 @@
 | Target | Android, arm64-v8a (+ armeabi-v7a if needed) |
 | Network | None (offline) |
 
-> **Decision (2026-10-09):** Godot version pinned to **4.7.2** (editor, export templates and CI). Any upgrade goes through a new ADR.
+> **Decision (2026-10-09):** Godot version pinned to **4.7.2** (editor and export templates). Any upgrade goes through a new ADR.
 
 ## Core principle: rules engine ≠ presentation
 

@@ -25,3 +25,12 @@ mono_crash.*.json
 # *.pck
 
 android/
+# Build outputs and test reports
+build/
+*.apk
+*.aab
+*.idsig
+game/reports/
+
+# Test framework, installed by tools/install_gdunit4.sh (pinned version)
+game/addons/gdUnit4/
