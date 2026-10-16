@@ -106,32 +106,34 @@ Why Markdown: readable on GitHub and in VS Code, easy to diff and review, the wh
 
 ### Source format
 
-One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`, `cards/valkyries.md`, `cards/neutral.md`), one table row per card:
+One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`, `cards/valkyries.md`, `cards/neutral.md`), one table row per card. Leaders and starter deck lists use the same tabular format in `cards/leaders.md` and `cards/starter_decks.md`.
 
 ```markdown
 | id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
 |----|------|------|----------|--------|------|-----|----|----------|--------|-----------|------------|---------|
-| alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | | on_play: gain_energy(2); on_play[holds_ring]: draw(1) | energy, ring | *(libretto quote)* |
+| alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | | on_play: gain_energy(2); on_play[holds_ring]: draw(1) | energy, ring | |
 | loge_fire | Loge's Fire | spell | | rare | 3 | | | | | on_play: damage(all_enemy_units, 2) | fire | |
-| nothung | Nothung | artifact | relic, weapon | legendary | | | | | walsung | static: buff(bearer, atk 3); on_bearer_death: shatter(nothung_broken) | sword | |
+| ring_claimant | Ring Claimant | unit | dwarf | common | 3 | 2 | 3 | | | on_play: create_ring() | ring | |
 ```
 
 - `faction` comes from the file name.
 - `bearer` is filled for Relics only (subtypes or card ids, comma-separated); empty = any unit.
-- `name` and `flavour` are the **English** source text; the converter writes them into the `en` column of the localisation file. German, Spanish and French are translated there.
-- `abilities` uses a small syntax: `trigger[condition]: effect(args); …`. Every trigger, condition, effect and keyword must exist in the engine; unknown names are errors.
+- `name` and `flavour` are the **English** source text; the converter writes them into the `en` column of the localisation file. Until translated, new strings are copied to other locale columns; existing translations are preserved.
+- `abilities` uses a small syntax: `trigger[condition]: effect(args); …`. Each clause has one effect; multiple effects use multiple clauses. Every trigger, condition, effect, target and trait must be implemented by the engine; unknown names are errors.
 - Rules text shown on the card is **generated from `keywords` + `abilities`**, so it can never disagree with the actual behaviour.
+- `leaders.md` defines each Leader's faction, Life, activated effect and Energy cost. `starter_decks.md` lists the 20 card IDs in each starter deck.
 
 ### Converter
 
-- Written in GDScript (one language for the whole project), run with headless Godot from the command line; exact command documented in the tool's header once written.
-- Parses every `cards/*.md`, validates (see below), writes `game/data/cards/<faction>/<id>.tres` and updates the English localisation entries.
+- Written in GDScript (one language for the whole project), run with headless Godot: `godot --headless --path game --script ../tools/card_pipeline.gd` generates files; add `-- --check` to fail if generated outputs are missing or stale.
+- Parses every `cards/*.md`, validates (see below), writes card, Leader and starter deck Resources, plus localisation entries.
 - Generated `.tres` files are committed (the Godot project opens without running the tool) but **never edited by hand**.
-- A check mode re-runs the converter and fails if it produces a diff (source and generated files out of sync); run it before committing.
+- A check mode re-runs the converter and fails if any generated output differs from the sources; run it before committing.
 
 ## Validation
 
-The converter, plus a debug-only check at startup and in the tests, verifies every card:
-- unique `id`, translation keys present, art assigned,
+The converter validates every generated definition, and the `CardDatabase` autoload indexes the generated Resources by ID:
+- unique `id`, translation keys present,
 - units have attack/health, spells have at least one ability,
-- referenced effects/targets are valid.
+- referenced cards, effects, targets, triggers and traits are valid,
+- starter decks have 20 cards, matching faction and rarity copy limits.

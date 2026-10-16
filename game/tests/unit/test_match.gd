@@ -18,6 +18,21 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 	assert_int(initial.player(1 - initial.active_player).opening_energy).is_equal(1)
 
 
+func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
+	assert_int(CardDatabase.card_count()).is_equal(20)
+	var gods_deck: DeckData = CardDatabase.get_deck(&"gods_starter")
+	var nibelungs_deck: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
+	assert_object(gods_deck).is_not_null()
+	assert_object(nibelungs_deck).is_not_null()
+	assert_int(gods_deck.cards.size()).is_equal(20)
+	assert_int(nibelungs_deck.cards.size()).is_equal(20)
+	assert_int(CardDatabase.get_card(&"loges_fire").abilities[0].effects[0].amount).is_equal(2)
+	assert_int(CardDatabase.get_leader(&"wotan").ability.cost).is_equal(2)
+
+	var engine := Match.new(gods_deck, nibelungs_deck, 20261016)
+	assert_int(engine.get_state().phase).is_equal(GameState.Phase.REDRAW)
+
+
 func test_invalid_actions_do_not_mutate_state() -> void:
 	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 54)
 	var before := engine.state_hash()

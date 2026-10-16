@@ -58,11 +58,11 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 2 — Card pipeline
 
-- [ ] `cards/<faction>.md` format ([card authoring](technical/03-data-model.md#card-authoring-pipeline))
-- [ ] Converter `cards/*.md` → `game/data/cards/**/*.tres` + English localisation entries
-- [ ] Validator (unknown trait / effect / trigger = error) + check mode that fails on a diff (run before committing)
-- [ ] First ~20 cards: Gods vs Nibelungs (tutorial matchup) + 2 Leaders (Wotan, Alberich)
-- [ ] Two starter decks
+- [x] `cards/<faction>.md` format ([card authoring](technical/03-data-model.md#card-authoring-pipeline))
+- [x] Converter `cards/*.md` → `game/data/cards/**/*.tres` + English localisation entries
+- [x] Validator (unknown trait / effect / trigger = error) + check mode that fails on a diff (run before committing)
+- [x] First ~20 cards: Gods vs Nibelungs (tutorial matchup) + 2 Leaders (Wotan, Alberich)
+- [x] Two starter decks
 
 ## 3 — Playable match
 

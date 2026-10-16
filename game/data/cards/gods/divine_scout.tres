@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_3oo5m"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_i6bjf"]
+
+[resource]
+script = ExtResource("2_i6bjf")
+id = &"divine_scout"
+faction = &"gods"
+subtypes = Array[StringName]([&"god"])
+cost = 2
+attack = 2
+health = 1
+keywords = Array[StringName]([&"charge"])

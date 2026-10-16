@@ -75,6 +75,8 @@ Keep them few and thin.
 
 The `Match` itself is **not** an autoload: it is created per duel and owned by the duel scene.
 
+`CardDatabase` is implemented in `game/autoload/card_database.gd`. It loads generated card, Leader and starter deck Resources at startup; IDs remain the stable lookup keys.
+
 ## Communication rules
 
 - Core → Presentation: only through `GameEvent`s / signals. Core never references a Node.

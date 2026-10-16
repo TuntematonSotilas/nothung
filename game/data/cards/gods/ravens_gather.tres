@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_dwpk6"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_j7h20"]
+
+[resource]
+script = ExtResource("2_j7h20")
+id = &"ravens_gather"
+faction = &"gods"
+subtypes = Array[StringName]([&"god"])
+cost = 1
+attack = 1
+health = 2
+keywords = Array[StringName]([&"flying"])
+leitmotifs = Array[StringName]([&"wisdom"])

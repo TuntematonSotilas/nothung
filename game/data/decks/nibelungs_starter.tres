@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DeckData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_nskmk"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_miner.tres" id="2_i4ltl"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/mime_apprentice.tres" id="3_ewfd0"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/forge_guard.tres" id="4_wmbsc"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/tunnel_scout.tres" id="5_2atle"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/ring_claimant.tres" id="6_g7khu"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/coal_hurler.tres" id="7_fdpia"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/dwarven_brew.tres" id="8_tp8wh"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/cave_blessing.tres" id="9_2la6w"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/shadow_strike.tres" id="10_dbgbo"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/alberichs_bargain.tres" id="11_ve8ds"]
+[ext_resource type="Resource" path="res://data/leaders/alberich.tres" id="12_eviku"]
+[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="13_e8kgu"]
+
+[resource]
+script = ExtResource("13_e8kgu")
+id = &"nibelungs_starter"
+leader = ExtResource("12_eviku")
+cards = Array[ExtResource("1_nskmk")]([ExtResource("2_i4ltl"), ExtResource("3_ewfd0"), ExtResource("4_wmbsc"), ExtResource("5_2atle"), ExtResource("6_g7khu"), ExtResource("7_fdpia"), ExtResource("8_tp8wh"), ExtResource("9_2la6w"), ExtResource("10_dbgbo"), ExtResource("11_ve8ds"), ExtResource("2_i4ltl"), ExtResource("3_ewfd0"), ExtResource("4_wmbsc"), ExtResource("5_2atle"), ExtResource("6_g7khu"), ExtResource("7_fdpia"), ExtResource("8_tp8wh"), ExtResource("9_2la6w"), ExtResource("10_dbgbo"), ExtResource("11_ve8ds")])

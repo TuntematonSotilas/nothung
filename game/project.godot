@@ -20,6 +20,7 @@ config/icon="res://assets/app_icon/icon.svg"
 
 [autoload]
 
+CardDatabase="*res://autoload/card_database.gd"
 Settings="*res://autoload/settings.gd"
 SaveManager="*res://autoload/save_manager.gd"
 SceneRouter="*res://autoload/scene_router.gd"

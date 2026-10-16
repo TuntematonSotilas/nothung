@@ -25,6 +25,8 @@ func test_translations_are_loaded() -> void:
 	var previous: String = TranslationServer.get_locale()
 	TranslationServer.set_locale("fr")
 	assert_str(tr("UI_SPLASH_TAGLINE")).is_equal("INSPIRÉ DE DER RING DES NIBELUNGEN")
+	assert_str(tr("CARD_LOGES_FIRE_NAME")).is_equal("Loge's Fire")
+	assert_str(tr("LEADER_WOTAN_RULES")).is_equal("Ability (2 Energy): Deal 2 damage to a unit.")
 	TranslationServer.set_locale(previous)
 
 

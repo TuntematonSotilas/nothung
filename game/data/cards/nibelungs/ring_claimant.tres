@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_4qsbc"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_tlrrx"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_caeej"]
+
+[sub_resource type="Resource" id="Resource_n4s71"]
+script = ExtResource("2_tlrrx")
+kind = 7
+
+[sub_resource type="Resource" id="Resource_2juh1"]
+script = ExtResource("1_4qsbc")
+effects = Array[ExtResource("2_tlrrx")]([SubResource("Resource_n4s71")])
+
+[resource]
+script = ExtResource("3_caeej")
+id = &"ring_claimant"
+faction = &"nibelungs"
+subtypes = Array[StringName]([&"dwarf"])
+cost = 3
+attack = 2
+health = 3
+abilities = Array[ExtResource("1_4qsbc")]([SubResource("Resource_2juh1")])
+leitmotifs = Array[StringName]([&"ring"])

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_hcmg2"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_hbmcs"]
+
+[resource]
+script = ExtResource("2_hbmcs")
+id = &"nibelung_miner"
+faction = &"nibelungs"
+subtypes = Array[StringName]([&"dwarf"])
+cost = 1
+attack = 1
+health = 2
+leitmotifs = Array[StringName]([&"forge"])

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="DeckData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_7g5pj"]
+[ext_resource type="Resource" path="res://data/cards/gods/ravens_gather.tres" id="2_f13cy"]
+[ext_resource type="Resource" path="res://data/cards/gods/einherjar_guard.tres" id="3_ongqr"]
+[ext_resource type="Resource" path="res://data/cards/gods/spear_guard.tres" id="4_8qi4n"]
+[ext_resource type="Resource" path="res://data/cards/gods/divine_scout.tres" id="5_ivvhg"]
+[ext_resource type="Resource" path="res://data/cards/gods/thunder_adept.tres" id="6_h70fp"]
+[ext_resource type="Resource" path="res://data/cards/gods/blessing_of_valhalla.tres" id="7_5bfwj"]
+[ext_resource type="Resource" path="res://data/cards/gods/loges_fire.tres" id="8_ay5oy"]
+[ext_resource type="Resource" path="res://data/cards/gods/war_song.tres" id="9_6u5ch"]
+[ext_resource type="Resource" path="res://data/cards/gods/storm_bolt.tres" id="10_iduiq"]
+[ext_resource type="Resource" path="res://data/cards/gods/wotans_stormcaller.tres" id="11_pstvx"]
+[ext_resource type="Resource" path="res://data/leaders/wotan.tres" id="12_mmkfa"]
+[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="13_wq703"]
+
+[resource]
+script = ExtResource("13_wq703")
+id = &"gods_starter"
+leader = ExtResource("12_mmkfa")
+cards = Array[ExtResource("1_7g5pj")]([ExtResource("2_f13cy"), ExtResource("3_ongqr"), ExtResource("4_8qi4n"), ExtResource("5_ivvhg"), ExtResource("6_h70fp"), ExtResource("7_5bfwj"), ExtResource("8_ay5oy"), ExtResource("9_6u5ch"), ExtResource("10_iduiq"), ExtResource("11_pstvx"), ExtResource("2_f13cy"), ExtResource("3_ongqr"), ExtResource("4_8qi4n"), ExtResource("5_ivvhg"), ExtResource("6_h70fp"), ExtResource("7_5bfwj"), ExtResource("8_ay5oy"), ExtResource("9_6u5ch"), ExtResource("10_iduiq"), ExtResource("11_pstvx")])

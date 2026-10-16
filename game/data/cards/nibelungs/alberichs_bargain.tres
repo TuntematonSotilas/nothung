@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_t2cuv"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_d5d0a"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_k10ju"]
+
+[sub_resource type="Resource" id="Resource_wdfew"]
+script = ExtResource("2_d5d0a")
+kind = 2
+amount = 2
+
+[sub_resource type="Resource" id="Resource_g17us"]
+script = ExtResource("1_t2cuv")
+effects = Array[ExtResource("2_d5d0a")]([SubResource("Resource_wdfew")])
+
+[resource]
+script = ExtResource("3_k10ju")
+id = &"alberichs_bargain"
+faction = &"nibelungs"
+type = 1
+rarity = 1
+cost = 3
+abilities = Array[ExtResource("1_t2cuv")]([SubResource("Resource_g17us")])
+leitmotifs = Array[StringName]([&"ring"])

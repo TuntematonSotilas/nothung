@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_n1y6c"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_4r1qx"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_2n7kn"]
+
+[sub_resource type="Resource" id="Resource_neqgx"]
+script = ExtResource("2_4r1qx")
+kind = 5
+target = 4
+amount = 1
+
+[sub_resource type="Resource" id="Resource_a1ua8"]
+script = ExtResource("1_n1y6c")
+effects = Array[ExtResource("2_4r1qx")]([SubResource("Resource_neqgx")])
+
+[resource]
+script = ExtResource("3_2n7kn")
+id = &"cave_blessing"
+faction = &"nibelungs"
+type = 1
+cost = 3
+abilities = Array[ExtResource("1_n1y6c")]([SubResource("Resource_a1ua8")])
