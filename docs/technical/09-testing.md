@@ -8,6 +8,7 @@
 > **Decision (2026-10-09):** [gdUnit4](https://github.com/MikeSchulze/gdUnit4) — richer assertions and mocking, VS Code integration, headless CLI runner. See [ADR-0004](../adr/0004-gdunit4.md).
 
 - Addon in `game/addons/gdUnit4/`: **v6.2.2** (supports Godot 4.5 → 4.7.x), enabled as an editor plugin. The folder is **git-ignored** and installed by `bash tools/install_gdunit4.sh` (pinned version; does nothing if already installed). Run it after cloning, **before opening the editor** (otherwise Godot reports the enabled plugin as missing).
+- The project configures gdUnit4 to look in `tests/` and enables automatic discovery when the editor opens. To rediscover manually, use the circular-arrows button in the gdUnit4 inspector.
 - Upgrade: change `GDUNIT4_VERSION` in the script to a release that lists Godot 4.7 as compatible, rerun it, and commit the script.
 - Test files: `tests/**/test_*.gd`, classes extending `GdUnitTestSuite`.
 - Tests that touch files use `create_temp_dir()` with a **unique name per test** (e.g. suffixed with `Time.get_ticks_usec()`): gdUnit4 keeps the same temp folder across the tests of a suite, so leftovers from one test would leak into the next.

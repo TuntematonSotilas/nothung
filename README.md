@@ -40,7 +40,7 @@ Open `game/project.godot` in Godot 4.7.2. The first import takes a moment.
 
 ### 4. Run the tests
 
-From the editor (gdUnit4 panel), or headless from `game/`:
+In the editor, the gdUnit4 panel discovers the suites in `tests/` automatically a few seconds after opening the project. To refresh the list manually, click the circular-arrows button in the panel. Or run headless from `game/`:
 
 ```sh
 export GODOT_BIN=/path/to/Godot_v4.7.2-stable   # main executable, not _console.exe
