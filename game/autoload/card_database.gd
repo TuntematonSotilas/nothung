@@ -47,17 +47,19 @@ func card_count() -> int:
 
 
 func _load_directory(directory: String) -> bool:
-	var absolute_directory: String = ProjectSettings.globalize_path(directory)
-	if not DirAccess.dir_exists_absolute(absolute_directory):
+	var entries: PackedStringArray = ResourceLoader.list_directory(directory)
+	if entries.is_empty():
 		push_error("Generated data directory is missing: %s" % directory)
 		return false
 	var ok: bool = true
-	var files: PackedStringArray = DirAccess.get_files_at(absolute_directory)
-	files.sort()
-	for filename: String in files:
-		if not filename.ends_with(".tres"):
+	entries.sort()
+	for entry: String in entries:
+		if entry.ends_with("/"):
+			ok = _load_directory(directory.path_join(entry.trim_suffix("/"))) and ok
 			continue
-		var path: String = directory.path_join(filename)
+		if not entry.ends_with(".tres"):
+			continue
+		var path: String = directory.path_join(entry)
 		var resource: Resource = ResourceLoader.load(path)
 		if resource == null:
 			push_error("Could not load generated Resource: %s" % path)
@@ -72,10 +74,6 @@ func _load_directory(directory: String) -> bool:
 		else:
 			push_error("Unexpected Resource type in generated data: %s" % path)
 			ok = false
-	var directories: PackedStringArray = DirAccess.get_directories_at(absolute_directory)
-	directories.sort()
-	for child: String in directories:
-		ok = _load_directory(directory.path_join(child)) and ok
 	return ok
 
 

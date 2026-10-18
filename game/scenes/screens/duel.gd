@@ -29,6 +29,7 @@ var _log_label: Label
 var _end_turn_button: Button
 var _ability_button: Button
 var _overlay: ColorRect
+var _modal_layer: CanvasLayer
 var _main_layout: VBoxContainer
 var _results_shown: bool = false
 
@@ -60,6 +61,10 @@ func _build_ui() -> void:
 	_main_layout = VBoxContainer.new()
 	_main_layout.add_theme_constant_override("separation", 12)
 	margin.add_child(_main_layout)
+	_modal_layer = CanvasLayer.new()
+	_modal_layer.name = "ModalLayer"
+	_modal_layer.layer = 10
+	add_child(_modal_layer)
 
 	var header: HBoxContainer = HBoxContainer.new()
 	_main_layout.add_child(header)
@@ -242,10 +247,11 @@ func _show_redraw_overlay() -> void:
 	if _overlay != null and is_instance_valid(_overlay):
 		return
 	_overlay = ColorRect.new()
+	_overlay.name = "ModalOverlay"
 	_overlay.color = Color(Palette.BG, 0.96)
 	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_overlay.z_index = 20
-	add_child(_overlay)
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_modal_layer.add_child(_overlay)
 	var center: CenterContainer = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_overlay.add_child(center)
@@ -496,10 +502,11 @@ func _show_results() -> void:
 	if _overlay != null and is_instance_valid(_overlay):
 		_overlay.queue_free()
 	_overlay = ColorRect.new()
+	_overlay.name = "ModalOverlay"
 	_overlay.color = Color(Palette.BG, 0.94)
 	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_overlay.z_index = 30
-	add_child(_overlay)
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_modal_layer.add_child(_overlay)
 	var center: CenterContainer = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_overlay.add_child(center)
