@@ -1,6 +1,26 @@
 extends GdUnitTestSuite
 
 
+func test_wotan_portrait_is_loaded_and_displayed_in_duel() -> void:
+	var leader: LeaderData = CardDatabase.get_leader(&"wotan")
+	assert_object(leader).is_not_null()
+	assert_object(leader.art).is_not_null()
+	var portrait: Image = leader.art.get_image()
+	assert_bool(portrait.get_width() < portrait.get_height()).is_true()
+	assert_float(portrait.get_pixel(0, 0).a).is_equal(0.0)
+
+	var duel: Control = await _create_duel()
+	var frame: Panel = duel.get("_own_leader_portrait_frame") as Panel
+	var artwork: TextureRect = duel.get("_own_leader_artwork") as TextureRect
+	assert_bool(artwork.texture == leader.art).is_true()
+	assert_bool(artwork.visible).is_true()
+	var frame_style: StyleBoxFlat = frame.get_theme_stylebox("panel") as StyleBoxFlat
+	assert_int(frame_style.border_width_left).is_greater_equal(2)
+	assert_int(frame_style.corner_radius_top_left).is_greater_equal(8)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
 func test_opening_redraw_overlay_is_visible_after_initial_layout() -> void:
 	var packed_scene: PackedScene = load("res://scenes/screens/duel.tscn")
 	var duel: Control = packed_scene.instantiate() as Control

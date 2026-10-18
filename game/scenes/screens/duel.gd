@@ -26,6 +26,8 @@ var _enemy_artifacts: HBoxContainer
 var _own_board: HBoxContainer
 var _own_artifacts: HBoxContainer
 var _own_hand: HBoxContainer
+var _own_leader_portrait_frame: Panel
+var _own_leader_artwork: TextureRect
 var _own_leader_button: Button
 var _own_leader_label: Label
 var _energy_label: Label
@@ -142,6 +144,30 @@ func _build_ui() -> void:
 
 	var own_leader_row: HBoxContainer = HBoxContainer.new()
 	_main_layout.add_child(own_leader_row)
+	_own_leader_portrait_frame = Panel.new()
+	_own_leader_portrait_frame.name = "OwnLeaderPortraitFrame"
+	_own_leader_portrait_frame.custom_minimum_size = Vector2(
+		roundi(70 * _ui_scale),
+		roundi(86 * _ui_scale)
+	)
+	var portrait_frame_style: StyleBoxFlat = StyleBoxFlat.new()
+	portrait_frame_style.bg_color = Palette.ACCENT.darkened(0.3)
+	portrait_frame_style.border_color = Palette.ACCENT
+	portrait_frame_style.set_border_width_all(roundi(2 * _ui_scale))
+	portrait_frame_style.set_corner_radius_all(roundi(8 * _ui_scale))
+	_own_leader_portrait_frame.add_theme_stylebox_override("panel", portrait_frame_style)
+	_own_leader_portrait_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	own_leader_row.add_child(_own_leader_portrait_frame)
+	_own_leader_artwork = TextureRect.new()
+	_own_leader_artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_own_leader_artwork.offset_left = roundi(2 * _ui_scale)
+	_own_leader_artwork.offset_top = roundi(2 * _ui_scale)
+	_own_leader_artwork.offset_right = roundi(-2 * _ui_scale)
+	_own_leader_artwork.offset_bottom = roundi(-2 * _ui_scale)
+	_own_leader_artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_own_leader_artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_own_leader_artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_own_leader_portrait_frame.add_child(_own_leader_artwork)
 	_own_leader_button = _button("", 100)
 	_own_leader_button.custom_minimum_size.y = roundi(86 * _ui_scale)
 	_own_leader_button.pressed.connect(_on_own_leader_pressed)
@@ -207,6 +233,8 @@ func _refresh() -> void:
 	var opponent: PlayerState = state.player(AI_PLAYER)
 	_enemy_leader_button.text = "♥ %d" % opponent.life
 	_enemy_leader_label.text = tr("LEADER_ALBERICH_NAME")
+	_own_leader_artwork.texture = human.leader.art
+	_own_leader_artwork.visible = human.leader.art != null
 	_own_leader_button.text = "♥ %d" % human.life
 	_own_leader_label.text = tr("LEADER_WOTAN_NAME")
 	_energy_label.text = "%s  %d / %d" % [tr("UI_ENERGY"), human.energy, human.max_energy]

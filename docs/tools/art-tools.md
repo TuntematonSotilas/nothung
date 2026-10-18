@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, frames, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-18
 
 Prices and licences change — check them before buying.
 
@@ -33,41 +33,34 @@ Why: the text must be translated into 4 languages and must reflect runtime stats
 
 **Hardware:** a graphics tablet (Wacom, XP-Pen, Huion — entry models are fine) or an iPad with a stylus. Drawing with a mouse is not realistic for ~80 illustrations.
 
-## Paper-to-digital workflow
+## Hand-drawn art-to-digital workflow
 
-Recommended pipeline for hand-drawn illustrations: **ink on paper → scan → clean and colour in Krita**.
+**Draw and paint by hand → import the original → use AI-assisted cleanup → review and export.**
+The artist creates every character and illustration by hand, on paper or digitally. AI is a
+post-processing assistant for preparing that authored work, not an image generator or co-artist.
 
-### Drawing on paper
+### Draw and paint by hand
 
-| Setting | Value | Why |
-|---------|-------|-----|
-| Drawing area | **20 × 15 cm** (4:3) on A4 | Same ratio as the 1024 × 768 export; ~4–5× the final size |
-| Safe margin | ~1 cm inside the area, no key elements | The card frame may crop the edges; room to adjust framing |
-| Paper | Smooth Bristol / 180–250 g drawing paper | Ink doesn't bleed |
-| Sketch | Non-photo **blue pencil** | Removed after scanning, no erasing needed |
-| Ink | Fineliner **0.5–0.8 mm** for outlines, 0.3 mm minimum | The art is shown ~300–400 px wide on a phone (~12× reduction): thin lines disappear |
+- Keep the silhouette and key features readable at phone size; check a small thumbnail before
+  finishing the painting.
+- For paper work, leave enough margin for portrait/card crops and capture the whole painting
+  with even lighting and minimal perspective distortion.
+- Preserve the original scan, photo, or layered digital file unchanged as the master.
 
-**Readability check:** look at the drawing at thumbnail size (~4 cm wide) before finishing it. If the silhouette doesn't read, colour won't fix it.
+### Import and AI-assisted cleanup
 
-### Scanning
+1. Import a high-resolution scan, photo, or flattened export into the image-editing workflow.
+2. Use AI-assisted cleanup only to remove paper specks, pencil marks, capture artefacts, and
+   unwanted background; adjust crop, perspective, or colour balance where needed.
+3. Do not generate, extend, or repaint the subject. Keep the hand-painted strokes, shapes, and
+   colour choices authored by the artist.
+4. Compare the cleaned result with the untouched master at full size and at phone size. Correct
+   any cleanup that removes or changes painted detail; the artist approves the final image.
+5. Export the approved crop as PNG for Godot and retain both the untouched master and the approved
+   cleaned export.
 
-- **Flatbed scanner** (an entry model such as Canon LiDE is enough) rather than a phone photo: even lighting, no distortion. Free software: NAPS2 or Windows Scan.
-- **600 dpi, colour** (keeps the blue pencil separable), saved as **PNG or TIFF — never JPEG**. Result ≈ 4700 × 3500 px; this is the master file.
-- Phone apps (Microsoft Lens, Adobe Scan) are fine for tests only — quality is inconsistent across a full set.
-
-### Cleaning and colouring in Krita
-
-1. **Clean:** desaturate, or keep only the red channel (makes the blue pencil vanish), then *Filter → Adjust → Levels* for pure white and deep black.
-2. **Isolate line art:** *Filter → Colors → Color to Alpha* on white, or set the line layer to **Multiply**. The lines stay on a transparent layer above the colours.
-3. **Flats:** the **Colorize Mask** tool fills the closed areas automatically — a big time saver over ~80 cards.
-4. **Shading and light** on layers between the flats and the line art.
-5. **Export:** keep the `.kra` as source, export PNG at 1024 × 768 ([export specs](#export-specs-for-godot)).
-
-**Consistency across the set:** use a Krita **template** (canvas at size, safe-margin guide, named layers) and a fixed **palette**: muted tones plus the [faction colours](../functional/08-art-and-audio.md#faction-palette-draft) as accents.
-
-### Alternative: colour on paper
-
-Ink + watercolour washes, as Rackham did — a perfect fit for the "Romantic painting" direction. Downsides: no undo, colour scan needs colour correction, harder to keep ~80 cards consistent. **To decide:** test both workflows on 2–3 cards before committing.
+**Consistency across the set:** use a Krita template and a fixed palette: muted tones plus the
+[faction colours](../functional/08-art-and-audio.md#faction-palette-draft) as accents.
 
 ## Public-domain reference & material
 
@@ -77,17 +70,21 @@ Ink + watercolour washes, as Rackham did — a perfect fit for the "Romantic pai
 
 ## Artwork policy
 
-**Decision (2026-10-09): all final artwork is hand-drawn by the project author.**
+**Decision (2026-10-09, updated 2026-10-18): all final subject artwork is drawn and painted by
+the project author; AI-assisted cleanup is allowed as described in the workflow above.**
 
-- No AI-generated images in the game.
-- Public-domain works (Rackham, etc.) are used only as **reference** and **temporary placeholders** during prototyping; every placeholder is replaced before release.
-- Benefit: the author holds full copyright on the art, and no store AI-content disclosure is needed.
+- No AI-generated or AI-extended subject artwork in the game.
+- AI may clean the imported hand-made image but must not invent or repaint its subject; the artist
+  reviews and approves every final export.
+- Public-domain works (Rackham, etc.) are used only as **reference** and **temporary placeholders**
+  during prototyping; every placeholder is replaced before release.
 
 ## Export specs for Godot
 
 | Asset | Format | Size (draft) |
 |-------|--------|--------------|
 | Card illustration | PNG (source kept as `.kra` / `.psd` outside `res://`) | 1024 × 768, displayed smaller |
+| Leader portrait | PNG (master kept outside `res://`) | Portrait crop, displayed with aspect ratio preserved |
 | Frame pieces | PNG with transparency, 9-slice-friendly where possible | Per reference resolution 1080×1920 |
 | Icons | SVG (Godot imports SVG) or PNG @2x | 64–128 px |
 
