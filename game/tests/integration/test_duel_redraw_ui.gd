@@ -148,8 +148,15 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	var artifacts: HBoxContainer = duel.get("_own_artifacts") as HBoxContainer
 	var board: HBoxContainer = duel.get("_own_board") as HBoxContainer
 	duel.call("_on_card_drag_started", {"kind": "hand", "uid": card.uid})
+	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
+	var source: CardView = hand.get_child(0) as CardView
 	var hint: PanelContainer = duel.get("_drop_hint") as PanelContainer
+	var preview: Control = duel.get("_drag_preview") as Control
 	assert_bool(hint.visible).is_true()
+	assert_object(preview).is_not_null()
+	assert_float(absf(preview.size.x - source.custom_minimum_size.x)).is_less_equal(0.01)
+	assert_float(absf(preview.size.y - source.custom_minimum_size.y)).is_less_equal(0.01)
+	assert_bool(preview.get_node("CardText") is Label).is_true()
 	assert_bool(hint.get_global_rect().has_point(artifacts.get_global_rect().get_center())).is_true()
 	assert_bool(hint.get_global_rect().has_point(board.get_global_rect().get_center())).is_true()
 
@@ -158,6 +165,7 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	assert_int(player.hand.size()).is_equal(0)
 	assert_int(player.board.size()).is_equal(1)
 	assert_bool(hint.visible).is_false()
+	assert_bool(duel.get("_drag_preview") == null).is_true()
 	duel.queue_free()
 	await get_tree().process_frame
 

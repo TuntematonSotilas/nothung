@@ -40,6 +40,7 @@ var _zoom_overlay: ColorRect
 var _zoom_source: CardView
 var _drop_hint: PanelContainer
 var _drop_hint_label: Label
+var _drag_preview: Control
 var _modal_layer: CanvasLayer
 var _main_layout: VBoxContainer
 var _results_shown: bool = false
@@ -306,6 +307,7 @@ func _card_view(
 	view.zoom_requested.connect(_show_card_zoom.bind(view))
 	view.drop_requested.connect(_on_card_drop)
 	view.drag_started.connect(_on_card_drag_started)
+	view.drag_moved.connect(_on_card_drag_moved)
 	view.drag_released.connect(_on_card_drag_released)
 	return view
 
@@ -542,15 +544,32 @@ func _on_card_drop(data: Dictionary, target_uid: int, target_player: int) -> voi
 			_apply_action(action)
 
 
-func _on_card_drag_started(_data: Dictionary) -> void:
+func _on_card_drag_started(data: Dictionary) -> void:
+	var source: CardView
+	for node: Node in get_tree().get_nodes_in_group("duel_card_views"):
+		if node is CardView:
+			var view: CardView = node as CardView
+			if view.card_instance != null and view.card_instance.uid == int(data.get("uid", -1)):
+				source = view
+				break
+	if source == null:
+		push_error("Cannot display a drag preview: the source card view was not found.")
+		return
 	var target_rect: Rect2 = _own_drop_rect()
 	_drop_hint.position = target_rect.position
 	_drop_hint.size = target_rect.size
 	_drop_hint.visible = true
+	_show_drag_preview(source, get_viewport().get_mouse_position())
+
+
+func _on_card_drag_moved(_data: Dictionary, position: Vector2) -> void:
+	if _drag_preview != null:
+		_drag_preview.position = position - _drag_preview.size * 0.5
 
 
 func _on_card_drag_released(data: Dictionary, position: Vector2) -> void:
 	_drop_hint.visible = false
+	_hide_drag_preview()
 	if _enemy_leader_button.get_global_rect().has_point(position):
 		_on_card_drop(data, -1, AI_PLAYER)
 		return
@@ -957,3 +976,50 @@ func _own_drop_rect() -> Rect2:
 	var right: float = maxf(artifacts_rect.end.x, board_rect.end.x)
 	var bottom: float = maxf(artifacts_rect.end.y, board_rect.end.y)
 	return Rect2(Vector2(left, top), Vector2(right - left, bottom - top))
+
+
+func _show_drag_preview(source: CardView, position: Vector2) -> void:
+	_hide_drag_preview()
+	_drag_preview = Control.new()
+	_drag_preview.name = "CardDragPreview"
+	_drag_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_drag_preview.modulate = Color(1, 1, 1, 0.9)
+	_drag_preview.custom_minimum_size = source.custom_minimum_size
+	_drag_preview.size = source.custom_minimum_size
+	var faction: String = String(source.card_data.faction)
+	var faction_color: Color = CardView.FACTION_COLORS.get(faction, CardView.FACTION_COLORS["neutral"])
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = faction_color.darkened(0.66)
+	style.border_color = faction_color.lightened(0.15)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(14)
+	style.content_margin_left = 12
+	style.content_margin_top = 12
+	style.content_margin_right = 12
+	style.content_margin_bottom = 12
+	var panel: Panel = Panel.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.add_theme_stylebox_override("panel", style)
+	_drag_preview.add_child(panel)
+	var label: Label = _label(source.text, 18, Palette.TEXT)
+	label.name = "CardText"
+	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	label.offset_left = 12
+	label.offset_top = 12
+	label.offset_right = -12
+	label.offset_bottom = -12
+	label.clip_text = true
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_drag_preview.add_child(label)
+	_modal_layer.add_child(_drag_preview)
+	_drag_preview.reset_size()
+	_drag_preview.position = position - _drag_preview.custom_minimum_size * 0.5
+
+
+func _hide_drag_preview() -> void:
+	if _drag_preview != null and is_instance_valid(_drag_preview):
+		_drag_preview.queue_free()
+	_drag_preview = null

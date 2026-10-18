@@ -4,6 +4,7 @@ extends Button
 signal zoom_requested(data: CardData, instance: CardInstance)
 signal drop_requested(drag_data: Dictionary, target_uid: int, target_player: int)
 signal drag_started(drag_data: Dictionary)
+signal drag_moved(drag_data: Dictionary, position: Vector2)
 signal drag_released(drag_data: Dictionary, position: Vector2)
 
 const CARD_SIZE: Vector2 = Vector2(216, 310)
@@ -126,9 +127,9 @@ func _input(event: InputEvent) -> void:
 			_begin_press(mouse.position)
 		elif not mouse.pressed:
 			_end_press(mouse.position)
-	elif event is InputEventScreenDrag and _press_active:
+	elif event is InputEventScreenDrag and (_press_active or _drag_active):
 		_cancel_moved_press((event as InputEventScreenDrag).position)
-	elif event is InputEventMouseMotion and _press_active:
+	elif event is InputEventMouseMotion and (_press_active or _drag_active):
 		_cancel_moved_press((event as InputEventMouseMotion).position)
 
 
@@ -151,25 +152,20 @@ func _end_press(position: Vector2) -> void:
 
 
 func _cancel_moved_press(position: Vector2) -> void:
-	if position.distance_to(_press_position) > 18.0:
+	if _drag_active:
+		drag_moved.emit(_drag_data(), position)
+	elif _press_active and position.distance_to(_press_position) > 18.0:
 		_press_active = false
 		_stop_long_press()
 		_drag_active = _draggable and card_instance != null
 		if _drag_active:
 			drag_started.emit(_drag_data())
+			drag_moved.emit(_drag_data(), position)
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	if not _draggable or card_instance == null:
-		return null
-	_long_press_timer.stop()
-	var preview: Label = Label.new()
-	preview.text = tr("CARD_%s_NAME" % String(card_data.id).to_upper())
-	preview.custom_minimum_size = Vector2(220, 56)
-	preview.add_theme_color_override("font_color", Palette.TEXT)
-	preview.add_theme_font_size_override("font_size", 20)
-	set_drag_preview(preview)
-	return _drag_data()
+	# Touch drags use the custom preview and release path for consistent Android rendering.
+	return null
 
 
 func _drag_data() -> Dictionary:

@@ -77,6 +77,7 @@ flowchart TD
 ## Feedback
 
 - The own-side drop zone spans the artifact and unit rows and is visibly highlighted while dragging a card.
+- A complete card preview follows the pointer during a drag; Godot's platform-native drag preview is disabled to keep Android rendering consistent.
 - Valid targets glow; invalid ones dim.
 - **Undo play** is available after the most recent card play and disappears after the next action or turn end. Undo restores the state before the play, including any resolved play effects.
 - Duel controls, cards and text scale to the available viewport height to prevent bottom-edge clipping in shorter editor/debug windows. Board rows reserve card height even while empty, preventing the window from resizing when the AI plays a unit; the hand remains horizontally scrollable.
