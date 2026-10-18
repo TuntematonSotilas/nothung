@@ -77,9 +77,10 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 4 — AI & balancing
 
+- [x] Improve Easy AI action selection: evaluate card value, lethal attacks and favorable trades
 - [ ] Normal and Hard difficulties; AI profiles
-- [ ] AI vs AI soak tests: no crash, no illegal move ([testing](technical/09-testing.md))
-- [ ] Match-length and win-rate stats per deck
+- [x] AI vs AI soak tests: no crash, no illegal move ([testing](technical/09-testing.md))
+- [x] Match-length and win-rate stats per starter deck ([AI soak baseline](technical/09-testing.md#ai-soak))
 - [ ] Tune Götterdämmerung start (turn 10 vs 8) and the Ring curse from the stats ([game rules](functional/03-game-rules.md))
 - [ ] Remaining cards to ~80 (4 factions + Neutral) ([cards](functional/04-cards.md))
 

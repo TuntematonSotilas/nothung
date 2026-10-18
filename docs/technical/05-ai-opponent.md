@@ -24,7 +24,7 @@ func choose_action(state: GameState, legal: Array[Action]) -> Action
 
 ## Approach (incremental)
 
-1. **v0 — Legal-action priority (implemented as Easy)**: pick a play, then an ability, then an attack, otherwise end the turn.
+1. **v0 — Easy heuristic (implemented)**: score legal actions using own-card value, board trades, lethal attacks, play effects and Ring value; select the highest score.
 2. **v1 — Greedy heuristic**: for each legal action, simulate on a copy of the state, score with an evaluation function, pick the best. Repeat until `EndTurn` is best.
 3. **v2 — Turn planning**: search sequences of actions within the turn (beam search / limited depth), still with a heuristic evaluation.
 4. *(Optional)* **v3 — Determinised MCTS** for Hard difficulty.
@@ -46,7 +46,7 @@ Unit value ≈ `attack + health` + keyword bonuses. Weights live in `AIProfile` 
 
 | Level | Strategy | Noise |
 |-------|----------|-------|
-| Easy | Greedy, shallow, ignores some keywords | High random choice probability |
+| Easy | Shallow legal-action scoring with basic tactical cues | None |
 | Normal | Greedy with full evaluation | Low |
 | Hard | Turn planning (+ MCTS if implemented) | None |
 
@@ -70,3 +70,5 @@ Rules that make this safe:
 5. Current selection is bounded by the number of legal actions and takes less than a second; search cancellation and a deeper time budget are not needed for this first heuristic.
 
 For debugging and tests, the selector can also run **synchronously** on the calling thread (same `choose_action()` function).
+
+The main thread builds compact, serializable action records with scores from the AI's own hand and public board state. The worker only compares those records; it never receives the live match, the opponent's hand, or either deck order.

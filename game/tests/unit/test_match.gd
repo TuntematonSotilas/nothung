@@ -46,6 +46,104 @@ func test_easy_ai_selects_a_legal_action_on_a_worker_thread() -> void:
 	assert_int(int(selected["card_uid"])).is_equal(20)
 
 
+func test_easy_ai_prefers_a_better_unit_over_the_first_playable_card() -> void:
+	var engine := Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), 501)
+	var state: GameState = engine.get_state()
+	state.phase = GameState.Phase.MAIN
+	state.active_player = 1
+	var player: PlayerState = state.player(1)
+	player.energy = 5
+	player.leader_ability_used = true
+	player.hand.cards.clear()
+
+	var weak_data: CardData = CardData.new()
+	weak_data.id = &"weak_test_unit"
+	weak_data.faction = &"nibelungs"
+	weak_data.type = CardData.Type.UNIT
+	weak_data.cost = 1
+	weak_data.attack = 1
+	weak_data.health = 1
+	var strong_data: CardData = CardData.new()
+	strong_data.id = &"strong_test_unit"
+	strong_data.faction = &"nibelungs"
+	strong_data.type = CardData.Type.UNIT
+	strong_data.cost = 2
+	strong_data.attack = 4
+	strong_data.health = 4
+	player.hand.add(CardInstance.new(weak_data, 1, 601))
+	player.hand.add(CardInstance.new(strong_data, 1, 602))
+
+	var legal: Array[Action] = engine.get_legal_actions(1)
+	var records: Array[Dictionary] = EasyAI.prepare_actions(state, legal)
+	var selected: Dictionary = EasyAI.choose_action(records)
+
+	assert_str(String(selected["type"])).is_equal("play_card")
+	assert_int(int(selected["card_uid"])).is_equal(602)
+
+
+func test_easy_ai_redraws_expensive_cards_and_keeps_cheap_units() -> void:
+	var engine := Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), 503)
+	var state: GameState = engine.get_state()
+	state.redraw_player = 1
+	var player: PlayerState = state.player(1)
+	player.hand.cards.clear()
+
+	var cheap_data: CardData = CardData.new()
+	cheap_data.id = &"cheap_test_unit"
+	cheap_data.faction = &"nibelungs"
+	cheap_data.type = CardData.Type.UNIT
+	cheap_data.cost = 1
+	cheap_data.attack = 2
+	cheap_data.health = 2
+	var expensive_data: CardData = CardData.new()
+	expensive_data.id = &"expensive_test_unit"
+	expensive_data.faction = &"nibelungs"
+	expensive_data.type = CardData.Type.UNIT
+	expensive_data.cost = 5
+	expensive_data.attack = 5
+	expensive_data.health = 5
+	player.hand.add(CardInstance.new(cheap_data, 1, 801))
+	player.hand.add(CardInstance.new(expensive_data, 1, 802))
+
+	var legal: Array[Action] = engine.get_legal_actions(1)
+	var records: Array[Dictionary] = EasyAI.prepare_actions(state, legal)
+	var selected: Dictionary = EasyAI.choose_action(records)
+
+	assert_str(String(selected["type"])).is_equal("redraw")
+	assert_array(selected["card_uids"]).is_equal([802])
+
+
+func test_easy_ai_takes_a_lethal_attack_before_playing_a_card() -> void:
+	var engine := Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), 502)
+	var state: GameState = engine.get_state()
+	state.phase = GameState.Phase.MAIN
+	state.active_player = 1
+	var player: PlayerState = state.player(1)
+	player.energy = 5
+	player.hand.cards.clear()
+	var unit_data: CardData = CardData.new()
+	unit_data.id = &"test_attacker"
+	unit_data.faction = &"nibelungs"
+	unit_data.type = CardData.Type.UNIT
+	unit_data.cost = 1
+	unit_data.attack = 3
+	unit_data.health = 3
+	var attacker: CardInstance = CardInstance.new(unit_data, 1, 701)
+	attacker.can_attack = true
+	player.board.add(attacker)
+	var playable_data: CardData = unit_data.duplicate() as CardData
+	playable_data.id = &"test_playable"
+	player.hand.add(CardInstance.new(playable_data, 1, 702))
+	state.player(0).life = 3
+
+	var legal: Array[Action] = engine.get_legal_actions(1)
+	var records: Array[Dictionary] = EasyAI.prepare_actions(state, legal)
+	var selected: Dictionary = EasyAI.choose_action(records)
+
+	assert_str(String(selected["type"])).is_equal("attack")
+	assert_int(int(selected["target_player"])).is_equal(0)
+
+
 func test_invalid_actions_do_not_mutate_state() -> void:
 	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 54)
 	var before := engine.state_hash()

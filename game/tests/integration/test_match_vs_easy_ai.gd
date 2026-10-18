@@ -12,9 +12,7 @@ func test_starter_match_completes_against_easy_ai() -> void:
 		var legal: Array[Action] = engine.get_legal_actions(player)
 		var selected: Action
 		if player == 1:
-			var records: Array[Dictionary] = []
-			for action: Action in legal:
-				records.append(action.to_record())
+			var records: Array[Dictionary] = EasyAI.prepare_actions(engine.get_state(), legal)
 			var worker: Thread = Thread.new()
 			assert_int(worker.start(EasyAI.choose_action.bind(records))).is_equal(OK)
 			selected = Action.from_record(worker.wait_to_finish())

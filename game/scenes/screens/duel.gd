@@ -777,7 +777,23 @@ func _continue_ai() -> void:
 
 func _finish_ai_redraw() -> void:
 	await get_tree().create_timer(AI_DELAY).timeout
-	_match.apply(RedrawAction.new(AI_PLAYER))
+	var state: GameState = _match.get_state()
+	if state.phase != GameState.Phase.REDRAW or state.redraw_player != AI_PLAYER:
+		_ai_busy = false
+		return
+	var records: Array[Dictionary] = EasyAI.prepare_actions(state, _match.get_legal_actions(AI_PLAYER))
+	var worker: Thread = Thread.new()
+	var error: Error = worker.start(EasyAI.choose_action.bind(records))
+	if error != OK:
+		push_error("Could not start EasyAI redraw worker: %s" % error_string(error))
+		_ai_busy = false
+		return
+	var selected: Dictionary = worker.wait_to_finish()
+	var action: Action = Action.from_record(selected)
+	if action == null or not _match.apply(action):
+		push_error("EasyAI returned an invalid redraw action.")
+		_ai_busy = false
+		return
 	_ai_busy = false
 	_refresh()
 	_continue_ai()
@@ -789,9 +805,7 @@ func _run_ai_turn() -> void:
 	if state.phase != GameState.Phase.MAIN or state.active_player != AI_PLAYER:
 		_ai_busy = false
 		return
-	var records: Array[Dictionary] = []
-	for action: Action in _match.get_legal_actions(AI_PLAYER):
-		records.append(action.to_record())
+	var records: Array[Dictionary] = EasyAI.prepare_actions(state, _match.get_legal_actions(AI_PLAYER))
 	var worker: Thread = Thread.new()
 	var error: Error = worker.start(EasyAI.choose_action.bind(records))
 	if error != OK:

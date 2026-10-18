@@ -56,6 +56,52 @@ On Windows, `GODOT_BIN` must point to the main `Godot.exe`, not the `_console.ex
 
 Threaded AI ([05-ai-opponent](05-ai-opponent.md#threading)) is tested in **synchronous mode**, so tests stay deterministic.
 
+### AI soak
+
+Run the seeded Easy-AI vs Easy-AI baseline from `game/`:
+
+```sh
+bash addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode -a res://tests/soak
+```
+
+The soak alternates the two starter decks between player positions, verifies every selected action with `Match.is_legal()`, requires every match to finish within the action limit, and prints aggregate turn and action counts plus win rates and draws per deck.
+
+Initial first-legal-action Easy-AI baseline (40 seeded matches, 2026-10-18):
+
+| Metric | Result |
+|--------|--------|
+| Average match length | 16.2 turns |
+| Average actions | 60.7 |
+| Gods starter wins | 39 / 40 (97.5%) |
+| Nibelungs starter wins | 1 / 40 (2.5%) |
+| Draws | 0 |
+
+The first-legal-action baseline is not a balance conclusion: deck matchup and AI decision quality are confounded.
+
+After adding the Easy action-scoring heuristic, before the mulligan heuristic, the same seeds produced:
+
+| Metric | Result |
+|--------|--------|
+| Average match length | 15.5 turns |
+| Average actions | 62.7 |
+| Gods starter wins | 36 / 40 (90%) |
+| Nibelungs starter wins | 4 / 40 (10%) |
+| Draws | 0 |
+
+The Nibelungs win rate improved from 2.5% to 10% under the heuristic, but Gods still dominate this mirrored-AI sample. Treat this as an initial signal rather than a deck-balance verdict.
+
+With the mulligan heuristic enabled, the same 40 seeds produce:
+
+| Metric | Result |
+|--------|--------|
+| Average match length | 16.6 turns |
+| Average actions | 68.2 |
+| Gods starter wins | 38 / 40 (95%) |
+| Nibelungs starter wins | 2 / 40 (5%) |
+| Draws | 0 |
+
+The opening-hand policy did not improve the Nibelungs result in this small sample. More matchups and a stronger Normal profile are needed before changing card or turn-balance rules.
+
 ## Manual test checklist (release)
 
 - [ ] Install on reference device + one low-end device + one tall-aspect (20:9+) device
