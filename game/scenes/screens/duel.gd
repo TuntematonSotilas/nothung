@@ -4,11 +4,13 @@ const HUMAN_PLAYER: int = 0
 const AI_PLAYER: int = 1
 const AI_DELAY: float = 0.45
 const MAX_UI_SCALE: float = 1.15
-const UI_SCALE_REFERENCE_HEIGHT: float = 2050.0
+const MIN_UI_SCALE: float = 0.8
+const UI_SCALE_REFERENCE_HEIGHT: float = 2300.0
 const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
 
 var _match: Match
 var _ui_scale: float = 1.0
+var _board_card_scale: float = 1.0
 var _ai_busy: bool = false
 var _selected_hand_uid: int = -1
 var _selected_attacker_uid: int = -1
@@ -49,7 +51,16 @@ var _undo_log_lines: Array[String] = []
 
 func _ready() -> void:
 	var viewport_height: float = get_viewport().get_visible_rect().size.y
-	_ui_scale = clampf(MAX_UI_SCALE * viewport_height / UI_SCALE_REFERENCE_HEIGHT, 1.0, MAX_UI_SCALE)
+	_board_card_scale = clampf(
+		MAX_UI_SCALE * viewport_height / 2050.0,
+		1.0,
+		MAX_UI_SCALE
+	)
+	_ui_scale = clampf(
+		MAX_UI_SCALE * viewport_height / UI_SCALE_REFERENCE_HEIGHT,
+		MIN_UI_SCALE,
+		MAX_UI_SCALE
+	)
 	_build_ui()
 	_start_match()
 
@@ -167,7 +178,7 @@ func _build_ui() -> void:
 	_main_layout.add_child(_log_label)
 
 	var hand_scroll: ScrollContainer = ScrollContainer.new()
-	hand_scroll.custom_minimum_size.y = roundi(330 * _ui_scale)
+	hand_scroll.custom_minimum_size.y = roundi(350 * _ui_scale)
 	hand_scroll.size_flags_vertical = Control.SIZE_SHRINK_END
 	hand_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	hand_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -254,7 +265,7 @@ func _fill_board(row: HBoxContainer, zone: Zone, is_human: bool, zone_name: Stri
 			"attacker",
 			_match.get_state().phase != GameState.Phase.GAME_OVER
 		)
-		view.custom_minimum_size = Vector2(170, 200) * _ui_scale
+		view.custom_minimum_size = Vector2(170, 200) * _board_card_scale
 		view.pressed.connect(_on_board_card_pressed.bind(instance.uid, is_human, zone_name, view))
 		if is_human and instance.can_attack and not instance.exhausted:
 			view.modulate = Color.WHITE
@@ -877,8 +888,8 @@ func _set_status(message: String) -> void:
 func _board_row() -> HBoxContainer:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", roundi(8 * _ui_scale))
-	row.custom_minimum_size.y = roundi(180 * _ui_scale)
+	row.add_theme_constant_override("separation", roundi(8 * _board_card_scale))
+	row.custom_minimum_size.y = roundi(200 * _board_card_scale)
 	return row
 
 

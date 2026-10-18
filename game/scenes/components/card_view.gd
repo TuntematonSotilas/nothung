@@ -31,10 +31,12 @@ var _long_press_timer: Timer
 var _press_position: Vector2
 var _press_active: bool = false
 var _view_scale: float = 1.0
+var _view_scale_configured: bool = false
 
 
 func _ready() -> void:
-	_apply_view_scale()
+	if not _view_scale_configured:
+		_apply_view_scale()
 	size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	add_theme_stylebox_override("normal", _card_style())
@@ -100,6 +102,7 @@ func set_zoom_blocked(value: bool) -> void:
 
 func set_view_scale(value: float) -> void:
 	_view_scale = value
+	_view_scale_configured = true
 	_apply_view_scale()
 
 

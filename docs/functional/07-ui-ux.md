@@ -79,7 +79,7 @@ flowchart TD
 - The own-side drop zone spans the artifact and unit rows and is visibly highlighted while dragging a card.
 - Valid targets glow; invalid ones dim.
 - **Undo play** is available after the most recent card play and disappears after the next action or turn end. Undo restores the state before the play, including any resolved play effects.
-- Duel controls, cards and text scale to the available viewport height to prevent bottom-edge clipping in shorter editor/debug windows; the hand remains horizontally scrollable.
+- Duel controls, cards and text scale to the available viewport height to prevent bottom-edge clipping in shorter editor/debug windows. Board rows reserve card height even while empty, preventing the window from resizing when the AI plays a unit; the hand remains horizontally scrollable.
 - Every rules event has an animation + sound (damage numbers, death, draw).
 - AI turn is visible step by step; speed configurable (1×, 2×, instant).
 - Log of the last actions accessible from the duel screen.

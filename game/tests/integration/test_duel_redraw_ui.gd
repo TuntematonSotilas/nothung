@@ -162,6 +162,48 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	await get_tree().process_frame
 
 
+func test_ai_playing_a_unit_does_not_change_duel_minimum_height() -> void:
+	var duel: Control = await _create_duel()
+	var current_match: Match = duel.get("_match") as Match
+	var state: GameState = current_match.get_state()
+	var opponent: PlayerState = state.player(1)
+	state.phase = GameState.Phase.MAIN
+	state.active_player = 0
+	opponent.board.cards.clear()
+	duel.call("_refresh")
+	await get_tree().process_frame
+
+	var layout: VBoxContainer = duel.get("_main_layout") as VBoxContainer
+	var viewport_height: float = duel.get_viewport().get_visible_rect().size.y
+	var minimum_height_before_play: float = layout.get_combined_minimum_size().y
+	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"ravens_gather"), 1, 501)
+	opponent.board.add(card)
+	duel.call("_refresh")
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var minimum_height_after_play: float = layout.get_combined_minimum_size().y
+	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
+	var hand_scroll: ScrollContainer = hand.get_parent() as ScrollContainer
+	var hand_card: CardView = hand.get_child(0) as CardView
+	var enemy_board: HBoxContainer = duel.get("_enemy_board") as HBoxContainer
+	var enemy_card: CardView = enemy_board.get_child(0) as CardView
+	assert_bool(minimum_height_before_play <= viewport_height).is_true()
+	assert_float(absf(minimum_height_after_play - minimum_height_before_play)).is_less_equal(1.0)
+	assert_float(
+		absf(
+			enemy_card.custom_minimum_size.y
+			- 200 * float(duel.get("_board_card_scale"))
+		)
+	).is_less_equal(0.001)
+	assert_float(hand_scroll.size.y).is_greater_equal(hand_card.size.y)
+	assert_bool(
+		hand_card.get_global_rect().end.y <= hand_scroll.get_global_rect().end.y
+	).is_true()
+	duel.queue_free()
+	await get_tree().process_frame
+
+
 func _create_duel() -> Control:
 	var packed_scene: PackedScene = load("res://scenes/screens/duel.tscn")
 	var duel: Control = packed_scene.instantiate() as Control
