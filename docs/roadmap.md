@@ -67,13 +67,13 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 ## 3 — Playable match
 
 - [x] Duel screen layout (portrait) ([UI / UX](functional/07-ui-ux.md#duel-screen-layout-portrait-draft))
-- [ ] `CardView` with placeholder art (frame colour by faction, gem, generated rules text)
+- [x] `CardView` with placeholder art (frame colour by faction, gem, generated rules text)
 - [x] Hand, board, Leader, Energy and Life views driven by `Match` events
-- [ ] Input: drag-and-drop + tap-tap mode; long press → zoom (tap-to-select is implemented)
+- [x] Input: drag-and-drop + tap-tap mode; long press → zoom
 - [x] Opening hand screen with Redraw
 - [x] Easy AI on a worker thread ([AI opponent](technical/05-ai-opponent.md))
 - [x] Results screen
-- [ ] **Play a full match on the phone**
+- [x] **Play a full match on the phone**
 
 ## 4 — AI & balancing
 

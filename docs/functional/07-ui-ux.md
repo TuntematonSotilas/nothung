@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-16
 
 ## Platform constraints
 
@@ -57,7 +57,7 @@ flowchart TD
 │ ─────────── artifacts ────── │
 │ ▢ ▢ ▢ ▢ ▢ ▢   your board     │
 │ [Your Leader ♥20] [Ability]  │
-│ Energy ●●●●○○      [END TURN]│
+│ Energy ●●●● [UNDO] [END TURN]│
 │   ╭──╮╭──╮╭──╮╭──╮╭──╮       │
 │   hand (fanned, scrollable)  │
 └──────────────────────────────┘
@@ -68,19 +68,23 @@ flowchart TD
 | Action | Gesture |
 |--------|---------|
 | Inspect card | Long press → zoomed card with full text and trait tooltips |
-| Play card | Drag from hand onto board (or onto a target) |
+| Play card | Drag from hand onto the highlighted own-side drop zone (or onto a target) |
 | Attack | Drag from own unit to target; valid targets highlighted |
-| Cancel | Release outside a valid target |
+| Cancel drag | Release outside a valid target; the card stays where it was |
+| Undo last play | Tap **Undo play** before taking another action; the card returns to the top of the deck and the match state is restored to before it was played |
 | Accessibility alternative | Tap card → tap target (no drag required) |
 
 ## Feedback
 
+- The own-side drop zone spans the artifact and unit rows and is visibly highlighted while dragging a card.
 - Valid targets glow; invalid ones dim.
+- **Undo play** is available after the most recent card play and disappears after the next action or turn end. Undo restores the state before the play, including any resolved play effects.
+- Duel controls, cards and text scale to the available viewport height to prevent bottom-edge clipping in shorter editor/debug windows; the hand remains horizontally scrollable.
 - Every rules event has an animation + sound (damage numbers, death, draw).
 - AI turn is visible step by step; speed configurable (1×, 2×, instant).
 - Log of the last actions accessible from the duel screen.
 
-> **Playable match (2026-10-16):** the initial duel is launched from the splash screen and uses tap-to-select/tap-target controls. Drag-and-drop, card zoom, and a physical Android play-through remain outstanding.
+> **Playable match (2026-10-16):** the initial duel is launched from the splash screen. Tap-to-select/tap-target and drag-and-drop controls are verified on Android, as is long-press card zoom. A full match was played to its result screen on the Android emulator.
 
 ## Accessibility
 

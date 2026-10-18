@@ -51,6 +51,18 @@ func get_state() -> GameState:
 	return _state
 
 
+## Restores a previously captured state snapshot for an explicit undo operation.
+func restore_snapshot(snapshot: GameState) -> bool:
+	if snapshot == null or snapshot.players.size() != 2:
+		push_error("Match cannot restore an invalid state snapshot.")
+		return false
+	_state = snapshot.duplicate_state()
+	_trigger_queue.clear()
+	_resolving_triggers = false
+	_resolution_count = 0
+	return true
+
+
 ## Returns every currently legal action for the given player.
 func get_legal_actions(player_id: int) -> Array[Action]:
 	var actions: Array[Action] = []
