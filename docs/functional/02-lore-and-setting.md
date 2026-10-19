@@ -1,7 +1,7 @@
 # Lore & setting
 
 > The source material and how it maps onto game content (factions, characters, artifacts, campaign).
-> Status: Draft · Last updated: 2026-10-13
+> Status: Draft · Last updated: 2026-10-19
 
 ## Source material
 
@@ -22,11 +22,31 @@
 
 | Faction | Members | Play style (draft) |
 |---------|---------|--------------------|
-| **Gods (Æsir)** | Wotan, Fricka, Donner, Froh, Freia, Loge | Control, contracts/pacts, powerful but bound by law |
+| **Gods** | Wotan, Fricka, Donner, Froh, Freia, Loge | Control, contracts/pacts, powerful but bound by law |
 | **Nibelungs** | Alberich, Mime, Nibelung dwarves | Energy economy, forging artifacts, swarm |
 | **Wälsungs & Heroes** | Siegmund, Sieglinde, Siegfried | Aggression, growing units, weapon synergies |
-| **Valkyries** | Brünnhilde, the 8 sisters | Resurrecting fallen units, flying |
+| **Valkyries** | Brünnhilde and her 8 sisters — [one card each](#the-valkyries) | Resurrecting fallen units, flying |
 | *Neutral* | Rhinemaidens, Norns, Erda, Woodbird · Giants (Fasolt, Fafner) · Gibichungs (Gunther, Gutrune, Hagen) | Utility, fate / foresight, big Giant units, Gibichung deception |
+
+## The Valkyries
+
+> **Decision (2026-10-19):** The Valkyries faction has **one card per Valkyrie**: Brünnhilde and her eight sisters, as named in *Die Walküre* Act III. Card stats come with the faction (milestone 4). Separately, the Gods faction may have an unnamed *Valkyries* card for the Valkyries Wotan sends out; it never uses a sister's name.
+
+Wotan's warrior daughters choose the heroes who fall in battle and carry them to Valhalla (*Die Walküre*). Brünnhilde is the daughter of Wotan and Erda.
+
+| Valkyrie | Where she appears | Card rarity ([rule](04-cards.md#rarities)) |
+|----------|-------------------|--------------------------------------------|
+| **Brünnhilde** | Defies Wotan to protect Siegmund, is put to sleep in a ring of fire (*Die Walküre* II–III); woken by Siegfried (*Siegfried* III); returns the Ring to the Rhine (*Götterdämmerung*) | Legendary |
+| **Waltraute** | The Ride (*Die Walküre* III); visits Brünnhilde to beg her to give the Ring back to the Rhine, and is refused (*Götterdämmerung* I) | Rare or Epic |
+| **Gerhilde** | The Ride (*Die Walküre* III): her *„Hojotoho! Heiaha!"* opens the scene | Common / Rare |
+| **Helmwige** | The Ride (*Die Walküre* III) | Common / Rare |
+| **Ortlinde** | The Ride (*Die Walküre* III) | Common / Rare |
+| **Schwertleite** | The Ride (*Die Walküre* III) | Common / Rare |
+| **Siegrune** | The Ride (*Die Walküre* III) | Common / Rare |
+| **Grimgerde** | The Ride (*Die Walküre* III) | Common / Rare |
+| **Rossweisse** | The Ride (*Die Walküre* III) | Common / Rare |
+
+The eight sisters have no individual story beyond the Ride: their cards can differ by role (carrying heroes, riding, guarding Brünnhilde's rock) without inventing a biography.
 
 ## Key artifacts (card candidates)
 

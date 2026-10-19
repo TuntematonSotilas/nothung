@@ -49,6 +49,7 @@ const CARD_HEADER: PackedStringArray = [
 ]
 const LEADER_HEADER: PackedStringArray = ["id", "name", "faction", "life", "ability_cost", "ability", "flavour"]
 const DECK_HEADER: PackedStringArray = ["id", "leader", "cards"]
+const ART_DIRECTORY: String = "res://assets/art/cards"
 
 var _repo_root: String
 var _errors: Array[String] = []
@@ -84,6 +85,7 @@ func _run_pipeline() -> void:
 		_report_errors()
 		call_deferred("_exit_after_frame", 1)
 		return
+	_collect_rules_texts()
 	if not _validate_decks():
 		_report_errors()
 		call_deferred("_exit_after_frame", 1)
@@ -148,11 +150,6 @@ func _load_sources() -> bool:
 			card.take_over_path(resource_path)
 			_resources[resource_path] = card
 
-	for card_id: String in _cards:
-		var rules: String = _rules_text(_cards[card_id])
-		if not rules.is_empty():
-			_translation_entries["CARD_%s_RULES" % card_id.to_upper()] = rules
-
 	var leaders_path: String = cards_dir.path_join("leaders.md")
 	for row: Dictionary in _read_table(leaders_path, LEADER_HEADER):
 		var leader: LeaderData = _parse_leader(row, leaders_path)
@@ -166,11 +163,6 @@ func _load_sources() -> bool:
 		_translation_entries["LEADER_%s_NAME" % leader_id.to_upper()] = String(row["name"])
 		if not String(row["flavour"]).is_empty():
 			_translation_entries["LEADER_%s_FLAVOUR" % leader_id.to_upper()] = String(row["flavour"])
-		if leader.ability != null:
-			_translation_entries["LEADER_%s_RULES" % leader_id.to_upper()] = "Ability (%d Energy): %s" % [
-				leader.ability.cost,
-				_effect_text(leader.ability.effects[0]),
-			]
 		var leader_resource_path: String = "res://data/leaders/%s.tres" % leader_id
 		leader.take_over_path(leader_resource_path)
 		_resources[leader_resource_path] = leader
@@ -281,6 +273,7 @@ func _parse_card(row: Dictionary, faction: String, path: String) -> CardData:
 	_parse_abilities(String(row["abilities"]), card.abilities, path, line)
 	if _errors.size() > error_count:
 		return null
+	card.art = _art_for("%s.png" % card_id)
 	return card
 
 
@@ -308,7 +301,16 @@ func _parse_leader(row: Dictionary, path: String) -> LeaderData:
 				_error(path, line, "Leader abilities cannot create the Ring.")
 			ability.effects.append(effect)
 			leader.ability = ability
+	leader.art = _art_for("%s_leader.png" % leader_id)
 	return leader
+
+
+## Artwork is found by naming convention: res://assets/art/cards/<card_id>.png or <leader_id>_leader.png.
+func _art_for(file_name: String) -> Texture2D:
+	var art_path: String = ART_DIRECTORY.path_join(file_name)
+	if not ResourceLoader.exists(art_path):
+		return null
+	return load(art_path) as Texture2D
 
 
 func _parse_deck(row: Dictionary, path: String) -> DeckData:
@@ -536,6 +538,21 @@ func _resolve_references() -> bool:
 	return _errors.is_empty()
 
 
+## Rules texts name referenced cards (e.g. "Summon Nibelung Miner."), so they are built after references are resolved.
+func _collect_rules_texts() -> void:
+	for card_id: String in _cards:
+		var rules: String = _rules_text(_cards[card_id])
+		if not rules.is_empty():
+			_translation_entries["CARD_%s_RULES" % card_id.to_upper()] = rules
+	for leader_id: String in _leaders:
+		var leader: LeaderData = _leaders[leader_id]
+		if leader.ability != null:
+			_translation_entries["LEADER_%s_RULES" % leader_id.to_upper()] = "Ability (%d Energy): %s" % [
+				leader.ability.cost,
+				_effect_text(leader.ability.effects[0]),
+			]
+
+
 func _validate_decks() -> bool:
 	if _cards.size() < 1 or _leaders.size() < 1 or _decks.size() < 1:
 		_error("cards", 0, "At least one card, leader and starter deck are required.")
@@ -588,7 +605,12 @@ func _updated_localization(path: String) -> String:
 		if row[0].begins_with("CARD_") or row[0].begins_with("LEADER_"):
 			if not _translation_entries.has(row[0]):
 				continue
+			var previous_source: String = row[1]
 			row[1] = _translation_entries[row[0]]
+			# A column still equal to the old English text was never translated: it follows the new source.
+			for column: int in range(2, row.size()):
+				if row[column] == previous_source:
+					row[column] = row[1]
 			output.append(row)
 		else:
 			output.append(row)

@@ -28,8 +28,8 @@ func test_translations_are_loaded() -> void:
 	assert_str(tr("UI_CLOSE")).is_equal("FERMER")
 	assert_str(tr("UI_UNDO_PLAY")).is_equal("ANNULER LA POSE")
 	assert_str(tr("UI_DROP_TO_PLAY")).is_equal("DÉPOSER ICI POUR JOUER")
-	assert_str(tr("CARD_LOGES_FIRE_NAME")).is_equal("Loge's Fire")
-	assert_str(tr("LEADER_WOTAN_RULES")).is_equal("Ability (2 Energy): Deal 2 damage to a unit.")
+	assert_str(tr("CARD_LOGE_NAME")).is_equal("Loge")
+	assert_str(tr("LEADER_WOTAN_RULES")).is_equal("Ability (3 Energy): Deal 2 damage to a unit.")
 	TranslationServer.set_locale(previous)
 
 

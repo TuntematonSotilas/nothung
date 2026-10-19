@@ -1,7 +1,7 @@
 # Cards
 
 > Card anatomy, types, traits, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-19
 
 ## Card anatomy
 
@@ -69,7 +69,13 @@
 | Common | 2 | ~45 % |
 | Rare | 2 | ~30 % |
 | Epic | 1 | ~15 % |
-| Legendary | 1 | ~10 % (named characters, the Ring, Nothung…) |
+| Legendary | 1 | ~10 % (major characters, the Ring, Nothung…) |
+
+> **Decision (2026-10-19):** Rarity of **named characters** depends on their weight in the story, not on having a name.
+> - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm…
+> - **Common / Rare / Epic** (by power): the secondary named characters — Fricka, Freia, Donner, Froh, Loge, the eight sister Valkyries, Mime, Sieglinde, the Rhinemaidens…
+>
+> A card named after a character must come from the libretto: no figure from Norse mythology that Wagner does not use ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).
 
 ## Deckbuilding rules
 
@@ -102,7 +108,7 @@ Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card 
 | Alberich, Lord of the Nibelungs | 4 | Unit — Dwarf | Nibelungs | 3/4 | On play: gain 2 Energy. If you hold the Ring, draw a card. |
 | Fafner | 8 | Unit — Giant | Neutral | 8/8 | Guard. Cannot attack the turn after it attacks. |
 | Ride of the Valkyries | 5 | Spell | Valkyries | – | Return up to 2 Valhalla units from your graveyard to the board. |
-| Loge's Fire | 3 | Spell | Gods | – | Deal 2 damage to all enemy units. |
+| Loge | 4 | Unit — God | Gods | 2/3 | On play: deal 2 damage to all enemy units. |
 
 ## Signature cards (libretto rules)
 

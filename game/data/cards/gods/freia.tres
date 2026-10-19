@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_pjivg"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_7mk07"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_01s6a"]
+
+[sub_resource type="Resource" id="Resource_pfdi4"]
+script = ExtResource("2_7mk07")
+kind = 2
+amount = 1
+
+[sub_resource type="Resource" id="Resource_52j7c"]
+script = ExtResource("1_pjivg")
+effects = Array[ExtResource("2_7mk07")]([SubResource("Resource_pfdi4")])
+
+[resource]
+script = ExtResource("3_01s6a")
+id = &"freia"
+faction = &"gods"
+subtypes = Array[StringName]([&"god"])
+cost = 3
+attack = 3
+health = 3
+abilities = Array[ExtResource("1_pjivg")]([SubResource("Resource_52j7c")])
+leitmotifs = Array[StringName]([&"valhalla"])

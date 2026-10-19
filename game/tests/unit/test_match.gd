@@ -19,15 +19,15 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 
 
 func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
-	assert_int(CardDatabase.card_count()).is_equal(20)
+	assert_int(CardDatabase.card_count()).is_equal(21)
 	var gods_deck: DeckData = CardDatabase.get_deck(&"gods_starter")
 	var nibelungs_deck: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
 	assert_object(gods_deck).is_not_null()
 	assert_object(nibelungs_deck).is_not_null()
 	assert_int(gods_deck.cards.size()).is_equal(20)
 	assert_int(nibelungs_deck.cards.size()).is_equal(20)
-	assert_int(CardDatabase.get_card(&"loges_fire").abilities[0].effects[0].amount).is_equal(2)
-	assert_int(CardDatabase.get_leader(&"wotan").ability.cost).is_equal(2)
+	assert_int(CardDatabase.get_card(&"loge").abilities[0].effects[0].amount).is_equal(2)
+	assert_int(CardDatabase.get_leader(&"wotan").ability.cost).is_equal(3)
 
 	var engine := Match.new(gods_deck, nibelungs_deck, 20261016)
 	assert_int(engine.get_state().phase).is_equal(GameState.Phase.REDRAW)

@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_1glyh"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_ov48b"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_rx4th"]
+
+[sub_resource type="Resource" id="Resource_1nnyg"]
+script = ExtResource("2_ov48b")
+amount = 3
+
+[sub_resource type="Resource" id="Resource_emtt4"]
+script = ExtResource("1_1glyh")
+effects = Array[ExtResource("2_ov48b")]([SubResource("Resource_1nnyg")])
+
+[resource]
+script = ExtResource("3_rx4th")
+id = &"donners_hammer"
+faction = &"gods"
+type = 1
+rarity = 1
+cost = 4
+abilities = Array[ExtResource("1_1glyh")]([SubResource("Resource_emtt4")])
+leitmotifs = Array[StringName]([&"thunder"])

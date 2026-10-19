@@ -52,9 +52,9 @@ func test_tap_then_target_plays_a_targeted_card() -> void:
 	player.energy = 2
 	player.hand.cards.clear()
 	player.board.cards.clear()
-	var spell_data: CardData = CardDatabase.get_card(&"war_song")
+	var spell_data: CardData = CardDatabase.get_card(&"freias_golden_apples")
 	var spell: CardInstance = CardInstance.new(spell_data, 0, 101)
-	var target: CardInstance = CardInstance.new(CardDatabase.get_card(&"ravens_gather"), 0, 102)
+	var target: CardInstance = CardInstance.new(CardDatabase.get_card(&"wotans_ravens"), 0, 102)
 	player.hand.add(spell)
 	player.board.add(target)
 	duel.call("_refresh")
@@ -85,7 +85,7 @@ func test_dragging_a_playable_card_to_the_empty_board_plays_it() -> void:
 	player.energy = 1
 	player.hand.cards.clear()
 	player.board.cards.clear()
-	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"ravens_gather"), 0, 201)
+	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"wotans_ravens"), 0, 201)
 	player.hand.add(card)
 	duel.call("_refresh")
 	await get_tree().process_frame
@@ -115,8 +115,8 @@ func test_undoing_a_play_restores_effects_and_returns_card_to_deck() -> void:
 	player.energy = 2
 	player.hand.cards.clear()
 	player.board.cards.clear()
-	var spell: CardInstance = CardInstance.new(CardDatabase.get_card(&"war_song"), 0, 301)
-	var target: CardInstance = CardInstance.new(CardDatabase.get_card(&"ravens_gather"), 0, 302)
+	var spell: CardInstance = CardInstance.new(CardDatabase.get_card(&"freias_golden_apples"), 0, 301)
+	var target: CardInstance = CardInstance.new(CardDatabase.get_card(&"wotans_ravens"), 0, 302)
 	player.hand.add(spell)
 	player.board.add(target)
 	var original_deck_size: int = player.deck.size()
@@ -159,7 +159,7 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	player.energy = 1
 	player.hand.cards.clear()
 	player.board.cards.clear()
-	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"ravens_gather"), 0, 401)
+	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"wotans_ravens"), 0, 401)
 	player.hand.add(card)
 	duel.call("_refresh")
 	await get_tree().process_frame
@@ -204,7 +204,7 @@ func test_ai_playing_a_unit_does_not_change_duel_minimum_height() -> void:
 	var layout: VBoxContainer = duel.get("_main_layout") as VBoxContainer
 	var viewport_height: float = duel.get_viewport().get_visible_rect().size.y
 	var minimum_height_before_play: float = layout.get_combined_minimum_size().y
-	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"ravens_gather"), 1, 501)
+	var card: CardInstance = CardInstance.new(CardDatabase.get_card(&"wotans_ravens"), 1, 501)
 	opponent.board.add(card)
 	duel.call("_refresh")
 	await get_tree().process_frame

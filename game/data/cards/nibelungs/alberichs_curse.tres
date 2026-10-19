@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_p5y15"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_ydqok"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_6ip36"]
+
+[sub_resource type="Resource" id="Resource_qskuj"]
+script = ExtResource("2_ydqok")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_3ym32"]
+script = ExtResource("1_p5y15")
+effects = Array[ExtResource("2_ydqok")]([SubResource("Resource_qskuj")])
+
+[sub_resource type="Resource" id="Resource_uqwo7"]
+script = ExtResource("2_ydqok")
+kind = 1
+amount = 1
+
+[sub_resource type="Resource" id="Resource_ritci"]
+script = ExtResource("1_p5y15")
+effects = Array[ExtResource("2_ydqok")]([SubResource("Resource_uqwo7")])
+
+[resource]
+script = ExtResource("3_6ip36")
+id = &"alberichs_curse"
+faction = &"nibelungs"
+type = 1
+rarity = 1
+cost = 3
+abilities = Array[ExtResource("1_p5y15")]([SubResource("Resource_3ym32"), SubResource("Resource_ritci")])
+leitmotifs = Array[StringName]([&"ring"])

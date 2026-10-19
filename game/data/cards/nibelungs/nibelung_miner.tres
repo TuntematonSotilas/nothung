@@ -1,14 +1,26 @@
 [gd_resource type="Resource" script_class="CardData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_hcmg2"]
-[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_hbmcs"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_hbmcs"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_8uv6b"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_rqbkg"]
+
+[sub_resource type="Resource" id="Resource_dwqiw"]
+script = ExtResource("2_8uv6b")
+kind = 2
+amount = 1
+
+[sub_resource type="Resource" id="Resource_nl7lw"]
+script = ExtResource("1_hbmcs")
+trigger = &"on_death"
+effects = Array[ExtResource("2_8uv6b")]([SubResource("Resource_dwqiw")])
 
 [resource]
-script = ExtResource("2_hbmcs")
+script = ExtResource("3_rqbkg")
 id = &"nibelung_miner"
 faction = &"nibelungs"
 subtypes = Array[StringName]([&"dwarf"])
 cost = 1
 attack = 1
 health = 2
+abilities = Array[ExtResource("1_hbmcs")]([SubResource("Resource_nl7lw")])
 leitmotifs = Array[StringName]([&"forge"])

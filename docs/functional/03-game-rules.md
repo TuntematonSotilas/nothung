@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-19
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -87,7 +87,7 @@ A **Relic** is an artifact that is attached to a unit instead of going to the ar
 ## Leader
 
 - Each Leader has Life 20 and a **Leader ability** (costs Energy, once per turn).
-- Example: *Wotan — "Spear of Treaties" (2 Energy): give a unit Guard.*
+- Starter Leaders: *Wotan* (3 Energy): deal 2 damage to a unit. *Alberich* (2 Energy): summon a Nibelung Miner — he commands his Nibelungs.
 
 ## The Ring (signature mechanic)
 
@@ -105,6 +105,8 @@ The Ring is a special neutral legendary artifact that enters play only through s
 > **Decision (2026-10-09):** The Ring is not present by default; it enters play only through specific cards in a deck.
 
 > **Decision (2026-10-15):** Keep the curse values (1+2+3+3 = 9 Life over 4 turns, capped at 3 per turn) as the starting point; tune bonus vs curse from playtests and AI vs AI simulations ([09-testing](../technical/09-testing.md)).
+
+> **Decision (2026-10-19):** The curse stays as it is, but the **Nibelungs starter deck contains no card that creates the Ring** (*Renunciation of Love* stays in the card pool for built decks and the campaign). Reason: no Gods card can take the Ring back, so a starter-deck Nibelung player kept it to the end and lost 12.6 Life per match to the curse on average (AI vs AI, 40 matches: Gods won 38 / 40). Wotan's ability also went from 2 to 3 Energy. Figures: [AI soak](../technical/09-testing.md#ai-soak).
 
 ## Götterdämmerung (turn limit)
 

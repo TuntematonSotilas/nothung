@@ -4,5 +4,5 @@ Each listed card id appears twice in the deck.
 
 | id | leader | cards |
 |----|--------|-------|
-| gods_starter | wotan | ravens_gather, einherjar_guard, spear_guard, divine_scout, thunder_adept, blessing_of_valhalla, loges_fire, war_song, storm_bolt, wotans_stormcaller, ravens_gather, einherjar_guard, spear_guard, divine_scout, thunder_adept, blessing_of_valhalla, loges_fire, war_song, storm_bolt, wotans_stormcaller |
-| nibelungs_starter | alberich | nibelung_miner, mime_apprentice, forge_guard, tunnel_scout, ring_claimant, coal_hurler, dwarven_brew, cave_blessing, shadow_strike, alberichs_bargain, nibelung_miner, mime_apprentice, forge_guard, tunnel_scout, ring_claimant, coal_hurler, dwarven_brew, cave_blessing, shadow_strike, alberichs_bargain |
+| gods_starter | wotan | wotans_ravens, valhalla_hero, fricka, wotans_valkyries, freia, blessing_of_valhalla, loge, freias_golden_apples, donners_hammer, donner, wotans_ravens, valhalla_hero, fricka, wotans_valkyries, freia, blessing_of_valhalla, loge, freias_golden_apples, donners_hammer, donner |
+| nibelungs_starter | alberich | nibelung_miner, mime, hoard_bearers, smiths_of_nibelheim, nibelung_host, nibelung_hoard, alberichs_whip, alberichs_curse, mimes_brew, giant_serpent, nibelung_miner, mime, hoard_bearers, smiths_of_nibelheim, nibelung_host, nibelung_hoard, alberichs_whip, alberichs_curse, mimes_brew, giant_serpent |

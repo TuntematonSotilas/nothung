@@ -1,7 +1,7 @@
 # Testing
 
 > Test strategy and tooling.
-> Status: Draft · Last updated: 2026-10-16
+> Status: Draft · Last updated: 2026-10-19
 
 ## Framework
 
@@ -101,6 +101,46 @@ With the mulligan heuristic enabled, the same 40 seeds produce:
 | Draws | 0 |
 
 The opening-hand policy did not improve the Nibelungs result in this small sample. More matchups and a stronger Normal profile are needed before changing card or turn-balance rules.
+
+After the Gods canon rename (2026-10-19: same stats, except *Loge's Fire*, a 3-cost common spell, becoming **Loge**, a 4-cost rare 2/3 unit with the same on-play effect), the same 40 seeds produce:
+
+| Metric | Result |
+|--------|--------|
+| Average match length | 15.6 turns |
+| Average actions | 63.0 |
+| Gods starter wins | 37 / 40 (92.5%) |
+| Nibelungs starter wins | 3 / 40 (7.5%) |
+| Draws | 0 |
+
+Loge as a unit barely moves the balance; the Gods starter still dominates.
+
+**Nibelungs rebalance (2026-10-19).** The Nibelungs starter was rewritten from the libretto (Mime, Hoard Bearers, Smiths of Nibelheim, Alberich's Whip, Mime's Brew, The Giant Serpent…) and Alberich's ability, which cost 2 Energy to gain 2, now summons a Nibelung Miner. Still 38 / 40 for the Gods. A diagnostic run over the same seeds showed two causes:
+
+- **The Ring curse**: the Nibelungs created the Ring in 39 / 40 matches and lost 12.6 Life per match to it, since no Gods card can take it back.
+- **Wotan's ability** (2 damage for 2 Energy) was used 96 times and removed the small dwarves every turn.
+
+Variants measured in memory (same 40 seeds, Gods wins / Nibelungs wins):
+
+| Variant | Result |
+|---------|--------|
+| Rewritten Nibelungs, Ring card in the deck | 38 / 2 |
+| Ring card removed | 26 / 14 |
+| Ring kept, no curse | 26 / 14 |
+| Curse capped at 1 | 31 / 9 |
+| Ring card removed + Wotan's ability at 3 Energy | 18 / 22 |
+| Wotan's ability dealing 1 damage | 11–14 / 26–29 |
+
+Retained ([game rules](../functional/03-game-rules.md#the-ring-signature-mechanic)): Ring card out of the starter deck, replaced by *Nibelung Host* (2/3 Guard, +1 Energy on death); Wotan's ability at 3 Energy. Result:
+
+| Metric | Result |
+|--------|--------|
+| Average match length | 21.3 turns (~10.6 per player) |
+| Average actions | 82.6 |
+| Gods starter wins | 24 / 40 (60%) |
+| Nibelungs starter wins | 16 / 40 (40%) |
+| Draws | 0 |
+
+Matches are slightly above the 8–10 turns per player target.
 
 ## Manual test checklist (release)
 

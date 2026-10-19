@@ -1,21 +1,22 @@
 [gd_resource type="Resource" script_class="LeaderData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_2eg1r"]
-[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="2_3l1gl"]
-[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="3_r4bue"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_3l1gl"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_miner.tres" id="2_r4bue"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="3_asty6"]
+[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="4_sh62w"]
 
-[sub_resource type="Resource" id="Resource_asty6"]
-script = ExtResource("1_2eg1r")
-kind = 2
-amount = 2
+[sub_resource type="Resource" id="Resource_ec4wj"]
+script = ExtResource("1_3l1gl")
+kind = 3
+card = ExtResource("2_r4bue")
 
-[sub_resource type="Resource" id="Resource_sh62w"]
-script = ExtResource("2_3l1gl")
+[sub_resource type="Resource" id="Resource_amdot"]
+script = ExtResource("3_asty6")
 cost = 2
-effects = Array[ExtResource("1_2eg1r")]([SubResource("Resource_asty6")])
+effects = Array[ExtResource("1_3l1gl")]([SubResource("Resource_ec4wj")])
 
 [resource]
-script = ExtResource("3_r4bue")
+script = ExtResource("4_sh62w")
 id = &"alberich"
 faction = &"nibelungs"
-ability = SubResource("Resource_sh62w")
+ability = SubResource("Resource_amdot")

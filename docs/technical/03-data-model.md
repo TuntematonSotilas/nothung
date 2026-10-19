@@ -1,7 +1,7 @@
 # Data model
 
 > How cards, decks and effects are represented as data. Implements [functional/04-cards.md](../functional/04-cards.md).
-> Status: Draft · Last updated: 2026-10-16
+> Status: Draft · Last updated: 2026-10-19
 
 ## Principles
 
@@ -112,8 +112,8 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 | id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
 |----|------|------|----------|--------|------|-----|----|----------|--------|-----------|------------|---------|
 | alberich_lord | Alberich, Lord of the Nibelungs | unit | dwarf | legendary | 4 | 3 | 4 | | | on_play: gain_energy(2); on_play[holds_ring]: draw(1) | energy, ring | |
-| loge_fire | Loge's Fire | spell | | rare | 3 | | | | | on_play: damage(all_enemy_units, 2) | fire | |
-| ring_claimant | Ring Claimant | unit | dwarf | common | 3 | 2 | 3 | | | on_play: create_ring() | ring | |
+| loge | Loge | unit | god | rare | 4 | 2 | 3 | | | on_play: damage(all_enemy_units, 2) | fire | |
+| renunciation_of_love | Renunciation of Love | spell | | common | 2 | | | | | on_play: create_ring(); on_play: draw(1) | ring | |
 ```
 
 - `faction` comes from the file name.
@@ -127,7 +127,9 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 
 - Written in GDScript (one language for the whole project), run with headless Godot: `godot --headless --path game --script ../tools/card_pipeline.gd` generates files; add `-- --check` to fail if generated outputs are missing or stale.
 - Parses every `cards/*.md`, validates (see below), writes card, Leader and starter deck Resources, plus localisation entries.
-- Generated `.tres` files are committed (the Godot project opens without running the tool) but **never edited by hand**.
+- Generated `.tres` files are committed (the Godot project opens without running the tool) but **never edited by hand**: the next run overwrites them.
+- **Artwork** is attached by naming convention, not by editing the `.tres`: `game/assets/art/cards/<card_id>.png` for a card, `<leader_id>_leader.png` for a Leader (e.g. `wotan_leader.png`). Add the image, then rerun the converter.
+- Renaming or removing a card: the converter does not delete old `.tres` files; delete them by hand (the check mode reports them as stale). Translations of a removed id are dropped.
 - A check mode re-runs the converter and fails if any generated output differs from the sources; run it before committing.
 
 ## Validation

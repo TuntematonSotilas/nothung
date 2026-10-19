@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_cp06o"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_43n5v"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_k20ed"]
+
+[sub_resource type="Resource" id="Resource_oqgrr"]
+script = ExtResource("2_43n5v")
+kind = 7
+
+[sub_resource type="Resource" id="Resource_j71ag"]
+script = ExtResource("1_cp06o")
+effects = Array[ExtResource("2_43n5v")]([SubResource("Resource_oqgrr")])
+
+[sub_resource type="Resource" id="Resource_skma2"]
+script = ExtResource("2_43n5v")
+kind = 1
+amount = 1
+
+[sub_resource type="Resource" id="Resource_pchsw"]
+script = ExtResource("1_cp06o")
+effects = Array[ExtResource("2_43n5v")]([SubResource("Resource_skma2")])
+
+[resource]
+script = ExtResource("3_k20ed")
+id = &"renunciation_of_love"
+faction = &"nibelungs"
+type = 1
+cost = 2
+abilities = Array[ExtResource("1_cp06o")]([SubResource("Resource_j71ag"), SubResource("Resource_pchsw")])
+leitmotifs = Array[StringName]([&"ring"])

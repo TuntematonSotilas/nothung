@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="CardData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_db8mg"]
-[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_31vls"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_51up8"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_bej2w"]
 
 [resource]
-script = ExtResource("2_31vls")
-id = &"einherjar_guard"
+script = ExtResource("2_bej2w")
+id = &"valhalla_hero"
 faction = &"gods"
 subtypes = Array[StringName]([&"hero"])
 cost = 2

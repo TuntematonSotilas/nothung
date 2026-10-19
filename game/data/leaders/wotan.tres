@@ -1,22 +1,22 @@
 [gd_resource type="Resource" script_class="LeaderData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_82d8b"]
-[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="2_c4wh6"]
-[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="3_l3lxp"]
-[ext_resource type="Texture2D" path="res://assets/art/cards/wotan_leader.png" id="4_art"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_c4wh6"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="2_l3lxp"]
+[ext_resource type="Texture2D" path="res://assets/art/cards/wotan_leader.png" id="3_p6snu"]
+[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="4_q1j5j"]
 
-[sub_resource type="Resource" id="Resource_p6snu"]
-script = ExtResource("1_82d8b")
+[sub_resource type="Resource" id="Resource_666mu"]
+script = ExtResource("1_c4wh6")
 amount = 2
 
-[sub_resource type="Resource" id="Resource_q1j5j"]
-script = ExtResource("2_c4wh6")
-cost = 2
-effects = Array[ExtResource("1_82d8b")]([SubResource("Resource_p6snu")])
+[sub_resource type="Resource" id="Resource_lh11j"]
+script = ExtResource("2_l3lxp")
+cost = 3
+effects = Array[ExtResource("1_c4wh6")]([SubResource("Resource_666mu")])
 
 [resource]
-script = ExtResource("3_l3lxp")
+script = ExtResource("4_q1j5j")
 id = &"wotan"
 faction = &"gods"
-ability = SubResource("Resource_q1j5j")
-art = ExtResource("4_art")
+ability = SubResource("Resource_lh11j")
+art = ExtResource("3_p6snu")

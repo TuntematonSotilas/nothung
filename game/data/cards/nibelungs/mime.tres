@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_edq3c"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_vlgyx"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_gawkh"]
+
+[sub_resource type="Resource" id="Resource_uo2j1"]
+script = ExtResource("2_vlgyx")
+kind = 1
+amount = 1
+
+[sub_resource type="Resource" id="Resource_fd61t"]
+script = ExtResource("1_edq3c")
+effects = Array[ExtResource("2_vlgyx")]([SubResource("Resource_uo2j1")])
+
+[resource]
+script = ExtResource("3_gawkh")
+id = &"mime"
+faction = &"nibelungs"
+subtypes = Array[StringName]([&"dwarf"])
+cost = 2
+attack = 1
+health = 3
+abilities = Array[ExtResource("1_edq3c")]([SubResource("Resource_fd61t")])
+leitmotifs = Array[StringName]([&"forge"])

@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 
 func test_long_press_requests_zoom_and_is_consumed() -> void:
 	var view: CardView = auto_free(CardView.new())
-	view.set_card(CardDatabase.get_card(&"thunder_adept"))
+	view.set_card(CardDatabase.get_card(&"freia"))
 	view.size = Vector2(100, 100)
 	add_child(view)
 	await get_tree().process_frame
@@ -21,13 +21,13 @@ func test_long_press_requests_zoom_and_is_consumed() -> void:
 	touch.pressed = false
 	view._input(touch)
 
-	assert_array(zoomed_card_ids).contains([&"thunder_adept"])
+	assert_array(zoomed_card_ids).contains([&"freia"])
 	assert_bool(view.consume_long_press()).is_true()
 	assert_bool(view.consume_long_press()).is_false()
 
 
 func test_card_drop_emits_source_and_target_information() -> void:
-	var card_data: CardData = CardDatabase.get_card(&"thunder_adept")
+	var card_data: CardData = CardDatabase.get_card(&"freia")
 	var instance: CardInstance = CardInstance.new(card_data, 0, 42)
 	var view: CardView = auto_free(CardView.new())
 	view.set_card(card_data, instance, false, 1)
@@ -52,7 +52,7 @@ func test_card_drop_emits_source_and_target_information() -> void:
 
 
 func test_drag_release_emits_drop_position_and_is_consumed() -> void:
-	var card_data: CardData = CardDatabase.get_card(&"thunder_adept")
+	var card_data: CardData = CardDatabase.get_card(&"freia")
 	var instance: CardInstance = CardInstance.new(card_data, 0, 42)
 	var view: CardView = auto_free(CardView.new())
 	view.set_card(card_data, instance, true, -1)
@@ -79,7 +79,7 @@ func test_drag_release_emits_drop_position_and_is_consumed() -> void:
 
 
 func test_drag_motion_emits_position_for_custom_preview() -> void:
-	var card_data: CardData = CardDatabase.get_card(&"thunder_adept")
+	var card_data: CardData = CardDatabase.get_card(&"freia")
 	var instance: CardInstance = CardInstance.new(card_data, 0, 43)
 	var view: CardView = auto_free(CardView.new())
 	view.set_card(card_data, instance, true)

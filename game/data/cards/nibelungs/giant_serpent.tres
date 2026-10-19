@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_m1wsr"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_73ini"]
+
+[resource]
+script = ExtResource("2_73ini")
+id = &"giant_serpent"
+faction = &"nibelungs"
+subtypes = Array[StringName]([&"beast"])
+rarity = 1
+cost = 5
+attack = 5
+health = 5
+leitmotifs = Array[StringName]([&"tarnhelm"])

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_yhkny"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_hcqlh"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_pidc8"]
+
+[sub_resource type="Resource" id="Resource_k4ger"]
+script = ExtResource("2_hcqlh")
+kind = 2
+amount = 1
+
+[sub_resource type="Resource" id="Resource_yxovs"]
+script = ExtResource("1_yhkny")
+trigger = &"on_death"
+effects = Array[ExtResource("2_hcqlh")]([SubResource("Resource_k4ger")])
+
+[resource]
+script = ExtResource("3_pidc8")
+id = &"nibelung_host"
+faction = &"nibelungs"
+subtypes = Array[StringName]([&"dwarf"])
+cost = 2
+attack = 2
+health = 3
+keywords = Array[StringName]([&"guard"])
+abilities = Array[ExtResource("1_yhkny")]([SubResource("Resource_yxovs")])
+leitmotifs = Array[StringName]([&"hoard"])
