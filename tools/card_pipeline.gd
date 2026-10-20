@@ -47,7 +47,7 @@ const CARD_HEADER: PackedStringArray = [
 	"leitmotifs",
 	"flavour",
 ]
-const LEADER_HEADER: PackedStringArray = ["id", "name", "faction", "life", "ability_cost", "ability", "flavour"]
+const LEADER_HEADER: PackedStringArray = ["id", "name", "faction", "life", "ability_name", "ability_cost", "ability", "flavour"]
 const DECK_HEADER: PackedStringArray = ["id", "leader", "cards"]
 const ART_DIRECTORY: String = "res://assets/art/cards"
 
@@ -163,6 +163,10 @@ func _load_sources() -> bool:
 		_translation_entries["LEADER_%s_NAME" % leader_id.to_upper()] = String(row["name"])
 		if not String(row["flavour"]).is_empty():
 			_translation_entries["LEADER_%s_FLAVOUR" % leader_id.to_upper()] = String(row["flavour"])
+		if leader.ability != null:
+			if String(row["ability_name"]).strip_edges().is_empty():
+				_error(leaders_path, int(row["line"]), "Leader ability name is required.")
+			_translation_entries["LEADER_%s_ABILITY_NAME" % leader_id.to_upper()] = String(row["ability_name"])
 		var leader_resource_path: String = "res://data/leaders/%s.tres" % leader_id
 		leader.take_over_path(leader_resource_path)
 		_resources[leader_resource_path] = leader
@@ -547,10 +551,12 @@ func _collect_rules_texts() -> void:
 	for leader_id: String in _leaders:
 		var leader: LeaderData = _leaders[leader_id]
 		if leader.ability != null:
+			var effect_text: String = _effect_text(leader.ability.effects[0])
 			_translation_entries["LEADER_%s_RULES" % leader_id.to_upper()] = "Ability (%d Energy): %s" % [
 				leader.ability.cost,
-				_effect_text(leader.ability.effects[0]),
+				effect_text,
 			]
+			_translation_entries["LEADER_%s_ABILITY_TEXT" % leader_id.to_upper()] = effect_text
 
 
 func _validate_decks() -> bool:

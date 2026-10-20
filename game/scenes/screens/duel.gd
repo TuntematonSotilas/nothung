@@ -21,6 +21,18 @@ var _turn_label: Label
 var _status_label: Label
 var _enemy_leader_button: Button
 var _enemy_leader_label: Label
+var _enemy_life_label: Label
+var _enemy_energy_label: Label
+var _enemy_counts_label: Label
+var _enemy_portrait_frame: Panel
+var _enemy_artwork: TextureRect
+var _enemy_portrait_initial: Label
+var _enemy_ability_button: Button
+var _enemy_zone_frame: PanelContainer
+var _own_zone_frame: PanelContainer
+var _own_life_label: Label
+var _own_counts_label: Label
+var _own_portrait_initial: Label
 var _enemy_board: HBoxContainer
 var _enemy_artifacts: HBoxContainer
 var _own_board: HBoxContainer
@@ -31,7 +43,6 @@ var _own_leader_artwork: TextureRect
 var _own_leader_button: Button
 var _own_leader_label: Label
 var _energy_label: Label
-var _deck_label: Label
 var _log_label: Label
 var _end_turn_button: Button
 var _ability_button: Button
@@ -96,113 +107,97 @@ func _build_ui() -> void:
 	add_child(_modal_layer)
 	_build_drop_hint()
 
-	var header: HBoxContainer = HBoxContainer.new()
-	_main_layout.add_child(header)
-	_turn_label = _label("UI_DUEL", 24, Palette.ACCENT)
-	_turn_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(_turn_label)
-	var back_button: Button = _button("UI_PAUSE", 140)
+	# Top bar: match / turn info, pause.
+	var top_bar: HBoxContainer = HBoxContainer.new()
+	top_bar.add_theme_constant_override("separation", roundi(10 * _ui_scale))
+	_main_layout.add_child(top_bar)
+	var info_panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.BORDER)
+	info_panel.name = "MatchInfoPanel"
+	info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_bar.add_child(info_panel)
+	var info_box: VBoxContainer = VBoxContainer.new()
+	info_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	info_panel.add_child(info_box)
+	_status_label = _label("", 19, Palette.ACCENT)
+	info_box.add_child(_status_label)
+	_turn_label = _label("UI_TURN", 15, Palette.TEXT_MUTED)
+	info_box.add_child(_turn_label)
+	var back_button: Button = _button("UI_PAUSE", 120)
+	back_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	back_button.pressed.connect(_on_pause_pressed)
-	header.add_child(back_button)
+	top_bar.add_child(back_button)
 
-	_status_label = _label("", 18, Palette.TEXT_MUTED)
-	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_main_layout.add_child(_status_label)
-
-	_enemy_leader_button = _button("", 100)
-	_enemy_leader_button.custom_minimum_size.y = roundi(92 * _ui_scale)
+	# Opponent: leader panel, then its play area.
+	var enemy: Dictionary = _leader_panel(AI_PLAYER)
+	_main_layout.add_child(enemy["panel"])
+	_enemy_leader_button = enemy["button"]
 	_enemy_leader_button.pressed.connect(_on_enemy_leader_pressed)
-	_enemy_leader_button.set_drag_forwarding(
-		Callable(),
-		_can_drop_on_leader.bind(AI_PLAYER),
-		_drop_on_leader.bind(AI_PLAYER)
-	)
-	_main_layout.add_child(_enemy_leader_button)
-	_enemy_leader_label = _label("", 20, Palette.LIFE)
-	_enemy_leader_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_main_layout.add_child(_enemy_leader_label)
-	_deck_label = _label("", 16, Palette.TEXT_MUTED)
-	_deck_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_main_layout.add_child(_deck_label)
+	_enemy_portrait_frame = enemy["portrait_frame"]
+	_enemy_artwork = enemy["artwork"]
+	_enemy_portrait_initial = enemy["initial"]
+	_enemy_leader_label = enemy["name"]
+	_enemy_life_label = enemy["life"]
+	_enemy_energy_label = enemy["energy"]
+	_enemy_counts_label = enemy["counts"]
+	_enemy_ability_button = enemy["ability"]
 
-	_main_layout.add_child(_section_label("UI_ENEMY_UNITS"))
-	_enemy_board = _board_row()
-	_main_layout.add_child(_enemy_board)
-	_enemy_artifacts = _board_row()
-	_main_layout.add_child(_enemy_artifacts)
+	_enemy_zone_frame = _zone_frame("UI_ENEMY_UNITS")
+	_main_layout.add_child(_enemy_zone_frame)
+	_enemy_artifacts = _board_row(false)
+	_enemy_zone_frame.get_child(0).add_child(_enemy_artifacts)
+	_enemy_board = _board_row(true)
+	_enemy_zone_frame.get_child(0).add_child(_enemy_board)
 
-	_turn_label = _label("UI_TURN", 18, Palette.ACCENT)
-	_turn_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_main_layout.add_child(_turn_label)
-
-	_own_artifacts = _board_row()
-	_main_layout.add_child(_own_artifacts)
-	_own_board = _board_row()
+	# Player: play area, then leader panel.
+	_own_zone_frame = _zone_frame("UI_YOUR_UNITS")
+	_own_zone_frame.set_drag_forwarding(Callable(), _can_drop_on_own_board, _drop_on_own_board)
+	_main_layout.add_child(_own_zone_frame)
+	_own_artifacts = _board_row(false)
+	_own_zone_frame.get_child(0).add_child(_own_artifacts)
+	_own_board = _board_row(true)
 	_own_board.set_drag_forwarding(Callable(), _can_drop_on_own_board, _drop_on_own_board)
-	_main_layout.add_child(_own_board)
-	_main_layout.add_child(_section_label("UI_YOUR_UNITS"))
+	_own_zone_frame.get_child(0).add_child(_own_board)
 
-	var own_leader_row: HBoxContainer = HBoxContainer.new()
-	_main_layout.add_child(own_leader_row)
-	_own_leader_portrait_frame = Panel.new()
-	_own_leader_portrait_frame.name = "OwnLeaderPortraitFrame"
-	_own_leader_portrait_frame.custom_minimum_size = Vector2(
-		roundi(70 * _ui_scale),
-		roundi(86 * _ui_scale)
-	)
-	var portrait_frame_style: StyleBoxFlat = StyleBoxFlat.new()
-	portrait_frame_style.bg_color = Palette.ACCENT.darkened(0.3)
-	portrait_frame_style.border_color = Palette.ACCENT
-	portrait_frame_style.set_border_width_all(roundi(2 * _ui_scale))
-	portrait_frame_style.set_corner_radius_all(roundi(8 * _ui_scale))
-	_own_leader_portrait_frame.add_theme_stylebox_override("panel", portrait_frame_style)
-	_own_leader_portrait_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	own_leader_row.add_child(_own_leader_portrait_frame)
-	_own_leader_artwork = TextureRect.new()
-	_own_leader_artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_own_leader_artwork.offset_left = roundi(2 * _ui_scale)
-	_own_leader_artwork.offset_top = roundi(2 * _ui_scale)
-	_own_leader_artwork.offset_right = roundi(-2 * _ui_scale)
-	_own_leader_artwork.offset_bottom = roundi(-2 * _ui_scale)
-	_own_leader_artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_own_leader_artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_own_leader_artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_own_leader_portrait_frame.add_child(_own_leader_artwork)
-	_own_leader_button = _button("", 100)
-	_own_leader_button.custom_minimum_size.y = roundi(86 * _ui_scale)
+	var own: Dictionary = _leader_panel(HUMAN_PLAYER)
+	_main_layout.add_child(own["panel"])
+	_own_leader_button = own["button"]
 	_own_leader_button.pressed.connect(_on_own_leader_pressed)
-	_own_leader_button.set_drag_forwarding(
-		Callable(),
-		_can_drop_on_leader.bind(HUMAN_PLAYER),
-		_drop_on_leader.bind(HUMAN_PLAYER)
-	)
-	own_leader_row.add_child(_own_leader_button)
-	_own_leader_label = _label("", 19, Palette.LIFE)
-	_own_leader_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	own_leader_row.add_child(_own_leader_label)
-	_ability_button = _button("UI_ABILITY", 168)
+	_own_leader_portrait_frame = own["portrait_frame"]
+	_own_leader_artwork = own["artwork"]
+	_own_portrait_initial = own["initial"]
+	_own_leader_label = own["name"]
+	_own_life_label = own["life"]
+	_energy_label = own["energy"]
+	_own_counts_label = own["counts"]
+	_ability_button = own["ability"]
 	_ability_button.pressed.connect(_on_ability_pressed)
-	own_leader_row.add_child(_ability_button)
 
 	var action_row: HBoxContainer = HBoxContainer.new()
+	action_row.alignment = BoxContainer.ALIGNMENT_END
+	action_row.add_theme_constant_override("separation", roundi(10 * _ui_scale))
 	_main_layout.add_child(action_row)
-	_energy_label = _label("", 21, Palette.ENERGY)
-	_energy_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	action_row.add_child(_energy_label)
+	var log_panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.BORDER)
+	log_panel.name = "BattleLogPanel"
+	log_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	action_row.add_child(log_panel)
+	var log_box: VBoxContainer = VBoxContainer.new()
+	log_panel.add_child(log_box)
+	log_box.add_child(_section_label("UI_BATTLE_LOG"))
+	_log_label = _label("", 13, Palette.TEXT_MUTED)
+	_log_label.custom_minimum_size.y = roundi(54 * _ui_scale)
+	_log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_log_label.max_lines_visible = 3
+	log_box.add_child(_log_label)
 	_undo_play_button = _button("UI_UNDO_PLAY", 150)
 	_undo_play_button.visible = false
 	_undo_play_button.pressed.connect(_on_undo_play_pressed)
 	action_row.add_child(_undo_play_button)
 	_end_turn_button = _button("UI_END_TURN", 200)
+	_end_turn_button.theme_type_variation = &"ButtonPrimary"
 	_end_turn_button.pressed.connect(_on_end_turn_pressed)
+	_end_turn_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_undo_play_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	action_row.add_child(_end_turn_button)
-
-	var log_title: Label = _section_label("UI_BATTLE_LOG")
-	_main_layout.add_child(log_title)
-	_log_label = _label("", 14, Palette.TEXT_MUTED)
-	_log_label.custom_minimum_size.y = roundi(50 * _ui_scale)
-	_log_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_main_layout.add_child(_log_label)
 
 	var hand_scroll: ScrollContainer = ScrollContainer.new()
 	hand_scroll.custom_minimum_size.y = roundi(350 * _ui_scale)
@@ -231,28 +226,20 @@ func _refresh() -> void:
 	var state: GameState = _match.get_state()
 	var human: PlayerState = state.player(HUMAN_PLAYER)
 	var opponent: PlayerState = state.player(AI_PLAYER)
-	_enemy_leader_button.text = "♥ %d" % opponent.life
-	_enemy_leader_label.text = tr("LEADER_ALBERICH_NAME")
-	_own_leader_artwork.texture = human.leader.art
-	_own_leader_artwork.visible = human.leader.art != null
-	_own_leader_button.text = "♥ %d" % human.life
-	_own_leader_label.text = tr("LEADER_WOTAN_NAME")
-	_energy_label.text = "%s  %d / %d" % [tr("UI_ENERGY"), human.energy, human.max_energy]
-	_deck_label.text = "%s %d     %s %d     %s %d" % [
-		tr("UI_DECK"),
-		opponent.deck.size(),
-		tr("UI_GRAVEYARD"),
-		opponent.graveyard.size(),
-		tr("UI_HAND"),
-		opponent.hand.size(),
-	]
+	_update_leader_panel(
+		opponent, _enemy_leader_label, _enemy_life_label, _enemy_energy_label,
+		_enemy_counts_label, _enemy_artwork, _enemy_portrait_initial, _enemy_ability_button
+	)
+	_update_leader_panel(
+		human, _own_leader_label, _own_life_label, _energy_label,
+		_own_counts_label, _own_leader_artwork, _own_portrait_initial, _ability_button
+	)
 	_turn_label.text = "%s %d  ·  %s %d" % [
 		tr("UI_TURN"),
 		state.turn,
 		tr("UI_DOOM_IN"),
 		maxi(10 - state.turn, 0),
 	]
-	_ability_button.text = "%s · %d" % [tr("UI_ABILITY"), human.leader.ability.cost if human.leader.ability != null else 0]
 	_ability_button.disabled = state.phase != GameState.Phase.MAIN or state.active_player != HUMAN_PLAYER
 	_end_turn_button.disabled = state.phase != GameState.Phase.MAIN or state.active_player != HUMAN_PLAYER
 	_undo_play_button.visible = _undo_snapshot != null
@@ -301,11 +288,6 @@ func _fill_board(row: HBoxContainer, zone: Zone, is_human: bool, zone_name: Stri
 		elif is_human and instance.exhausted:
 			view.modulate = Color(0.68, 0.68, 0.68)
 		row.add_child(view)
-	if zone.cards.is_empty():
-		var empty: Label = _label("—", 18, Palette.TEXT_DISABLED)
-		empty.custom_minimum_size = Vector2(108, 56)
-		empty.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		row.add_child(empty)
 
 
 func _fill_hand(hand: Zone) -> void:
@@ -920,20 +902,20 @@ func _event_message(event: GameEvent) -> String:
 		&"turn_started":
 			return tr("UI_LOG_TURN_STARTED").format({
 				"turn": event.turn,
-				"player": tr("LEADER_WOTAN_NAME") if event.player == HUMAN_PLAYER else tr("LEADER_ALBERICH_NAME"),
+				"player": _leader_name(event.player),
 			})
 		&"card_played":
 			return tr("UI_LOG_CARD_PLAYED").format({
-				"player": tr("UI_YOU") if event.player == HUMAN_PLAYER else tr("LEADER_ALBERICH_NAME"),
+				"player": tr("UI_YOU") if event.player == HUMAN_PLAYER else _leader_name(event.player),
 			})
 		&"damage_dealt":
 			return tr("UI_LOG_DAMAGE").format({
-				"player": tr("LEADER_WOTAN_NAME") if event.player == HUMAN_PLAYER else tr("LEADER_ALBERICH_NAME"),
+				"player": _leader_name(event.player),
 				"amount": event.amount,
 			})
 		&"ring_taken":
 			return tr("UI_LOG_RING").format({
-				"player": tr("UI_YOU") if event.player == HUMAN_PLAYER else tr("LEADER_ALBERICH_NAME"),
+				"player": tr("UI_YOU") if event.player == HUMAN_PLAYER else _leader_name(event.player),
 			})
 		&"match_ended":
 			return tr("UI_LOG_MATCH_ENDED")
@@ -946,12 +928,164 @@ func _set_status(message: String) -> void:
 		_status_label.text = tr(message)
 
 
-func _board_row() -> HBoxContainer:
+## Units rows keep a card's height when empty so the layout never jumps; artifact rows only take room when used.
+func _board_row(is_units_row: bool) -> HBoxContainer:
 	var row: HBoxContainer = HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", roundi(8 * _board_card_scale))
-	row.custom_minimum_size.y = roundi(200 * _board_card_scale)
+	if is_units_row:
+		row.custom_minimum_size.y = roundi(200 * _board_card_scale)
 	return row
+
+
+func _framed_panel(background_color: Color, border_color: Color) -> PanelContainer:
+	var panel: PanelContainer = PanelContainer.new()
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = background_color
+	style.border_color = border_color
+	style.set_border_width_all(maxi(1, roundi(2 * _ui_scale)))
+	style.set_corner_radius_all(roundi(12 * _ui_scale))
+	style.set_content_margin_all(roundi(10 * _ui_scale))
+	panel.add_theme_stylebox_override("panel", style)
+	return panel
+
+
+## A framed play area (units + artifacts) replacing separator lines between the two sides.
+func _zone_frame(title: String) -> PanelContainer:
+	var frame: PanelContainer = _framed_panel(Color(Palette.SURFACE, 0.55), Palette.BORDER)
+	frame.name = title.to_pascal_case() + "Zone"
+	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var box: VBoxContainer = VBoxContainer.new()
+	box.add_theme_constant_override("separation", roundi(6 * _ui_scale))
+	frame.add_child(box)
+	box.add_child(_section_label(title))
+	return frame
+
+
+## Same leader panel for both players: portrait, name, Life, Energy, card counts and the named ability.
+func _leader_panel(player_id: int) -> Dictionary:
+	var is_human: bool = player_id == HUMAN_PLAYER
+	var panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.ACCENT if is_human else Palette.BORDER)
+	panel.name = "OwnLeaderPanel" if is_human else "EnemyLeaderPanel"
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", roundi(10 * _ui_scale))
+	panel.add_child(row)
+
+	var button: Button = Button.new()
+	button.flat = true
+	button.focus_mode = Control.FOCUS_NONE
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.custom_minimum_size.y = roundi(90 * _ui_scale)
+	button.set_drag_forwarding(Callable(), _can_drop_on_leader.bind(player_id), _drop_on_leader.bind(player_id))
+	row.add_child(button)
+	var content: HBoxContainer = HBoxContainer.new()
+	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_theme_constant_override("separation", roundi(12 * _ui_scale))
+	button.add_child(content)
+
+	var portrait_frame: Panel = Panel.new()
+	portrait_frame.name = "OwnLeaderPortraitFrame" if is_human else "EnemyLeaderPortraitFrame"
+	portrait_frame.custom_minimum_size = Vector2(roundi(70 * _ui_scale), roundi(86 * _ui_scale))
+	portrait_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var portrait_style: StyleBoxFlat = StyleBoxFlat.new()
+	portrait_style.bg_color = Palette.ACCENT.darkened(0.3) if is_human else Palette.SURFACE_RAISED
+	portrait_style.border_color = Palette.ACCENT if is_human else Palette.BORDER
+	portrait_style.set_border_width_all(maxi(2, roundi(2 * _ui_scale)))
+	portrait_style.set_corner_radius_all(maxi(8, roundi(8 * _ui_scale)))
+	portrait_frame.add_theme_stylebox_override("panel", portrait_style)
+	portrait_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(portrait_frame)
+	var initial: Label = _label("", 34, Palette.ACCENT)
+	initial.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	initial.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	initial.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	initial.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	portrait_frame.add_child(initial)
+	var artwork: TextureRect = TextureRect.new()
+	artwork.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	artwork.offset_left = roundi(2 * _ui_scale)
+	artwork.offset_top = roundi(2 * _ui_scale)
+	artwork.offset_right = roundi(-2 * _ui_scale)
+	artwork.offset_bottom = roundi(-2 * _ui_scale)
+	artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	portrait_frame.add_child(artwork)
+
+	var info: VBoxContainer = VBoxContainer.new()
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	content.add_child(info)
+	var name_label: Label = _label("", 20, Palette.TEXT)
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info.add_child(name_label)
+	var stats: HBoxContainer = HBoxContainer.new()
+	stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stats.add_theme_constant_override("separation", roundi(16 * _ui_scale))
+	info.add_child(stats)
+	var life: Label = _label("", 20, Palette.LIFE)
+	life.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stats.add_child(life)
+	var energy: Label = _label("", 20, Palette.ENERGY)
+	energy.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stats.add_child(energy)
+	var counts: Label = _label("", 13, Palette.TEXT_MUTED)
+	counts.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	info.add_child(counts)
+
+	var ability: Button = Button.new()
+	ability.name = "OwnAbilityButton" if is_human else "EnemyAbilityButton"
+	ability.custom_minimum_size = Vector2(roundi(250 * _ui_scale), roundi(90 * _ui_scale))
+	ability.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ability.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	ability.add_theme_font_size_override("font_size", roundi(15 * _ui_scale))
+	if not is_human:
+		ability.disabled = true
+		ability.focus_mode = Control.FOCUS_NONE
+	row.add_child(ability)
+
+	return {
+		"panel": panel,
+		"button": button,
+		"portrait_frame": portrait_frame,
+		"artwork": artwork,
+		"initial": initial,
+		"name": name_label,
+		"life": life,
+		"energy": energy,
+		"counts": counts,
+		"ability": ability,
+	}
+
+
+func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, counts_label: Label, artwork: TextureRect, initial: Label, ability_button: Button) -> void:
+	var key: String = String(player.leader.id).to_upper()
+	var leader_name: String = tr("LEADER_%s_NAME" % key)
+	name_label.text = leader_name
+	life_label.text = "♥ %d" % player.life
+	energy_label.text = "◆ %d / %d" % [player.energy, player.max_energy]
+	counts_label.text = "%s %d  ·  %s %d  ·  %s %d" % [
+		tr("UI_DECK"),
+		player.deck.size(),
+		tr("UI_GRAVEYARD"),
+		player.graveyard.size(),
+		tr("UI_HAND"),
+		player.hand.size(),
+	]
+	artwork.texture = player.leader.art
+	artwork.visible = player.leader.art != null
+	initial.text = leader_name.left(1)
+	initial.visible = player.leader.art == null
+	if player.leader.ability == null:
+		ability_button.text = tr("UI_ABILITY")
+		return
+	ability_button.text = "%s  ◆ %d\n%s" % [
+		tr("LEADER_%s_ABILITY_NAME" % key),
+		player.leader.ability.cost,
+		tr("LEADER_%s_ABILITY_TEXT" % key),
+	]
 
 
 func _section_label(value: String) -> Label:
@@ -996,14 +1130,9 @@ func _build_drop_hint() -> void:
 	_modal_layer.add_child(_drop_hint)
 
 
+## The whole framed play area (units + artifacts) accepts drops.
 func _own_drop_rect() -> Rect2:
-	var artifacts_rect: Rect2 = _own_artifacts.get_global_rect()
-	var board_rect: Rect2 = _own_board.get_global_rect()
-	var left: float = minf(artifacts_rect.position.x, board_rect.position.x)
-	var top: float = minf(artifacts_rect.position.y, board_rect.position.y)
-	var right: float = maxf(artifacts_rect.end.x, board_rect.end.x)
-	var bottom: float = maxf(artifacts_rect.end.y, board_rect.end.y)
-	return Rect2(Vector2(left, top), Vector2(right - left, bottom - top))
+	return _own_zone_frame.get_global_rect()
 
 
 func _show_drag_preview(source: CardView, position: Vector2) -> void:
@@ -1051,3 +1180,9 @@ func _hide_drag_preview() -> void:
 	if _drag_preview != null and is_instance_valid(_drag_preview):
 		_drag_preview.queue_free()
 	_drag_preview = null
+
+
+func _leader_name(player_id: int) -> String:
+	if _match == null or player_id < 0 or player_id > 1:
+		return ""
+	return tr("LEADER_%s_NAME" % String(_match.get_state().player(player_id).leader.id).to_upper())

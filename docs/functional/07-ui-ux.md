@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-16
+> Status: Draft · Last updated: 2026-10-20
 
 ## Platform constraints
 
@@ -43,25 +43,41 @@ flowchart TD
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |
 | Opening hand | Starting cards, tap to mark cards to replace, **Redraw** button, then confirm; flavour line "The Norns weave your fate…" |
-| **Duel** | Turn counter + Götterdämmerung countdown (from turn 7), enemy Leader + Life (top), enemy board, own board, own hand (bottom fan), Energy counter, end-turn button, Leader ability button, graveyard/deck counters |
+| **Duel** | Top bar: whose turn, turn number, Götterdämmerung countdown, pause. One identical panel per Leader (portrait, name, Life, Energy, card counts, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
 | Settings | Audio volumes, language, animation speed, reset progress |
 
-## Duel screen layout (portrait draft)
+## Duel screen layout (portrait)
+
+> **Decision (2026-10-20):** Information is grouped by owner. Each Leader has **one panel**, identical for both players; turn and match information sit together in the top bar; the battle log sits just above the hand, next to End turn; play areas are framed instead of separated by lines.
 
 ```
-┌──────────────────────────────┐
-│ [Enemy Leader ♥20]  deck 22  │
-│ ▢ ▢ ▢ ▢ ▢ ▢   enemy board    │
-│ ─────────── artifacts ────── │
-│ ▢ ▢ ▢ ▢ ▢ ▢   your board     │
-│ [Your Leader ♥20] [Ability]  │
-│ Energy ●●●● [UNDO] [END TURN]│
-│   ╭──╮╭──╮╭──╮╭──╮╭──╮       │
-│   hand (fanned, scrollable)  │
-└──────────────────────────────┘
+┌──────────────────────────────────────┐
+│ [YOUR TURN                     ] [PAUSE] │  match info
+│ [Turn 1 · Götterdämmerung in 9 ]         │
+│ ┌ Enemy Leader ──────────────────────┐ │
+│ │ (A) Alberich  ♥20 ◆0/0  [Lord of the   │ │  portrait · name · Life · Energy
+│ │     Deck · Graveyard · Hand  Nibelungs ◆2]│ │  counts · named ability (read-only)
+│ └────────────────────────────────────┘ │
+│ ┌ ENEMY UNITS ───────────────────────┐ │
+│ │ artifacts (when any) / ▢ ▢ ▢ units   │ │  framed play area
+│ └────────────────────────────────────┘ │
+│ ┌ YOUR UNITS ────────────────────────┐ │
+│ │ artifacts (when any) / ▢ ▢ ▢ units   │ │  whole frame = drop zone
+│ └────────────────────────────────────┘ │
+│ ┌ Your Leader (gold border) ─────────┐ │
+│ │ (portrait) Wotan ♥20 ◆1/1 [Spear of │ │  same panel, ability is the button
+│ │  Deck · Graveyard · Hand   Treaties ◆3]│ │
+│ └────────────────────────────────────┘ │
+│ [BATTLE LOG · last 3 lines] [UNDO] [END TURN] │
+│   ╭──╮╭──╮╭──╮╭──╮╭──╮  hand (scroll) │
+└──────────────────────────────────────┘
 ```
+
+- **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, deck / graveyard / hand counts, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
+- Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*.
+- The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
 
 ## Gestures
 

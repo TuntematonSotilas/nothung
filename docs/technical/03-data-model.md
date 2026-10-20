@@ -1,7 +1,7 @@
 # Data model
 
 > How cards, decks and effects are represented as data. Implements [functional/04-cards.md](../functional/04-cards.md).
-> Status: Draft · Last updated: 2026-10-19
+> Status: Draft · Last updated: 2026-10-20
 
 ## Principles
 
@@ -121,7 +121,7 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 - `name` and `flavour` are the **English** source text; the converter writes them into the `en` column of the localisation file. Until translated, new strings are copied to other locale columns; existing translations are preserved.
 - `abilities` uses a small syntax: `trigger[condition]: effect(args); …`. Each clause has one effect; multiple effects use multiple clauses. Every trigger, condition, effect, target and trait must be implemented by the engine; unknown names are errors.
 - Rules text shown on the card is **generated from `keywords` + `abilities`**, so it can never disagree with the actual behaviour.
-- `leaders.md` defines each Leader's faction, Life, activated effect and Energy cost. `starter_decks.md` lists the 20 card IDs in each starter deck.
+- `leaders.md` defines each Leader's faction, Life, ability name (`ability_name`, required when the Leader has an ability, shown on the duel screen), activated effect and Energy cost. The converter also writes `LEADER_<ID>_ABILITY_NAME` and `LEADER_<ID>_ABILITY_TEXT` (effect only) to the localisation file. `starter_decks.md` lists the 20 card IDs in each starter deck.
 
 ### Converter
 

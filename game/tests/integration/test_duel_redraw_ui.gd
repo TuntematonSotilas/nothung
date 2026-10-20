@@ -232,6 +232,39 @@ func test_ai_playing_a_unit_does_not_change_duel_minimum_height() -> void:
 	await get_tree().process_frame
 
 
+func test_leader_panels_share_layout_and_show_named_abilities() -> void:
+	var duel: Control = await _create_duel()
+	var own_panel: PanelContainer = duel.find_child("OwnLeaderPanel", true, false) as PanelContainer
+	var enemy_panel: PanelContainer = duel.find_child("EnemyLeaderPanel", true, false) as PanelContainer
+	assert_object(own_panel).is_not_null()
+	assert_object(enemy_panel).is_not_null()
+	assert_int(own_panel.get_child(0).get_child_count()).is_equal(enemy_panel.get_child(0).get_child_count())
+
+	var own_ability: Button = duel.get("_ability_button") as Button
+	var enemy_ability: Button = duel.get("_enemy_ability_button") as Button
+	assert_str(own_ability.text).contains(tr("LEADER_WOTAN_ABILITY_NAME"))
+	assert_str(enemy_ability.text).contains(tr("LEADER_ALBERICH_ABILITY_NAME"))
+	assert_bool(enemy_ability.disabled).is_true()
+	assert_str((duel.get("_enemy_leader_label") as Label).text).is_equal(tr("LEADER_ALBERICH_NAME"))
+	assert_str((duel.get("_own_leader_label") as Label).text).is_equal(tr("LEADER_WOTAN_NAME"))
+	assert_bool(own_panel.is_ancestor_of(duel.get("_energy_label") as Label)).is_true()
+	assert_bool(enemy_panel.is_ancestor_of(duel.get("_enemy_energy_label") as Label)).is_true()
+
+	var info_panel: PanelContainer = duel.find_child("MatchInfoPanel", true, false) as PanelContainer
+	assert_bool(info_panel.is_ancestor_of(duel.get("_status_label") as Label)).is_true()
+	assert_bool(info_panel.is_ancestor_of(duel.get("_turn_label") as Label)).is_true()
+	var log_panel: PanelContainer = duel.find_child("BattleLogPanel", true, false) as PanelContainer
+	assert_bool(log_panel.is_ancestor_of(duel.get("_log_label") as Label)).is_true()
+
+	var current_match: Match = duel.get("_match") as Match
+	current_match.get_state().player(1).board.cards.clear()
+	duel.call("_refresh")
+	await get_tree().process_frame
+	assert_int((duel.get("_enemy_board") as HBoxContainer).get_child_count()).is_equal(0)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
 func _create_duel() -> Control:
 	var packed_scene: PackedScene = load("res://scenes/screens/duel.tscn")
 	var duel: Control = packed_scene.instantiate() as Control
