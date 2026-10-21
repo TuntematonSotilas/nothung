@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-19
+> Status: Draft · Last updated: 2026-10-21
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -26,7 +26,7 @@ Match length is measured with AI vs AI simulations ([technical/09-testing.md](..
 
 1. Each player chooses a deck (20 cards) and its Leader.
 2. Decks are shuffled. A coin flip decides who goes first.
-3. Each player draws **4 cards**; the second player draws **5** and gets one **Energy token** (catch-up resource: +1 Energy once).
+3. Each player draws **4 cards**; the second player draws **5** and gets one **Energy token** (catch-up resource: +1 Energy once, on their first turn).
 4. **Redraw (opening hand):** each player may put back any number of cards once and redraw that many.
 
 ## Zones
@@ -44,7 +44,9 @@ Match length is measured with AI vs AI simulations ([technical/09-testing.md](..
 
 ## Resource: Energy
 
-- Each player has an **Energy** pool. At the start of their turn, max Energy increases by 1 (up to 10) and the pool refills.
+- Each player has an **Energy** pool. **First turn: max Energy 2** for both players (the second player has 3 with the Energy token). Then, at the start of each turn, max Energy increases by 1 (up to 10) and the pool refills.
+
+> **Decision (2026-10-21):** Starting max Energy raised from 1 to 2 (playtest: a 1-Energy first turn left nothing to do). Measured effect: [AI soak](../technical/09-testing.md#ai-soak).
 - Cards cost Energy to play.
 - *Theme hook:* some cards (Nibelungs) produce extra Energy or let you store unspent Energy.
 

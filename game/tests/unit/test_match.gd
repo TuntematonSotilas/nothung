@@ -14,8 +14,11 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 	assert_bool(engine.apply(RedrawAction.new(1))).is_true()
 	assert_int(initial.phase).is_equal(GameState.Phase.MAIN)
 	assert_int(initial.turn).is_equal(1)
-	assert_int(initial.player(initial.active_player).energy).is_equal(1)
+	assert_int(initial.player(initial.active_player).energy).is_equal(Match.FIRST_TURN_MAX_ENERGY)
 	assert_int(initial.player(1 - initial.active_player).opening_energy).is_equal(1)
+	var second_player: int = 1 - initial.active_player
+	assert_bool(engine.apply(EndTurnAction.new(initial.active_player))).is_true()
+	assert_int(initial.player(second_player).energy).is_equal(Match.FIRST_TURN_MAX_ENERGY + 1)
 
 
 func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
@@ -348,7 +351,7 @@ func test_ring_bonus_and_stealing_reset_its_curse_counter() -> void:
 	var hand_before: int = state.player(0).hand.size()
 
 	assert_bool(engine.apply(EndTurnAction.new(1))).is_true()
-	assert_int(state.player(0).energy).is_equal(3)
+	assert_int(state.player(0).energy).is_equal(Match.FIRST_TURN_MAX_ENERGY + 2)
 	assert_int(state.player(0).hand.size()).is_equal(hand_before + 2)
 	assert_int(state.ring_turns_held).is_equal(2)
 
@@ -496,3 +499,36 @@ func _deck(faction: StringName) -> DeckData:
 		deck.cards.append(card)
 		deck.cards.append(card)
 	return deck
+
+
+func test_play_block_reason_explains_unplayable_cards() -> void:
+	var engine := Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), 20261021)
+	var state: GameState = engine.get_state()
+	assert_bool(engine.apply(RedrawAction.new(0))).is_true()
+	assert_bool(engine.apply(RedrawAction.new(1))).is_true()
+	var active: int = state.active_player
+	var player: PlayerState = state.player(active)
+	player.hand.cards.clear()
+	for unit: CardInstance in state.player(0).board.cards.duplicate():
+		state.player(0).board.remove_uid(unit.uid)
+	for unit: CardInstance in state.player(1).board.cards.duplicate():
+		state.player(1).board.remove_uid(unit.uid)
+	var faction_prefix: StringName = player.leader.faction
+	var cheap: CardInstance = CardInstance.new(CardDatabase.get_card(&"wotans_ravens" if faction_prefix == &"gods" else &"nibelung_miner"), active, 9001)
+	var costly: CardInstance = CardInstance.new(CardDatabase.get_card(&"donner" if faction_prefix == &"gods" else &"giant_serpent"), active, 9002)
+	var targeted: CardInstance = CardInstance.new(CardDatabase.get_card(&"donners_hammer" if faction_prefix == &"gods" else &"mimes_brew"), active, 9003)
+	player.hand.add(cheap)
+	player.hand.add(costly)
+	player.hand.add(targeted)
+	player.energy = 3
+
+	assert_str(String(engine.play_block_reason(active, cheap.uid))).is_empty()
+	assert_str(String(engine.play_block_reason(active, costly.uid))).is_equal("energy")
+	player.energy = 10
+	assert_str(String(engine.play_block_reason(active, targeted.uid))).is_equal("no_target")
+	assert_str(String(engine.play_block_reason(1 - active, cheap.uid))).is_equal("not_your_turn")
+	for index: int in Match.MAX_BOARD_SIZE:
+		player.board.add(CardInstance.new(cheap.data, active, 9100 + index))
+	assert_str(String(engine.play_block_reason(active, cheap.uid))).is_equal("board_full")
+	state.player(1 - active).board.add(CardInstance.new(cheap.data, 1 - active, 9200))
+	assert_str(String(engine.play_block_reason(active, targeted.uid))).is_empty()

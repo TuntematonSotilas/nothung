@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-20
+> Status: Draft · Last updated: 2026-10-21
 
 ## Platform constraints
 
@@ -42,7 +42,8 @@ flowchart TD
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |
-| Opening hand | Starting cards, tap to mark cards to replace, **Redraw** button, then confirm; flavour line "The Norns weave your fate…" |
+| Opening hand | Near full-screen panel, cards in a grid sized to fit (never scrolls); tap to mark cards to put back (dimmed + **REDRAW** badge), then **Redraw selected**; flavour title "The Norns weave your fate" |
+| Pause | Themed panel: **Resume** (primary), **Leave**; leaving asks for confirmation inside the panel. The Android back button opens / closes it during a match |
 | **Duel** | Top bar: whose turn, turn number, Götterdämmerung countdown, pause. One identical panel per Leader (portrait, name, Life, Energy, card counts, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
@@ -78,17 +79,21 @@ flowchart TD
 - **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, deck / graveyard / hand counts, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
 - Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*.
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
+- **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.
+- Icons (Life, Energy, deck, graveyard, hand, pause, end turn, undo, close) come from game-icons.net ([CREDITS](../../CREDITS.md)); faction and card-type icons will be hand-drawn ([art & audio](08-art-and-audio.md#icons)).
+- A painted board can sit behind the duel (`assets/art/boards/<board_id>.png`, dimmed); see [art & audio](08-art-and-audio.md#duel-backgrounds).
 
 ## Gestures
 
 | Action | Gesture |
 |--------|---------|
 | Inspect card | Long press → zoomed card with full text and trait tooltips |
-| Play card | Drag from hand onto the highlighted own-side drop zone (or onto a target) |
+| Play card | Drag from hand onto the highlighted own play area (or onto a target) — or tap-tap (below) |
 | Attack | Drag from own unit to target; valid targets highlighted |
 | Cancel drag | Release outside a valid target; the card stays where it was |
 | Undo last play | Tap **Undo play** before taking another action; the card returns to the top of the deck and the match state is restored to before it was played |
-| Accessibility alternative | Tap card → tap target (no drag required) |
+| Tap-tap (no drag) | **1st tap selects** the card (gold border, own play area highlighted); **2nd tap** on the play area — or on a target for targeted cards — plays it. Tapping the selected card again cancels. A single tap never plays a card. |
+| Unplayable card | Greyed out in the hand, cannot be selected or dragged; tapping it or opening its details shows why (not enough Energy: X needed / Y available, board full, artifact limit, no valid target, not your turn) |
 
 ## Feedback
 

@@ -8,6 +8,9 @@ const MIN_UI_SCALE: float = 0.8
 const UI_SCALE_REFERENCE_HEIGHT: float = 2300.0
 const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
 
+## Board art to show behind the duel (campaign duels will set it; see assets/art/boards/).
+@export var board_id: String = "default"
+
 var _match: Match
 var _ui_scale: float = 1.0
 var _board_card_scale: float = 1.0
@@ -23,7 +26,7 @@ var _enemy_leader_button: Button
 var _enemy_leader_label: Label
 var _enemy_life_label: Label
 var _enemy_energy_label: Label
-var _enemy_counts_label: Label
+var _enemy_counts: Dictionary
 var _enemy_portrait_frame: Panel
 var _enemy_artwork: TextureRect
 var _enemy_portrait_initial: Label
@@ -31,7 +34,7 @@ var _enemy_ability_button: Button
 var _enemy_zone_frame: PanelContainer
 var _own_zone_frame: PanelContainer
 var _own_life_label: Label
-var _own_counts_label: Label
+var _own_counts: Dictionary
 var _own_portrait_initial: Label
 var _enemy_board: HBoxContainer
 var _enemy_artifacts: HBoxContainer
@@ -50,6 +53,7 @@ var _undo_play_button: Button
 var _results_undo_button: Button
 var _overlay: ColorRect
 var _zoom_overlay: ColorRect
+var _pause_overlay: ColorRect
 var _zoom_source: CardView
 var _drop_hint: PanelContainer
 var _drop_hint_label: Label
@@ -90,6 +94,18 @@ func _build_ui() -> void:
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(background)
+	# Painted board, if any: res://assets/art/boards/<board_id>.png, dimmed so cards stay readable.
+	var board_path: String = "res://assets/art/boards/%s.png" % board_id
+	if ResourceLoader.exists(board_path):
+		var board_art: TextureRect = TextureRect.new()
+		board_art.name = "BoardBackground"
+		board_art.texture = load(board_path) as Texture2D
+		board_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		board_art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		board_art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		board_art.modulate = Color(0.45, 0.45, 0.45)
+		board_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(board_art)
 
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -123,6 +139,7 @@ func _build_ui() -> void:
 	_turn_label = _label("UI_TURN", 15, Palette.TEXT_MUTED)
 	info_box.add_child(_turn_label)
 	var back_button: Button = _button("UI_PAUSE", 120)
+	_set_button_icon(back_button, "pause", Palette.TEXT)
 	back_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	back_button.pressed.connect(_on_pause_pressed)
 	top_bar.add_child(back_button)
@@ -138,7 +155,7 @@ func _build_ui() -> void:
 	_enemy_leader_label = enemy["name"]
 	_enemy_life_label = enemy["life"]
 	_enemy_energy_label = enemy["energy"]
-	_enemy_counts_label = enemy["counts"]
+	_enemy_counts = enemy["counts"]
 	_enemy_ability_button = enemy["ability"]
 
 	_enemy_zone_frame = _zone_frame("UI_ENEMY_UNITS")
@@ -151,6 +168,7 @@ func _build_ui() -> void:
 	# Player: play area, then leader panel.
 	_own_zone_frame = _zone_frame("UI_YOUR_UNITS")
 	_own_zone_frame.set_drag_forwarding(Callable(), _can_drop_on_own_board, _drop_on_own_board)
+	_own_zone_frame.gui_input.connect(_on_own_zone_input)
 	_main_layout.add_child(_own_zone_frame)
 	_own_artifacts = _board_row(false)
 	_own_zone_frame.get_child(0).add_child(_own_artifacts)
@@ -168,7 +186,7 @@ func _build_ui() -> void:
 	_own_leader_label = own["name"]
 	_own_life_label = own["life"]
 	_energy_label = own["energy"]
-	_own_counts_label = own["counts"]
+	_own_counts = own["counts"]
 	_ability_button = own["ability"]
 	_ability_button.pressed.connect(_on_ability_pressed)
 
@@ -189,25 +207,29 @@ func _build_ui() -> void:
 	_log_label.max_lines_visible = 3
 	log_box.add_child(_log_label)
 	_undo_play_button = _button("UI_UNDO_PLAY", 150)
+	_set_button_icon(_undo_play_button, "undo", Palette.TEXT)
 	_undo_play_button.visible = false
 	_undo_play_button.pressed.connect(_on_undo_play_pressed)
 	action_row.add_child(_undo_play_button)
 	_end_turn_button = _button("UI_END_TURN", 200)
+	_set_button_icon(_end_turn_button, "end_turn", Palette.INK)
 	_end_turn_button.theme_type_variation = &"ButtonPrimary"
 	_end_turn_button.pressed.connect(_on_end_turn_pressed)
 	_end_turn_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_undo_play_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	action_row.add_child(_end_turn_button)
 
-	var hand_scroll: ScrollContainer = ScrollContainer.new()
-	hand_scroll.custom_minimum_size.y = roundi(350 * _ui_scale)
-	hand_scroll.size_flags_vertical = Control.SIZE_SHRINK_END
-	hand_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	hand_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_main_layout.add_child(hand_scroll)
+	# The hand always fits the width (cards overlap when needed): no scrollbar to fight with drags.
+	var hand_area: MarginContainer = MarginContainer.new()
+	hand_area.name = "HandArea"
+	hand_area.custom_minimum_size.y = roundi(350 * _ui_scale)
+	hand_area.size_flags_vertical = Control.SIZE_SHRINK_END
+	_main_layout.add_child(hand_area)
 	_own_hand = HBoxContainer.new()
+	_own_hand.alignment = BoxContainer.ALIGNMENT_CENTER
 	_own_hand.add_theme_constant_override("separation", roundi(12 * _ui_scale))
-	hand_scroll.add_child(_own_hand)
+	hand_area.resized.connect(_fit_hand)
+	hand_area.add_child(_own_hand)
 
 
 func _start_match() -> void:
@@ -228,11 +250,11 @@ func _refresh() -> void:
 	var opponent: PlayerState = state.player(AI_PLAYER)
 	_update_leader_panel(
 		opponent, _enemy_leader_label, _enemy_life_label, _enemy_energy_label,
-		_enemy_counts_label, _enemy_artwork, _enemy_portrait_initial, _enemy_ability_button
+		_enemy_counts, _enemy_artwork, _enemy_portrait_initial, _enemy_ability_button
 	)
 	_update_leader_panel(
 		human, _own_leader_label, _own_life_label, _energy_label,
-		_own_counts_label, _own_leader_artwork, _own_portrait_initial, _ability_button
+		_own_counts, _own_leader_artwork, _own_portrait_initial, _ability_button
 	)
 	_turn_label.text = "%s %d  ·  %s %d" % [
 		tr("UI_TURN"),
@@ -251,6 +273,7 @@ func _refresh() -> void:
 	_fill_board(_enemy_artifacts, opponent.artifacts, false, &"artifact")
 	_fill_board(_own_artifacts, human.artifacts, true, &"artifact")
 	_fill_hand(human.hand)
+	_update_selection_feedback()
 	_log_label.text = "\n".join(_log_lines.slice(maxi(0, _log_lines.size() - 3)))
 	if state.phase == GameState.Phase.REDRAW and state.redraw_player == HUMAN_PLAYER:
 		_show_redraw_overlay()
@@ -291,17 +314,40 @@ func _fill_board(row: HBoxContainer, zone: Zone, is_human: bool, zone_name: Stri
 
 
 func _fill_hand(hand: Zone) -> void:
+	# Detach old views right away: queue_free alone keeps them counted (and laid out) until the end of the frame.
 	for child: Node in _own_hand.get_children():
+		_own_hand.remove_child(child)
 		child.queue_free()
+	var state: GameState = _match.get_state()
+	var my_main_phase: bool = state.phase == GameState.Phase.MAIN and state.active_player == HUMAN_PLAYER
 	for instance: CardInstance in hand.cards:
-		var phase: GameState.Phase = _match.get_state().phase
-		var zoom_allowed: bool = phase != GameState.Phase.REDRAW and phase != GameState.Phase.GAME_OVER
-		var view: CardView = _card_view(instance, true, -1, "hand", zoom_allowed)
+		var zoom_allowed: bool = state.phase != GameState.Phase.REDRAW and state.phase != GameState.Phase.GAME_OVER
+		# Unplayable cards are greyed out and cannot be dragged; the zoom popup tells why.
+		var blocked: bool = my_main_phase and _match.play_block_reason(HUMAN_PLAYER, instance.uid) != &""
+		var view: CardView = _card_view(instance, not blocked, -1, "hand", zoom_allowed)
 		view.set_selected(instance.uid == _selected_hand_uid)
+		if blocked:
+			view.modulate = Color(0.55, 0.55, 0.55)
+		if instance.uid == _selected_hand_uid:
+			view.z_index = 1
 		view.pressed.connect(_on_hand_card_pressed.bind(instance.uid, view))
 		_own_hand.add_child(view)
 	if hand.cards.is_empty():
 		_own_hand.add_child(_label("UI_NO_CARDS", 16, Palette.TEXT_MUTED))
+	_fit_hand()
+
+
+## Fits the whole hand in the available width: cards overlap instead of scrolling.
+func _fit_hand() -> void:
+	var count: int = _own_hand.get_child_count()
+	var card_width: float = CardView.CARD_SIZE.x * _ui_scale
+	# The hand area always spans the layout width; the hand row itself shrinks with its separation.
+	var hand_area: Control = _own_hand.get_parent() as Control
+	var available: float = hand_area.size.x if hand_area != null and hand_area.size.x > 0.0 else get_viewport().get_visible_rect().size.x - 48.0 * _ui_scale
+	var separation: float = 12.0 * _ui_scale
+	if count > 1 and count * card_width + (count - 1) * separation > available:
+		separation = (available - count * card_width) / float(count - 1)
+	_own_hand.add_theme_constant_override("separation", floori(separation))
 
 
 func _card_view(
@@ -385,11 +431,19 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 	rules_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rules_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_child(rules_label)
+	if instance != null and _match.get_state().player(HUMAN_PLAYER).hand.find(instance.uid) != null:
+		var reason: StringName = _match.play_block_reason(HUMAN_PLAYER, instance.uid)
+		if reason != &"":
+			var blocked_label: Label = _label(_block_reason_text(reason, instance.uid), 20, Palette.LIFE)
+			blocked_label.name = "BlockedReason"
+			blocked_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			content.add_child(blocked_label)
 	if data.type == CardData.Type.UNIT:
 		var attack: int = instance.attack if instance != null else data.attack
 		var health: int = instance.health if instance != null else data.health
 		content.add_child(_label("⚔ %d   ♥ %d" % [attack, health], 24, Palette.LIFE))
 	var close: Button = _button("UI_CLOSE", 300)
+	_set_button_icon(close, "close", Palette.TEXT)
 	close.pressed.connect(_close_card_zoom)
 	content.add_child(close)
 
@@ -426,27 +480,59 @@ func _show_redraw_overlay() -> void:
 	var center: CenterContainer = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_overlay.add_child(center)
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(840, 560)
+	# Near full-screen panel; cards in a grid sized to fit, so the popup never needs scrolling.
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
+	var panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.ACCENT)
+	panel.name = "RedrawPanel"
+	panel.custom_minimum_size = Vector2(viewport_size.x - 60.0 * _ui_scale, 0.0)
 	center.add_child(panel)
 	var content: VBoxContainer = VBoxContainer.new()
-	content.add_theme_constant_override("separation", 18)
+	content.add_theme_constant_override("separation", roundi(18 * _ui_scale))
 	panel.add_child(content)
-	content.add_child(_label("UI_REDRAW_TITLE", 26, Palette.ACCENT))
-	content.add_child(_label("UI_REDRAW_PROMPT", 17, Palette.TEXT_MUTED))
-	var scroll: ScrollContainer = ScrollContainer.new()
-	scroll.custom_minimum_size.y = 310
-	content.add_child(scroll)
-	var cards: HBoxContainer = HBoxContainer.new()
-	cards.add_theme_constant_override("separation", 10)
-	scroll.add_child(cards)
-	for instance: CardInstance in _match.get_state().player(HUMAN_PLAYER).hand.cards:
+	var title: Label = _label("UI_REDRAW_TITLE", 28, Palette.ACCENT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+	var prompt: Label = _label("UI_REDRAW_PROMPT", 18, Palette.TEXT_MUTED)
+	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(prompt)
+
+	# Same card size as in the hand; as many columns as the panel width allows.
+	var separation: float = 16.0 * _ui_scale
+	var card_width: float = CardView.CARD_SIZE.x * _ui_scale
+	var hand: Array[CardInstance] = _match.get_state().player(HUMAN_PLAYER).hand.cards
+	var usable_width: float = panel.custom_minimum_size.x - 40.0 * _ui_scale
+	var columns: int = clampi(floori((usable_width + separation) / (card_width + separation)), 1, maxi(hand.size(), 1))
+	var grid_center: CenterContainer = CenterContainer.new()
+	content.add_child(grid_center)
+	var cards: GridContainer = GridContainer.new()
+	cards.name = "RedrawCards"
+	cards.columns = columns
+	cards.add_theme_constant_override("h_separation", roundi(separation))
+	cards.add_theme_constant_override("v_separation", roundi(separation))
+	grid_center.add_child(cards)
+	for instance: CardInstance in hand:
 		var view: CardView = _card_view(instance)
-		view.custom_minimum_size = Vector2(154, 250) * _ui_scale
-		view.set_selected(_redraw_selected.has(instance.uid))
+		var marked: bool = _redraw_selected.has(instance.uid)
+		view.set_selected(marked)
+		if marked:
+			view.modulate = Color(0.75, 0.75, 0.75)
+			var badge: Label = _label("UI_REDRAW_BADGE", 18, Palette.INK)
+			badge.name = "RedrawBadge"
+			badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			var badge_style: StyleBoxFlat = StyleBoxFlat.new()
+			badge_style.bg_color = Palette.ACCENT
+			badge_style.set_corner_radius_all(roundi(6 * _ui_scale))
+			badge.add_theme_stylebox_override("normal", badge_style)
+			badge.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+			badge.position.y = -10.0 * _ui_scale
+			view.add_child(badge)
 		view.pressed.connect(_toggle_redraw_card.bind(instance.uid, view))
 		cards.add_child(view)
-	var confirm: Button = _button("UI_REDRAW_CONFIRM", 300)
+	var confirm: Button = _button("UI_REDRAW_CONFIRM", 360)
+	confirm.theme_type_variation = &"ButtonPrimary"
+	confirm.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	confirm.pressed.connect(_confirm_redraw)
 	content.add_child(confirm)
 
@@ -481,23 +567,65 @@ func _on_hand_card_pressed(uid: int, view: CardView) -> void:
 		return
 	if _match.get_state().phase != GameState.Phase.MAIN or _match.get_state().active_player != HUMAN_PLAYER:
 		return
-	var matching: PlayCardAction
-	for action: Action in _match.get_legal_actions(HUMAN_PLAYER):
-		if action is PlayCardAction and (action as PlayCardAction).card_uid == uid:
-			matching = action as PlayCardAction
-			break
-	if matching == null:
-		_set_status("UI_CANNOT_PLAY")
+	var reason: StringName = _match.play_block_reason(HUMAN_PLAYER, uid)
+	if reason != &"":
+		_status_label.text = _block_reason_text(reason, uid)
+		return
+	# Tap-tap: the first tap only selects; tapping the same card again cancels.
+	if _selected_hand_uid == uid:
+		_clear_selection()
+		_refresh()
 		return
 	_selected_hand_uid = uid
-	if matching.target_uid >= 0:
-		_selected_attacker_uid = -1
-		_selected_ability = false
-		_set_status("UI_CHOOSE_CARD_TARGET")
-	else:
-		_apply_action(matching)
-		return
+	_selected_attacker_uid = -1
+	_selected_ability = false
 	_refresh()
+
+
+## Tap on the own play area: plays the selected untargeted card.
+func _on_own_zone_input(event: InputEvent) -> void:
+	var released: bool = (
+		(event is InputEventMouseButton and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT and not event.is_pressed())
+		or (event is InputEventScreenTouch and not event.is_pressed())
+	)
+	if not released or _selected_hand_uid < 0:
+		return
+	var play: PlayCardAction = _find_play_action(_selected_hand_uid, -1, -1)
+	if play != null:
+		_apply_action(play)
+
+
+func _clear_selection() -> void:
+	_selected_hand_uid = -1
+	_selected_attacker_uid = -1
+	_selected_ability = false
+
+
+## Status text and play-zone highlight for the selected hand card.
+func _update_selection_feedback() -> void:
+	var state: GameState = _match.get_state()
+	var zone_play: bool = false
+	if _selected_hand_uid >= 0 and state.player(HUMAN_PLAYER).hand.find(_selected_hand_uid) != null:
+		zone_play = _find_play_action(_selected_hand_uid, -1, -1) != null
+		_status_label.text = tr("UI_TAP_ZONE_TO_PLAY") if zone_play else tr("UI_CHOOSE_CARD_TARGET")
+	elif _selected_hand_uid >= 0:
+		_selected_hand_uid = -1
+	if _drag_preview != null:
+		return
+	_drop_hint.visible = zone_play
+	if zone_play:
+		var target_rect: Rect2 = _own_drop_rect()
+		_drop_hint.position = target_rect.position
+		_drop_hint.size = target_rect.size
+
+
+func _block_reason_text(reason: StringName, uid: int) -> String:
+	var player: PlayerState = _match.get_state().player(HUMAN_PLAYER)
+	var card: CardInstance = player.hand.find(uid)
+	return tr("UI_BLOCKED_%s" % String(reason).to_upper()).format({
+		"cost": card.data.cost if card != null else 0,
+		"energy": player.energy,
+	})
 
 
 func _on_board_card_pressed(uid: int, is_human: bool, zone_name: StringName, view: CardView) -> void:
@@ -507,6 +635,12 @@ func _on_board_card_pressed(uid: int, is_human: bool, zone_name: StringName, vie
 		return
 	if _match.get_state().phase != GameState.Phase.MAIN or _match.get_state().active_player != HUMAN_PLAYER:
 		return
+	if is_human and _selected_hand_uid >= 0 and _find_play_action(_selected_hand_uid, uid) == null:
+		# The tap lands inside the own play area: an untargeted card is played there.
+		var zone_play: PlayCardAction = _find_play_action(_selected_hand_uid, -1, -1)
+		if zone_play != null:
+			_apply_action(zone_play)
+			return
 	if zone_name == &"board":
 		if _selected_hand_uid >= 0:
 			var play: PlayCardAction = _find_play_action(_selected_hand_uid, uid)
@@ -732,15 +866,77 @@ func _clear_undo() -> void:
 
 
 func _on_pause_pressed() -> void:
-	var dialog: ConfirmationDialog = ConfirmationDialog.new()
-	dialog.title = tr("UI_PAUSE")
-	dialog.dialog_text = tr("UI_LEAVE_MATCH")
-	dialog.ok_button_text = tr("UI_LEAVE")
-	dialog.confirmed.connect(func() -> void:
+	if _pause_overlay != null and is_instance_valid(_pause_overlay):
+		_close_pause()
+		return
+	_pause_overlay = ColorRect.new()
+	_pause_overlay.name = "PauseOverlay"
+	_pause_overlay.color = Color(Palette.BG, 0.88)
+	_pause_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_pause_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_modal_layer.add_child(_pause_overlay)
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_pause_overlay.add_child(center)
+	var panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.ACCENT)
+	panel.name = "PausePanel"
+	panel.custom_minimum_size.x = roundi(560 * _ui_scale)
+	center.add_child(panel)
+	_show_pause_menu(panel)
+
+
+## Back button: opens or closes the pause panel instead of leaving the match.
+func handle_back() -> bool:
+	_on_pause_pressed()
+	return true
+
+
+func _show_pause_menu(panel: PanelContainer) -> void:
+	for child: Node in panel.get_children():
+		child.queue_free()
+	var content: VBoxContainer = VBoxContainer.new()
+	content.add_theme_constant_override("separation", roundi(18 * _ui_scale))
+	panel.add_child(content)
+	var title: Label = _label("UI_PAUSE", 30, Palette.ACCENT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+	var resume: Button = _button("UI_RESUME", 420)
+	resume.name = "ResumeButton"
+	resume.theme_type_variation = &"ButtonPrimary"
+	resume.pressed.connect(_close_pause)
+	content.add_child(resume)
+	var leave: Button = _button("UI_LEAVE", 420)
+	leave.name = "LeaveButton"
+	leave.pressed.connect(_show_leave_confirmation.bind(panel))
+	content.add_child(leave)
+
+
+func _show_leave_confirmation(panel: PanelContainer) -> void:
+	for child: Node in panel.get_children():
+		child.queue_free()
+	var content: VBoxContainer = VBoxContainer.new()
+	content.add_theme_constant_override("separation", roundi(18 * _ui_scale))
+	panel.add_child(content)
+	var question: Label = _label("UI_LEAVE_MATCH", 24, Palette.TEXT)
+	question.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(question)
+	var confirm: Button = _button("UI_LEAVE", 420)
+	confirm.name = "ConfirmLeaveButton"
+	confirm.pressed.connect(func() -> void:
 		SceneRouter.go_to("res://scenes/screens/splash.tscn", false)
 	)
-	add_child(dialog)
-	dialog.popup_centered()
+	content.add_child(confirm)
+	var cancel: Button = _button("UI_CANCEL", 420)
+	cancel.theme_type_variation = &"ButtonPrimary"
+	cancel.pressed.connect(_show_pause_menu.bind(panel))
+	content.add_child(cancel)
+
+
+func _close_pause() -> void:
+	if _pause_overlay != null and is_instance_valid(_pause_overlay):
+		_pause_overlay.queue_free()
+	_pause_overlay = null
 
 
 func _find_play_action(card_uid: int, target_uid: int, target_player: int = -1) -> PlayCardAction:
@@ -872,6 +1068,7 @@ func _show_results() -> void:
 	center.add_child(content)
 	content.add_child(_label(_status_text(_match.get_state()), 42, Palette.ACCENT))
 	_results_undo_button = _button("UI_UNDO_PLAY", 250)
+	_set_button_icon(_results_undo_button, "undo", Palette.TEXT)
 	_results_undo_button.visible = false
 	_results_undo_button.pressed.connect(_on_undo_play_pressed)
 	content.add_child(_results_undo_button)
@@ -1025,15 +1222,17 @@ func _leader_panel(player_id: int) -> Dictionary:
 	stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stats.add_theme_constant_override("separation", roundi(16 * _ui_scale))
 	info.add_child(stats)
-	var life: Label = _label("", 20, Palette.LIFE)
-	life.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	stats.add_child(life)
-	var energy: Label = _label("", 20, Palette.ENERGY)
-	energy.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	stats.add_child(energy)
-	var counts: Label = _label("", 13, Palette.TEXT_MUTED)
-	counts.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	info.add_child(counts)
+	var life: Label = _icon_stat(stats, "life", Palette.LIFE, 20)
+	var energy: Label = _icon_stat(stats, "energy", Palette.ENERGY, 20)
+	var count_row: HBoxContainer = HBoxContainer.new()
+	count_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	count_row.add_theme_constant_override("separation", roundi(14 * _ui_scale))
+	info.add_child(count_row)
+	var counts: Dictionary = {
+		"deck": _icon_stat(count_row, "deck", Palette.TEXT_MUTED, 14),
+		"graveyard": _icon_stat(count_row, "graveyard", Palette.TEXT_MUTED, 14),
+		"hand": _icon_stat(count_row, "hand", Palette.TEXT_MUTED, 14),
+	}
 
 	var ability: Button = Button.new()
 	ability.name = "OwnAbilityButton" if is_human else "EnemyAbilityButton"
@@ -1060,20 +1259,15 @@ func _leader_panel(player_id: int) -> Dictionary:
 	}
 
 
-func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, counts_label: Label, artwork: TextureRect, initial: Label, ability_button: Button) -> void:
+func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, counts: Dictionary, artwork: TextureRect, initial: Label, ability_button: Button) -> void:
 	var key: String = String(player.leader.id).to_upper()
 	var leader_name: String = tr("LEADER_%s_NAME" % key)
 	name_label.text = leader_name
-	life_label.text = "♥ %d" % player.life
-	energy_label.text = "◆ %d / %d" % [player.energy, player.max_energy]
-	counts_label.text = "%s %d  ·  %s %d  ·  %s %d" % [
-		tr("UI_DECK"),
-		player.deck.size(),
-		tr("UI_GRAVEYARD"),
-		player.graveyard.size(),
-		tr("UI_HAND"),
-		player.hand.size(),
-	]
+	life_label.text = str(player.life)
+	energy_label.text = "%d / %d" % [player.energy, player.max_energy]
+	(counts["deck"] as Label).text = str(player.deck.size())
+	(counts["graveyard"] as Label).text = str(player.graveyard.size())
+	(counts["hand"] as Label).text = str(player.hand.size())
 	artwork.texture = player.leader.art
 	artwork.visible = player.leader.art != null
 	initial.text = leader_name.left(1)
@@ -1186,3 +1380,39 @@ func _leader_name(player_id: int) -> String:
 	if _match == null or player_id < 0 or player_id > 1:
 		return ""
 	return tr("LEADER_%s_NAME" % String(_match.get_state().player(player_id).leader.id).to_upper())
+
+
+## Standard UI icons: library SVGs (game-icons.net, CC BY 3.0 — see CREDITS.md), tinted with modulate.
+func _icon(icon_name: String) -> Texture2D:
+	return load("res://ui/icons/%s.svg" % icon_name) as Texture2D
+
+
+## Icon + value label in a row; returns the label to update.
+func _icon_stat(parent: Container, icon_name: String, color: Color, font_size: int) -> Label:
+	var box: HBoxContainer = HBoxContainer.new()
+	box.name = icon_name.to_pascal_case() + "Stat"
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_theme_constant_override("separation", roundi(5 * _ui_scale))
+	box.tooltip_text = tr("UI_%s" % icon_name.to_upper())
+	parent.add_child(box)
+	var icon: TextureRect = TextureRect.new()
+	icon.texture = _icon(icon_name)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2.ONE * roundi(font_size * 1.15 * _ui_scale)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.modulate = color
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(icon)
+	var value: Label = _label("", font_size, color)
+	value.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(value)
+	return value
+
+
+func _set_button_icon(button: Button, icon_name: String, color: Color) -> void:
+	button.icon = _icon(icon_name)
+	button.add_theme_constant_override("icon_max_width", roundi(26 * _ui_scale))
+	for state: String in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color", "icon_hover_pressed_color"]:
+		button.add_theme_color_override(state, color)
+	button.add_theme_color_override("icon_disabled_color", Palette.TEXT_DISABLED)

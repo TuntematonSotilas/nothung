@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, frames, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-18
+> Status: Draft · Last updated: 2026-10-21
 
 Prices and licences change — check them before buying.
 
@@ -78,6 +78,7 @@ the project author; AI-assisted cleanup is allowed as described in the workflow 
   reviews and approves every final export.
 - Public-domain works (Rackham, etc.) are used only as **reference** and **temporary placeholders**
   during prototyping; every placeholder is replaced before release.
+- **Exception — standard UI icons** (Life, Energy, pause…): taken from game-icons.net (CC BY 3.0, see `CREDITS.md`). Faction and card-type icons stay hand-drawn ([icons](../functional/08-art-and-audio.md#icons)).
 
 ## Export specs for Godot
 

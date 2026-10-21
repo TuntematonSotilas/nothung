@@ -212,7 +212,7 @@ func test_ai_playing_a_unit_does_not_change_duel_minimum_height() -> void:
 
 	var minimum_height_after_play: float = layout.get_combined_minimum_size().y
 	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
-	var hand_scroll: ScrollContainer = hand.get_parent() as ScrollContainer
+	var hand_scroll: Control = hand.get_parent() as Control
 	var hand_card: CardView = hand.get_child(0) as CardView
 	var enemy_board: HBoxContainer = duel.get("_enemy_board") as HBoxContainer
 	var enemy_card: CardView = enemy_board.get_child(0) as CardView
@@ -272,3 +272,124 @@ func _create_duel() -> Control:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	return duel
+
+
+func _main_phase_duel_with_hand(card_ids: Array[StringName], energy: int) -> Control:
+	var duel: Control = await _create_duel()
+	var current_match: Match = duel.get("_match") as Match
+	var state: GameState = current_match.get_state()
+	var player: PlayerState = state.player(0)
+	state.phase = GameState.Phase.MAIN
+	state.active_player = 0
+	player.energy = energy
+	player.hand.cards.clear()
+	player.board.cards.clear()
+	state.player(1).board.cards.clear()
+	var uid: int = 700
+	for card_id: StringName in card_ids:
+		player.hand.add(CardInstance.new(CardDatabase.get_card(card_id), 0, uid))
+		uid += 1
+	duel.call("_refresh")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	return duel
+
+
+func test_tap_tap_selects_first_then_plays_on_the_play_area() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"wotans_ravens"], 2)
+	var player: PlayerState = (duel.get("_match") as Match).get_state().player(0)
+	var view: CardView = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	duel.call("_on_hand_card_pressed", 700, view)
+	assert_int(player.hand.size()).is_equal(1)
+	assert_int(int(duel.get("_selected_hand_uid"))).is_equal(700)
+	assert_bool((duel.get("_drop_hint") as PanelContainer).visible).is_true()
+
+	var release: InputEventMouseButton = InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	duel.call("_on_own_zone_input", release)
+	assert_int(player.hand.size()).is_equal(0)
+	assert_int(player.board.size()).is_equal(1)
+	assert_bool((duel.get("_drop_hint") as PanelContainer).visible).is_false()
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_tapping_the_selected_card_again_cancels() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"wotans_ravens"], 2)
+	var view: CardView = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	duel.call("_on_hand_card_pressed", 700, view)
+	view = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	duel.call("_on_hand_card_pressed", 700, view)
+	assert_int(int(duel.get("_selected_hand_uid"))).is_equal(-1)
+	assert_int((duel.get("_match") as Match).get_state().player(0).hand.size()).is_equal(1)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_unplayable_card_is_greyed_and_zoom_explains_why() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"donner"], 1)
+	var view: CardView = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	assert_float(view.modulate.r).is_less(1.0)
+	duel.call("_on_hand_card_pressed", 700, view)
+	assert_int(int(duel.get("_selected_hand_uid"))).is_equal(-1)
+	assert_str((duel.get("_status_label") as Label).text).contains("4")
+
+	duel.call("_show_card_zoom", view.card_data, view.card_instance, view)
+	var reason: Label = duel.find_child("BlockedReason", true, false) as Label
+	assert_object(reason).is_not_null()
+	assert_str(reason.text).contains("4")
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_full_hand_fits_the_screen_width_without_scrollbar() -> void:
+	var ids: Array[StringName] = [&"wotans_ravens", &"fricka", &"freia", &"loge", &"donner", &"valhalla_hero", &"wotans_valkyries", &"donners_hammer"]
+	var duel: Control = await _main_phase_duel_with_hand(ids, 10)
+	await get_tree().process_frame
+	assert_int(duel.find_children("*", "ScrollContainer", true, false).size()).is_equal(0)
+	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
+	var viewport_width: float = duel.get_viewport().get_visible_rect().size.x
+	var last_card: CardView = hand.get_child(hand.get_child_count() - 1) as CardView
+	assert_float(last_card.get_global_rect().end.x).is_less_equal(viewport_width)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_redraw_and_pause_panels_fit_without_scrolling() -> void:
+	var duel: Control = await _create_duel()
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var viewport_size: Vector2 = duel.get_viewport().get_visible_rect().size
+	if state.phase == GameState.Phase.REDRAW and state.redraw_player == 0:
+		await get_tree().process_frame
+		var redraw_panel: PanelContainer = duel.find_child("RedrawPanel", true, false) as PanelContainer
+		assert_object(redraw_panel).is_not_null()
+		assert_int(redraw_panel.find_children("*", "ScrollContainer", true, false).size()).is_equal(0)
+		assert_bool(Rect2(Vector2.ZERO, viewport_size).encloses(redraw_panel.get_global_rect())).is_true()
+
+	duel.call("_on_pause_pressed")
+	await get_tree().process_frame
+	var pause_panel: PanelContainer = duel.find_child("PausePanel", true, false) as PanelContainer
+	assert_object(pause_panel).is_not_null()
+	assert_object(pause_panel.find_child("ResumeButton", true, false)).is_not_null()
+	assert_bool(duel.call("handle_back")).is_true()
+	await get_tree().process_frame
+	assert_object(duel.find_child("PausePanel", true, false)).is_null()
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_releasing_a_drag_that_plays_the_card_does_not_crash() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"wotans_ravens"], 2)
+	var player: PlayerState = (duel.get("_match") as Match).get_state().player(0)
+	var view: CardView = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	var start: Vector2 = view.get_global_rect().get_center()
+	var drop: Vector2 = (duel.call("_own_drop_rect") as Rect2).get_center()
+	view.call("_begin_press", start)
+	view.call("_cancel_moved_press", start + Vector2(0, -60))
+	view.call("_end_press", drop)
+	await get_tree().process_frame
+	assert_int(player.hand.size()).is_equal(0)
+	assert_int(player.board.size()).is_equal(1)
+	duel.queue_free()
+	await get_tree().process_frame

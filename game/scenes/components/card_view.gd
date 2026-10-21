@@ -144,8 +144,11 @@ func _end_press(position: Vector2) -> void:
 	if _drag_active:
 		_drag_active = false
 		_drag_triggered = true
-		drag_released.emit(_drag_data(), position)
+		# Handle the input before emitting: the listener may play the card and remove this view from the tree.
 		get_viewport().set_input_as_handled()
+		drag_released.emit(_drag_data(), position)
+		if not is_inside_tree():
+			return
 	if _press_active:
 		_press_active = false
 		_stop_long_press()

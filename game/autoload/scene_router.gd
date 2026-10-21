@@ -22,7 +22,13 @@ func _ready() -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_GO_BACK_REQUEST and not go_back():
+	if what != NOTIFICATION_WM_GO_BACK_REQUEST:
+		return
+	# A screen can handle back itself (e.g. the duel opens its pause panel) by defining handle_back() -> bool.
+	var current: Node = get_tree().current_scene
+	if current != null and current.has_method("handle_back") and current.call("handle_back"):
+		return
+	if not go_back():
 		get_tree().quit()
 
 

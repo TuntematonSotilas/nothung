@@ -13,6 +13,8 @@ const MAX_ARTIFACTS: int = 3
 const MAX_EFFECT_RESOLUTIONS: int = 500
 const RING_MAX_CURSE: int = 3
 const DOOM_START_TURN: int = 10
+## Max Energy on each player's first turn (the second player still gets +1 once).
+const FIRST_TURN_MAX_ENERGY: int = 2
 
 var _state: GameState
 var _trigger_queue: Array[Dictionary] = []
@@ -133,6 +135,32 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 	actions.append(EndTurnAction.new(player_id))
 	actions.append(ConcedeAction.new(player_id))
 	return actions
+
+
+## Why a card in hand cannot be played right now (&"" when it can). Order follows what the player can act on first.
+## Values: &"not_your_turn", &"energy", &"board_full", &"artifact_limit", &"no_target", &"unplayable".
+func play_block_reason(player_id: int, card_uid: int) -> StringName:
+	if _state.phase != GameState.Phase.MAIN or player_id != _state.active_player:
+		return &"not_your_turn"
+	var player := _state.player(player_id)
+	var card := player.hand.find(card_uid)
+	if card == null or card.data.is_ring:
+		return &"unplayable"
+	if _play_cost(card.data, player_id) > player.energy:
+		return &"energy"
+	if card.data.type == CardData.Type.UNIT and player.board.size() >= MAX_BOARD_SIZE:
+		return &"board_full"
+	if (
+		card.data.type == CardData.Type.ARTIFACT
+		and not card.data.is_relic()
+		and not card.data.artifact_limit_exempt
+		and player.artifacts.size() >= MAX_ARTIFACTS
+	):
+		return &"artifact_limit"
+	for action: Action in get_legal_actions(player_id):
+		if action is PlayCardAction and (action as PlayCardAction).card_uid == card_uid:
+			return &""
+	return &"no_target"
 
 
 ## Returns whether an action satisfies the current phase and all game rules.
@@ -260,6 +288,8 @@ func _valid_deck(deck: DeckData) -> bool:
 
 func _create_player(player_id: int, deck_data: DeckData) -> PlayerState:
 	var player := PlayerState.new(player_id, deck_data.leader)
+	# Raised by 1 at the start of each turn, so the first turn starts at FIRST_TURN_MAX_ENERGY.
+	player.max_energy = FIRST_TURN_MAX_ENERGY - 1
 	for card_data: CardData in deck_data.cards:
 		player.deck.add(_new_instance(card_data, player_id))
 	return player

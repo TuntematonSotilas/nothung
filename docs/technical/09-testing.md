@@ -1,7 +1,7 @@
 # Testing
 
 > Test strategy and tooling.
-> Status: Draft · Last updated: 2026-10-19
+> Status: Draft · Last updated: 2026-10-21
 
 ## Framework
 
@@ -141,6 +141,18 @@ Retained ([game rules](../functional/03-game-rules.md#the-ring-signature-mechani
 | Draws | 0 |
 
 Matches are slightly above the 8–10 turns per player target.
+
+**First-turn Energy 2 (2026-10-21).** Starting max Energy raised from 1 to 2 for both players ([game rules](../functional/03-game-rules.md#resource-energy)). Same 40 seeds:
+
+| Metric | Result |
+|--------|--------|
+| Average match length | 19.7 turns (~9.9 per player) |
+| Average actions | 80.0 |
+| Gods starter wins | 27 / 40 (67.5%) |
+| Nibelungs starter wins | 13 / 40 (32.5%) |
+| Draws | 0 |
+
+Matches are back inside the 8–10 turns per player target, but the Gods gain more from the extra Energy (their 2-cost units come down on turn 1). Next lever if needed: *Nibelung Host* at 2/4.
 
 ## Manual test checklist (release)
 

@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-16
+> Status: Draft · Last updated: 2026-10-21
 
 ## Art direction
 
@@ -102,6 +102,34 @@ Game logo for *Nothung: The Ring Card Game* built around the sword Nothung (e.g.
 
 Frames follow the [card colour system](#card-colour-system): 4 shapes (unit, spell, artifact, relic) × 5 faction colours + the dark-gold Ring / Cursed variant. Produced as separate layers so Godot assembles them at runtime ([tools/art-tools.md](../tools/art-tools.md)).
 
+### Icons
+
+> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, deck, graveyard, hand, pause, end turn, undo, close…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). **Faction and card-type icons are hand-drawn** by the author, like the rest of the artwork.
+
+- Format: **SVG** rather than an icon font. Godot imports SVG as a crisp texture at any size and tints it in game; icon fonts need codepoints and rich-text labels.
+- In-game icons are single-colour on a transparent background (white or black, any shade): the game tints them (`modulate`).
+- Hand-drawn icons to deliver, in `game/ui/icons/`:
+  - Factions: `faction_gods.svg` (spear), `faction_nibelungs.svg` (anvil), `faction_walsungs.svg` (sword), `faction_valkyries.svg` (winged helm), `faction_neutral.svg` (Rhine wave).
+  - Card types: `type_unit.svg`, `type_spell.svg`, `type_artifact.svg`, `type_relic.svg`.
+  - SVG (vectorised in Inkscape from a scanned drawing) or PNG **256 × 256**; one solid shape, no thin details: they are shown at 24–48 px.
+
+### Decorated buttons
+
+Buttons can get a painted frame instead of the flat theme colours:
+
+- One PNG per state: `button_normal.png`, `button_pressed.png` (and optionally `button_primary.png` for gold buttons), in `game/ui/theme/`.
+- **9-slice**: e.g. 192 × 96 px with a **32 px** decorated border on each side; the middle must be plain (it gets stretched). Ornaments only in the corners and edges.
+- Keep the centre dark and calm enough for the text (`#E8E0CC` on normal, ink `#1C1A17` on primary).
+- Wired as `StyleBoxTexture` in `main_theme.tres`, so every button changes at once.
+
+### Duel backgrounds
+
+> **Decision (2026-10-21):** Duel backgrounds are **visual** boards (Valhalla, Nibelheim, Rhine depths, Gibichung hall…). Bonuses or penalties tied to a place exist only as [campaign duel special rules](05-game-modes.md#campaign).
+
+- File: `game/assets/art/boards/<board_id>.png`, **1080 × 1920** (portrait), shown dimmed behind the duel; `default.png` is used for quick matches.
+- Composition: interest at the **top and bottom edges**; keep the two play areas (roughly the middle 60 % of the height) **calm and low in contrast**, since cards sit on them.
+- Muted tones from the Romantic palette; no text.
+
 ## Audio
 
 ### Music
@@ -120,6 +148,7 @@ Frames follow the [card colour system](#card-colour-system): 4 shapes (unit, spe
 ## Asset rights checklist
 
 - [ ] All artwork hand-drawn for the project by the author — no AI-generated images, no public-domain placeholders left ([artwork policy](../tools/art-tools.md#artwork-policy)).
+- [ ] Standard UI icons from game-icons.net credited in `CREDITS.md` (CC BY 3.0) — the only third-party images allowed ([icons](#icons)).
 - [ ] Every audio file has a documented source + licence (keep a `CREDITS.md`).
 - [ ] Fonts licensed for embedding in apps (e.g. SIL OFL).
 - [ ] Libretto quotes: German original is public domain; translations must be public domain or our own.
