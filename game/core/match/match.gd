@@ -163,6 +163,24 @@ func play_block_reason(player_id: int, card_uid: int) -> StringName:
 	return &"no_target"
 
 
+## Why a unit on the board cannot attack right now (&"" when it can).
+## Values: &"not_your_turn", &"summoning_sick" (played this turn, no Charge), &"already_attacked", &"no_target", &"unknown".
+func attack_block_reason(player_id: int, unit_uid: int) -> StringName:
+	if _state.phase != GameState.Phase.MAIN or player_id != _state.active_player:
+		return &"not_your_turn"
+	var unit := _state.player(player_id).board.find(unit_uid)
+	if unit == null:
+		return &"unknown"
+	if unit.exhausted:
+		return &"already_attacked"
+	if not unit.can_attack:
+		return &"summoning_sick"
+	for action: Action in get_legal_actions(player_id):
+		if action is AttackAction and (action as AttackAction).attacker_uid == unit_uid:
+			return &""
+	return &"no_target"
+
+
 ## Returns whether an action satisfies the current phase and all game rules.
 func is_legal(action: Action) -> bool:
 	if action == null or _state.phase == GameState.Phase.GAME_OVER:

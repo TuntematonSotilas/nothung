@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-21
+> Status: Draft · Last updated: 2026-10-22
 
 ## Platform constraints
 
@@ -44,7 +44,7 @@ flowchart TD
 | Deck select | Deck list, Leader portrait, validity indicator |
 | Opening hand | Near full-screen panel, cards in a grid sized to fit (never scrolls); tap to mark cards to put back (dimmed + **REDRAW** badge), then **Redraw selected**; flavour title "The Norns weave your fate" |
 | Pause | Themed panel: **Resume** (primary), **Leave**; leaving asks for confirmation inside the panel. The Android back button opens / closes it during a match |
-| **Duel** | Top bar: whose turn, turn number, Götterdämmerung countdown, pause. One identical panel per Leader (portrait, name, Life, Energy, card counts, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
+| **Duel** | Top bar: whose turn, turn number, Götterdämmerung countdown, pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
 | Settings | Audio volumes, language, animation speed, reset progress |
@@ -59,7 +59,7 @@ flowchart TD
 │ [Turn 1 · Götterdämmerung in 9 ]         │
 │ ┌ Enemy Leader ──────────────────────┐ │
 │ │ (A) Alberich  ♥20 ◆0/0  [Lord of the   │ │  portrait · name · Life · Energy
-│ │     Deck · Graveyard · Hand  Nibelungs ◆2]│ │  counts · named ability (read-only)
+│ │                              Nibelungs ◆2]│ │  named ability (read-only)
 │ └────────────────────────────────────┘ │
 │ ┌ ENEMY UNITS ───────────────────────┐ │
 │ │ artifacts (when any) / ▢ ▢ ▢ units   │ │  framed play area
@@ -69,18 +69,19 @@ flowchart TD
 │ └────────────────────────────────────┘ │
 │ ┌ Your Leader (gold border) ─────────┐ │
 │ │ (portrait) Wotan ♥20 ◆1/1 [Spear of │ │  same panel, ability is the button
-│ │  Deck · Graveyard · Hand   Treaties ◆3]│ │
+│ │                            Treaties ◆3]│ │
 │ └────────────────────────────────────┘ │
 │ [BATTLE LOG · last 3 lines] [UNDO] [END TURN] │
 │   ╭──╮╭──╮╭──╮╭──╮╭──╮  hand (scroll) │
 └──────────────────────────────────────┘
 ```
 
-- **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, deck / graveyard / hand counts, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
+- **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
 - Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*.
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
 - **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.
-- Icons (Life, Energy, deck, graveyard, hand, pause, end turn, undo, close) come from game-icons.net ([CREDITS](../../CREDITS.md)); faction and card-type icons will be hand-drawn ([art & audio](08-art-and-audio.md#icons)).
+- **Play areas wrap**: when units do not fit on one line (up to 6 per side), they continue on a second line instead of widening the screen.
+- Icons (Life, Energy, pause, end turn, undo, close) come from game-icons.net ([CREDITS](../../CREDITS.md)); faction and card-type icons will be hand-drawn ([art & audio](08-art-and-audio.md#icons)).
 - A painted board can sit behind the duel (`assets/art/boards/<board_id>.png`, dimmed); see [art & audio](08-art-and-audio.md#duel-backgrounds).
 
 ## Gestures
@@ -89,7 +90,8 @@ flowchart TD
 |--------|---------|
 | Inspect card | Long press → zoomed card with full text and trait tooltips |
 | Play card | Drag from hand onto the highlighted own play area (or onto a target) — or tap-tap (below) |
-| Attack | Drag from own unit to target; valid targets highlighted |
+| Attack | Units that can attack now have a **gold border** (the status line says so). **Tap the unit, then a target** — or drag the unit onto the target. While a unit is selected or dragged, its valid targets get a **red border** (enemy units, and the enemy Leader panel when it can be hit); if the enemy has Guard units, the status line says they must be attacked first. Tap the unit again to cancel |
+| Unit that cannot attack | Dimmed on the board and cannot be dragged. Tapping it, or opening its details, explains why: played this turn (attacks next turn unless it has Charge), already attacked this turn, or nothing to attack |
 | Cancel drag | Release outside a valid target; the card stays where it was |
 | Undo last play | Tap **Undo play** before taking another action; the card returns to the top of the deck and the match state is restored to before it was played |
 | Tap-tap (no drag) | **1st tap selects** the card (gold border, own play area highlighted); **2nd tap** on the play area — or on a target for targeted cards — plays it. Tapping the selected card again cancels. A single tap never plays a card. |

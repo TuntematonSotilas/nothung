@@ -104,7 +104,7 @@ Frames follow the [card colour system](#card-colour-system): 4 shapes (unit, spe
 
 ### Icons
 
-> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, deck, graveyard, hand, pause, end turn, undo, close…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). **Faction and card-type icons are hand-drawn** by the author, like the rest of the artwork.
+> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, pause, end turn, undo, close…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). **Faction and card-type icons are hand-drawn** by the author, like the rest of the artwork.
 
 - Format: **SVG** rather than an icon font. Godot imports SVG as a crisp texture at any size and tints it in game; icon fonts need codepoints and rich-text labels.
 - In-game icons are single-colour on a transparent background (white or black, any shade): the game tints them (`modulate`).

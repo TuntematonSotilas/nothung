@@ -8,12 +8,9 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 
 | File | Icon | Author |
 |------|------|--------|
-| `energy.svg` | Crystal shine | Lorc |
+| `energy.svg` | Electric | Sbed |
 | `life.svg` | Hearts | Skoll |
 | `attack.svg` | Crossed swords | Lorc |
-| `deck.svg` | Stack | Delapouite |
-| `hand.svg` | Poker hand | Lorc |
-| `graveyard.svg` | Tombstone | Lorc |
 | `pause.svg` | Pause button | Guard13007 |
 | `end_turn.svg` | Player next | Delapouite |
 | `undo.svg` | Anticlockwise rotation | Delapouite |

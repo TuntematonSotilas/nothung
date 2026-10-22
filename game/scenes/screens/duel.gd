@@ -26,7 +26,6 @@ var _enemy_leader_button: Button
 var _enemy_leader_label: Label
 var _enemy_life_label: Label
 var _enemy_energy_label: Label
-var _enemy_counts: Dictionary
 var _enemy_portrait_frame: Panel
 var _enemy_artwork: TextureRect
 var _enemy_portrait_initial: Label
@@ -34,12 +33,11 @@ var _enemy_ability_button: Button
 var _enemy_zone_frame: PanelContainer
 var _own_zone_frame: PanelContainer
 var _own_life_label: Label
-var _own_counts: Dictionary
 var _own_portrait_initial: Label
-var _enemy_board: HBoxContainer
-var _enemy_artifacts: HBoxContainer
-var _own_board: HBoxContainer
-var _own_artifacts: HBoxContainer
+var _enemy_board: HFlowContainer
+var _enemy_artifacts: HFlowContainer
+var _own_board: HFlowContainer
+var _own_artifacts: HFlowContainer
 var _own_hand: HBoxContainer
 var _own_leader_portrait_frame: Panel
 var _own_leader_artwork: TextureRect
@@ -54,6 +52,10 @@ var _results_undo_button: Button
 var _overlay: ColorRect
 var _zoom_overlay: ColorRect
 var _pause_overlay: ColorRect
+var _enemy_leader_panel: PanelContainer
+var _own_leader_panel: PanelContainer
+## Card being dragged ({"kind", "uid"}), so targets can be highlighted during the drag.
+var _drag_source: Dictionary = {}
 var _zoom_source: CardView
 var _drop_hint: PanelContainer
 var _drop_hint_label: Label
@@ -134,7 +136,11 @@ func _build_ui() -> void:
 	var info_box: VBoxContainer = VBoxContainer.new()
 	info_box.alignment = BoxContainer.ALIGNMENT_CENTER
 	info_panel.add_child(info_box)
-	_status_label = _label("", 19, Palette.ACCENT)
+	_status_label = _label("", 17, Palette.ACCENT)
+	# Long instructions wrap instead of widening the top bar (which pushed Pause off screen).
+	_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_status_label.custom_minimum_size.x = 1
+	_status_label.max_lines_visible = 2
 	info_box.add_child(_status_label)
 	_turn_label = _label("UI_TURN", 15, Palette.TEXT_MUTED)
 	info_box.add_child(_turn_label)
@@ -147,6 +153,7 @@ func _build_ui() -> void:
 	# Opponent: leader panel, then its play area.
 	var enemy: Dictionary = _leader_panel(AI_PLAYER)
 	_main_layout.add_child(enemy["panel"])
+	_enemy_leader_panel = enemy["panel"]
 	_enemy_leader_button = enemy["button"]
 	_enemy_leader_button.pressed.connect(_on_enemy_leader_pressed)
 	_enemy_portrait_frame = enemy["portrait_frame"]
@@ -155,7 +162,6 @@ func _build_ui() -> void:
 	_enemy_leader_label = enemy["name"]
 	_enemy_life_label = enemy["life"]
 	_enemy_energy_label = enemy["energy"]
-	_enemy_counts = enemy["counts"]
 	_enemy_ability_button = enemy["ability"]
 
 	_enemy_zone_frame = _zone_frame("UI_ENEMY_UNITS")
@@ -178,6 +184,7 @@ func _build_ui() -> void:
 
 	var own: Dictionary = _leader_panel(HUMAN_PLAYER)
 	_main_layout.add_child(own["panel"])
+	_own_leader_panel = own["panel"]
 	_own_leader_button = own["button"]
 	_own_leader_button.pressed.connect(_on_own_leader_pressed)
 	_own_leader_portrait_frame = own["portrait_frame"]
@@ -186,7 +193,6 @@ func _build_ui() -> void:
 	_own_leader_label = own["name"]
 	_own_life_label = own["life"]
 	_energy_label = own["energy"]
-	_own_counts = own["counts"]
 	_ability_button = own["ability"]
 	_ability_button.pressed.connect(_on_ability_pressed)
 
@@ -220,7 +226,8 @@ func _build_ui() -> void:
 	action_row.add_child(_end_turn_button)
 
 	# The hand always fits the width (cards overlap when needed): no scrollbar to fight with drags.
-	var hand_area: MarginContainer = MarginContainer.new()
+	# A plain Control (not a container) so the cards' total width never widens the layout.
+	var hand_area: Control = Control.new()
 	hand_area.name = "HandArea"
 	hand_area.custom_minimum_size.y = roundi(350 * _ui_scale)
 	hand_area.size_flags_vertical = Control.SIZE_SHRINK_END
@@ -228,6 +235,7 @@ func _build_ui() -> void:
 	_own_hand = HBoxContainer.new()
 	_own_hand.alignment = BoxContainer.ALIGNMENT_CENTER
 	_own_hand.add_theme_constant_override("separation", roundi(12 * _ui_scale))
+	_own_hand.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hand_area.resized.connect(_fit_hand)
 	hand_area.add_child(_own_hand)
 
@@ -250,11 +258,11 @@ func _refresh() -> void:
 	var opponent: PlayerState = state.player(AI_PLAYER)
 	_update_leader_panel(
 		opponent, _enemy_leader_label, _enemy_life_label, _enemy_energy_label,
-		_enemy_counts, _enemy_artwork, _enemy_portrait_initial, _enemy_ability_button
+		_enemy_artwork, _enemy_portrait_initial, _enemy_ability_button
 	)
 	_update_leader_panel(
 		human, _own_leader_label, _own_life_label, _energy_label,
-		_own_counts, _own_leader_artwork, _own_portrait_initial, _ability_button
+		_own_leader_artwork, _own_portrait_initial, _ability_button
 	)
 	_turn_label.text = "%s %d  ·  %s %d" % [
 		tr("UI_TURN"),
@@ -274,6 +282,7 @@ func _refresh() -> void:
 	_fill_board(_own_artifacts, human.artifacts, true, &"artifact")
 	_fill_hand(human.hand)
 	_update_selection_feedback()
+	_apply_highlights()
 	_log_label.text = "\n".join(_log_lines.slice(maxi(0, _log_lines.size() - 3)))
 	if state.phase == GameState.Phase.REDRAW and state.redraw_player == HUMAN_PLAYER:
 		_show_redraw_overlay()
@@ -289,14 +298,108 @@ func _status_text(state: GameState) -> String:
 		return tr("UI_CHOOSE_REDRAW") if state.redraw_player == HUMAN_PLAYER else tr("UI_OPPONENT_REDRAW")
 	if state.phase == GameState.Phase.GAME_OVER:
 		return tr("UI_VICTORY") if state.winner == HUMAN_PLAYER else (tr("UI_DRAW") if state.winner < 0 else tr("UI_DEFEAT"))
-	return tr("UI_YOUR_TURN") if state.active_player == HUMAN_PLAYER else tr("UI_OPPONENT_TURN")
+	if state.active_player != HUMAN_PLAYER:
+		return tr("UI_OPPONENT_TURN")
+	# Derived from the current selection, so a refresh never erases the instruction.
+	if _selected_attacker_uid >= 0:
+		var targets: Dictionary = _current_targets()
+		var guarded: bool = not targets["enemy_leader"] and not _match.get_state().player(AI_PLAYER).board.is_empty()
+		return tr("UI_CHOOSE_ATTACK_TARGET_GUARD") if guarded and _enemy_has_guard() else tr("UI_CHOOSE_ATTACK_TARGET")
+	if _selected_ability:
+		return tr("UI_CHOOSE_ABILITY_TARGET")
+	for unit: CardInstance in state.player(HUMAN_PLAYER).board.cards:
+		if _match.attack_block_reason(HUMAN_PLAYER, unit.uid) == &"":
+			return tr("UI_YOUR_TURN_ATTACK_HINT")
+	return tr("UI_YOUR_TURN")
 
 
-func _fill_board(row: HBoxContainer, zone: Zone, is_human: bool, zone_name: StringName) -> void:
+func _enemy_has_guard() -> bool:
+	for unit: CardInstance in _match.get_state().player(AI_PLAYER).board.cards:
+		if unit.has_keyword(&"guard"):
+			return true
+	return false
+
+
+## Valid targets of the selected (or dragged) attacker, hand card or Leader ability.
+func _current_targets() -> Dictionary:
+	var targets: Dictionary = {"units": {}, "enemy_leader": false, "own_leader": false}
+	var attacker_uid: int = _selected_attacker_uid
+	var hand_uid: int = _selected_hand_uid
+	if not _drag_source.is_empty():
+		attacker_uid = int(_drag_source["uid"]) if _drag_source.get("kind", "") == "attacker" else -1
+		hand_uid = int(_drag_source["uid"]) if _drag_source.get("kind", "") == "hand" else -1
+	if attacker_uid < 0 and hand_uid < 0 and not _selected_ability:
+		return targets
+	for action: Action in _match.get_legal_actions(HUMAN_PLAYER):
+		var target_uid: int = -1
+		var target_player: int = -1
+		if action is AttackAction and (action as AttackAction).attacker_uid == attacker_uid:
+			target_uid = (action as AttackAction).target_uid
+			target_player = (action as AttackAction).target_player
+		elif action is PlayCardAction and (action as PlayCardAction).card_uid == hand_uid:
+			target_uid = (action as PlayCardAction).target_uid
+			target_player = (action as PlayCardAction).target_player
+		elif action is UseLeaderAbilityAction and _selected_ability and _drag_source.is_empty():
+			target_uid = (action as UseLeaderAbilityAction).target_uid
+			target_player = (action as UseLeaderAbilityAction).target_player
+		else:
+			continue
+		if target_uid >= 0:
+			(targets["units"] as Dictionary)[target_uid] = true
+		elif target_player == AI_PLAYER:
+			targets["enemy_leader"] = true
+		elif target_player == HUMAN_PLAYER:
+			targets["own_leader"] = true
+	return targets
+
+
+## Gold border on units ready to attack, red border on valid targets, dimmed units that cannot attack.
+func _apply_highlights() -> void:
+	var state: GameState = _match.get_state()
+	var my_main_phase: bool = state.phase == GameState.Phase.MAIN and state.active_player == HUMAN_PLAYER
+	var targets: Dictionary = _current_targets()
+	var choosing: bool = _selected_attacker_uid >= 0 or _selected_hand_uid >= 0 or _selected_ability or not _drag_source.is_empty()
+	for row: HFlowContainer in [_own_board, _enemy_board]:
+		for child: Node in row.get_children():
+			var view: CardView = child as CardView
+			if view == null or view.card_instance == null:
+				continue
+			var uid: int = view.card_instance.uid
+			var is_own: bool = row == _own_board
+			var ready: bool = is_own and my_main_phase and _match.attack_block_reason(HUMAN_PLAYER, uid) == &""
+			if (targets["units"] as Dictionary).has(uid):
+				view.set_highlight(&"target")
+			elif ready and not choosing:
+				view.set_highlight(&"ready")
+			else:
+				view.set_highlight(&"")
+			if is_own:
+				var dragging_it: bool = _drag_source.get("kind", "") == "attacker" and int(_drag_source.get("uid", -1)) == uid
+				view.set_selected(uid == _selected_attacker_uid or dragging_it)
+				view.modulate = Color.WHITE if ready or not my_main_phase else Color(0.68, 0.68, 0.68)
+	_set_panel_border(_enemy_leader_panel, Palette.LIFE if targets["enemy_leader"] else Palette.BORDER, targets["enemy_leader"])
+	_set_panel_border(_own_leader_panel, Palette.LIFE if targets["own_leader"] else Palette.ACCENT, targets["own_leader"])
+
+
+func _set_panel_border(panel: PanelContainer, color: Color, emphasised: bool) -> void:
+	var style: StyleBoxFlat = panel.get_theme_stylebox("panel") as StyleBoxFlat
+	if style == null:
+		return
+	style.border_color = color
+	style.set_border_width_all(maxi(1, roundi((5 if emphasised else 2) * _ui_scale)))
+
+
+func _fill_board(row: HFlowContainer, zone: Zone, is_human: bool, zone_name: StringName) -> void:
 	for child: Node in row.get_children():
+		row.remove_child(child)
 		child.queue_free()
 	for instance: CardInstance in zone.cards:
-		var can_attack: bool = is_human and zone_name == &"board"
+		# Only units that can attack right now can be dragged; _apply_highlights dims the others.
+		var can_attack: bool = (
+			is_human
+			and zone_name == &"board"
+			and _match.attack_block_reason(HUMAN_PLAYER, instance.uid) == &""
+		)
 		var view: CardView = _card_view(
 			instance,
 			can_attack,
@@ -306,10 +409,6 @@ func _fill_board(row: HBoxContainer, zone: Zone, is_human: bool, zone_name: Stri
 		)
 		view.custom_minimum_size = Vector2(170, 200) * _board_card_scale
 		view.pressed.connect(_on_board_card_pressed.bind(instance.uid, is_human, zone_name, view))
-		if is_human and instance.can_attack and not instance.exhausted:
-			view.modulate = Color.WHITE
-		elif is_human and instance.exhausted:
-			view.modulate = Color(0.68, 0.68, 0.68)
 		row.add_child(view)
 
 
@@ -397,7 +496,7 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 	var name_label: Label = _label("CARD_%s_NAME" % String(data.id).to_upper(), 28, Palette.ACCENT)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.add_child(name_label)
-	title.add_child(_label("◆ %d" % data.cost, 24, Palette.ENERGY))
+	_icon_stat(title, "energy", Palette.ENERGY, 26).text = str(data.cost)
 	content.add_child(title)
 
 	var artwork: Control
@@ -433,15 +532,27 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 	content.add_child(rules_label)
 	if instance != null and _match.get_state().player(HUMAN_PLAYER).hand.find(instance.uid) != null:
 		var reason: StringName = _match.play_block_reason(HUMAN_PLAYER, instance.uid)
-		if reason != &"":
+		if reason != &"" and reason != &"not_your_turn":
 			var blocked_label: Label = _label(_block_reason_text(reason, instance.uid), 20, Palette.LIFE)
 			blocked_label.name = "BlockedReason"
 			blocked_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			content.add_child(blocked_label)
+	var on_own_board: bool = instance != null and _match.get_state().player(HUMAN_PLAYER).board.find(instance.uid) != null
+	if on_own_board and _match.get_state().active_player == HUMAN_PLAYER:
+		var attack_reason: StringName = _match.attack_block_reason(HUMAN_PLAYER, instance.uid)
+		if attack_reason != &"" and attack_reason != &"not_your_turn":
+			var attack_label: Label = _label("UI_ATTACK_BLOCKED_%s" % String(attack_reason).to_upper(), 20, Palette.LIFE)
+			attack_label.name = "BlockedReason"
+			attack_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			content.add_child(attack_label)
 	if data.type == CardData.Type.UNIT:
 		var attack: int = instance.attack if instance != null else data.attack
 		var health: int = instance.health if instance != null else data.health
-		content.add_child(_label("⚔ %d   ♥ %d" % [attack, health], 24, Palette.LIFE))
+		var stats_row: HBoxContainer = HBoxContainer.new()
+		stats_row.add_theme_constant_override("separation", roundi(28 * _ui_scale))
+		content.add_child(stats_row)
+		_icon_stat(stats_row, "attack", Palette.TEXT, 26).text = str(attack)
+		_icon_stat(stats_row, "life", Palette.LIFE, 26).text = str(health)
 	var close: Button = _button("UI_CLOSE", 300)
 	_set_button_icon(close, "close", Palette.TEXT)
 	close.pressed.connect(_close_card_zoom)
@@ -658,10 +769,19 @@ func _on_board_card_pressed(uid: int, is_human: bool, zone_name: StringName, vie
 				_apply_action(attack)
 				return
 		if is_human:
+			if _selected_attacker_uid == uid:
+				_clear_selection()
+				_refresh()
+				return
+			var reason: StringName = _match.attack_block_reason(HUMAN_PLAYER, uid)
+			if reason != &"":
+				_clear_selection()
+				_refresh()
+				_status_label.text = tr("UI_ATTACK_BLOCKED_%s" % String(reason).to_upper())
+				return
 			_selected_attacker_uid = uid
 			_selected_hand_uid = -1
 			_selected_ability = false
-			_set_status("UI_CHOOSE_ATTACK_TARGET")
 			_refresh()
 
 
@@ -699,10 +819,18 @@ func _on_card_drag_started(data: Dictionary) -> void:
 	if source == null:
 		push_error("Cannot display a drag preview: the source card view was not found.")
 		return
+	_drag_source = data.duplicate()
+	# The "drop here to play" zone only makes sense for a hand card played without a target;
+	# attackers and targeted cards get their valid targets outlined in red instead.
+	var zone_play: bool = (
+		data.get("kind", "") == "hand"
+		and _find_play_action(int(data.get("uid", -1)), -1, -1) != null
+	)
 	var target_rect: Rect2 = _own_drop_rect()
 	_drop_hint.position = target_rect.position
 	_drop_hint.size = target_rect.size
-	_drop_hint.visible = true
+	_drop_hint.visible = zone_play
+	_apply_highlights()
 	_show_drag_preview(source, get_viewport().get_mouse_position())
 
 
@@ -714,6 +842,8 @@ func _on_card_drag_moved(_data: Dictionary, position: Vector2) -> void:
 func _on_card_drag_released(data: Dictionary, position: Vector2) -> void:
 	_drop_hint.visible = false
 	_hide_drag_preview()
+	_drag_source = {}
+	_apply_highlights()
 	if _enemy_leader_button.get_global_rect().has_point(position):
 		_on_card_drop(data, -1, AI_PLAYER)
 		return
@@ -817,7 +947,6 @@ func _on_ability_pressed() -> void:
 		_selected_hand_uid = -1
 		_selected_attacker_uid = -1
 		_selected_ability = true
-		_set_status("UI_CHOOSE_ABILITY_TARGET")
 		_refresh()
 	else:
 		_apply_action(selected)
@@ -1126,10 +1255,12 @@ func _set_status(message: String) -> void:
 
 
 ## Units rows keep a card's height when empty so the layout never jumps; artifact rows only take room when used.
-func _board_row(is_units_row: bool) -> HBoxContainer:
-	var row: HBoxContainer = HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", roundi(8 * _board_card_scale))
+## Flow rows wrap onto a second line instead of growing wider than the screen (which widened the whole layout).
+func _board_row(is_units_row: bool) -> HFlowContainer:
+	var row: HFlowContainer = HFlowContainer.new()
+	row.alignment = FlowContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("h_separation", roundi(8 * _board_card_scale))
+	row.add_theme_constant_override("v_separation", roundi(8 * _board_card_scale))
 	if is_units_row:
 		row.custom_minimum_size.y = roundi(200 * _board_card_scale)
 	return row
@@ -1159,7 +1290,7 @@ func _zone_frame(title: String) -> PanelContainer:
 	return frame
 
 
-## Same leader panel for both players: portrait, name, Life, Energy, card counts and the named ability.
+## Same leader panel for both players: portrait, name, Life, Energy and the named ability.
 func _leader_panel(player_id: int) -> Dictionary:
 	var is_human: bool = player_id == HUMAN_PLAYER
 	var panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.ACCENT if is_human else Palette.BORDER)
@@ -1224,15 +1355,6 @@ func _leader_panel(player_id: int) -> Dictionary:
 	info.add_child(stats)
 	var life: Label = _icon_stat(stats, "life", Palette.LIFE, 20)
 	var energy: Label = _icon_stat(stats, "energy", Palette.ENERGY, 20)
-	var count_row: HBoxContainer = HBoxContainer.new()
-	count_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	count_row.add_theme_constant_override("separation", roundi(14 * _ui_scale))
-	info.add_child(count_row)
-	var counts: Dictionary = {
-		"deck": _icon_stat(count_row, "deck", Palette.TEXT_MUTED, 14),
-		"graveyard": _icon_stat(count_row, "graveyard", Palette.TEXT_MUTED, 14),
-		"hand": _icon_stat(count_row, "hand", Palette.TEXT_MUTED, 14),
-	}
 
 	var ability: Button = Button.new()
 	ability.name = "OwnAbilityButton" if is_human else "EnemyAbilityButton"
@@ -1240,6 +1362,7 @@ func _leader_panel(player_id: int) -> Dictionary:
 	ability.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	ability.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ability.add_theme_font_size_override("font_size", roundi(15 * _ui_scale))
+	_set_button_icon(ability, "energy", Palette.ENERGY)
 	if not is_human:
 		ability.disabled = true
 		ability.focus_mode = Control.FOCUS_NONE
@@ -1254,20 +1377,16 @@ func _leader_panel(player_id: int) -> Dictionary:
 		"name": name_label,
 		"life": life,
 		"energy": energy,
-		"counts": counts,
 		"ability": ability,
 	}
 
 
-func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, counts: Dictionary, artwork: TextureRect, initial: Label, ability_button: Button) -> void:
+func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, artwork: TextureRect, initial: Label, ability_button: Button) -> void:
 	var key: String = String(player.leader.id).to_upper()
 	var leader_name: String = tr("LEADER_%s_NAME" % key)
 	name_label.text = leader_name
 	life_label.text = str(player.life)
 	energy_label.text = "%d / %d" % [player.energy, player.max_energy]
-	(counts["deck"] as Label).text = str(player.deck.size())
-	(counts["graveyard"] as Label).text = str(player.graveyard.size())
-	(counts["hand"] as Label).text = str(player.hand.size())
 	artwork.texture = player.leader.art
 	artwork.visible = player.leader.art != null
 	initial.text = leader_name.left(1)
@@ -1275,9 +1394,10 @@ func _update_leader_panel(player: PlayerState, name_label: Label, life_label: La
 	if player.leader.ability == null:
 		ability_button.text = tr("UI_ABILITY")
 		return
-	ability_button.text = "%s  ◆ %d\n%s" % [
-		tr("LEADER_%s_ABILITY_NAME" % key),
+	# The Energy icon sits on the button; the text starts with the cost, then the ability name and effect.
+	ability_button.text = "%d   %s\n%s" % [
 		player.leader.ability.cost,
+		tr("LEADER_%s_ABILITY_NAME" % key),
 		tr("LEADER_%s_ABILITY_TEXT" % key),
 	]
 
@@ -1331,42 +1451,18 @@ func _own_drop_rect() -> Rect2:
 
 func _show_drag_preview(source: CardView, position: Vector2) -> void:
 	_hide_drag_preview()
-	_drag_preview = Control.new()
-	_drag_preview.name = "CardDragPreview"
-	_drag_preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_drag_preview.modulate = Color(1, 1, 1, 0.9)
-	_drag_preview.custom_minimum_size = source.custom_minimum_size
-	_drag_preview.size = source.custom_minimum_size
-	var faction: String = String(source.card_data.faction)
-	var faction_color: Color = CardView.FACTION_COLORS.get(faction, CardView.FACTION_COLORS["neutral"])
-	var style: StyleBoxFlat = StyleBoxFlat.new()
-	style.bg_color = faction_color.darkened(0.66)
-	style.border_color = faction_color.lightened(0.15)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(14)
-	style.content_margin_left = 12
-	style.content_margin_top = 12
-	style.content_margin_right = 12
-	style.content_margin_bottom = 12
-	var panel: Panel = Panel.new()
-	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	panel.add_theme_stylebox_override("panel", style)
-	_drag_preview.add_child(panel)
-	var label: Label = _label(source.text, 18, Palette.TEXT)
-	label.name = "CardText"
-	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	label.offset_left = 12
-	label.offset_top = 12
-	label.offset_right = -12
-	label.offset_bottom = -12
-	label.clip_text = true
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_drag_preview.add_child(label)
+	# A non-interactive copy of the dragged card: same face (cost, name, rules, stats) and size.
+	var preview: CardView = CARD_VIEW_SCRIPT.new()
+	preview.name = "CardDragPreview"
+	preview.set_card(source.card_data, source.card_instance, false, -1, "hand", false)
+	preview.set_view_scale(_ui_scale)
+	preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	preview.modulate = Color(1, 1, 1, 0.9)
+	preview.custom_minimum_size = source.custom_minimum_size
+	preview.size = source.custom_minimum_size
+	_drag_preview = preview
 	_modal_layer.add_child(_drag_preview)
-	_drag_preview.reset_size()
+	preview.remove_from_group("duel_card_views")
 	_drag_preview.position = position - _drag_preview.custom_minimum_size * 0.5
 
 

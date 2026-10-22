@@ -61,7 +61,7 @@ func test_tap_then_target_plays_a_targeted_card() -> void:
 	await get_tree().process_frame
 
 	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
-	var board: HBoxContainer = duel.get("_own_board") as HBoxContainer
+	var board: HFlowContainer = duel.get("_own_board") as HFlowContainer
 	duel.call("_on_hand_card_pressed", spell.uid, hand.get_child(0))
 	assert_int(duel.get("_selected_hand_uid")).is_equal(spell.uid)
 	duel.call("_on_board_card_pressed", target.uid, true, &"board", board.get_child(0))
@@ -90,7 +90,7 @@ func test_dragging_a_playable_card_to_the_empty_board_plays_it() -> void:
 	duel.call("_refresh")
 	await get_tree().process_frame
 
-	var board: HBoxContainer = duel.get("_own_board") as HBoxContainer
+	var board: HFlowContainer = duel.get("_own_board") as HFlowContainer
 	duel.call(
 		"_on_card_drag_released",
 		{"kind": "hand", "uid": card.uid},
@@ -165,8 +165,8 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	var artifacts: HBoxContainer = duel.get("_own_artifacts") as HBoxContainer
-	var board: HBoxContainer = duel.get("_own_board") as HBoxContainer
+	var artifacts: HFlowContainer = duel.get("_own_artifacts") as HFlowContainer
+	var board: HFlowContainer = duel.get("_own_board") as HFlowContainer
 	duel.call("_on_card_drag_started", {"kind": "hand", "uid": card.uid})
 	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
 	var source: CardView = hand.get_child(0) as CardView
@@ -176,7 +176,7 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	assert_object(preview).is_not_null()
 	assert_float(absf(preview.size.x - source.custom_minimum_size.x)).is_less_equal(0.01)
 	assert_float(absf(preview.size.y - source.custom_minimum_size.y)).is_less_equal(0.01)
-	assert_bool(preview.get_node("CardText") is Label).is_true()
+	assert_bool(preview.find_child("NameLabel", true, false) is Label).is_true()
 	assert_bool(hint.get_global_rect().has_point(artifacts.get_global_rect().get_center())).is_true()
 	assert_bool(hint.get_global_rect().has_point(board.get_global_rect().get_center())).is_true()
 
@@ -214,7 +214,7 @@ func test_ai_playing_a_unit_does_not_change_duel_minimum_height() -> void:
 	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
 	var hand_scroll: Control = hand.get_parent() as Control
 	var hand_card: CardView = hand.get_child(0) as CardView
-	var enemy_board: HBoxContainer = duel.get("_enemy_board") as HBoxContainer
+	var enemy_board: HFlowContainer = duel.get("_enemy_board") as HFlowContainer
 	var enemy_card: CardView = enemy_board.get_child(0) as CardView
 	assert_bool(minimum_height_before_play <= viewport_height).is_true()
 	assert_float(absf(minimum_height_after_play - minimum_height_before_play)).is_less_equal(1.0)
@@ -260,7 +260,7 @@ func test_leader_panels_share_layout_and_show_named_abilities() -> void:
 	current_match.get_state().player(1).board.cards.clear()
 	duel.call("_refresh")
 	await get_tree().process_frame
-	assert_int((duel.get("_enemy_board") as HBoxContainer).get_child_count()).is_equal(0)
+	assert_int((duel.get("_enemy_board") as HFlowContainer).get_child_count()).is_equal(0)
 	duel.queue_free()
 	await get_tree().process_frame
 
@@ -391,5 +391,76 @@ func test_releasing_a_drag_that_plays_the_card_does_not_crash() -> void:
 	await get_tree().process_frame
 	assert_int(player.hand.size()).is_equal(0)
 	assert_int(player.board.size()).is_equal(1)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_attack_by_tap_shows_targets_and_resolves() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 2)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var attacker: CardInstance = CardInstance.new(CardDatabase.get_card(&"donner"), 0, 950)
+	attacker.can_attack = true
+	state.player(0).board.add(attacker)
+	var fresh: CardInstance = CardInstance.new(CardDatabase.get_card(&"fricka"), 0, 951)
+	state.player(0).board.add(fresh)
+	var enemy: CardInstance = CardInstance.new(CardDatabase.get_card(&"nibelung_miner"), 1, 952)
+	enemy.can_attack = true
+	state.player(1).board.add(enemy)
+	duel.call("_refresh")
+	await get_tree().process_frame
+
+	var own_board: HFlowContainer = duel.get("_own_board") as HFlowContainer
+	var attacker_view: CardView = own_board.get_child(0) as CardView
+	var fresh_view: CardView = own_board.get_child(1) as CardView
+	assert_str(String(attacker_view.get("_highlight"))).is_equal("ready")
+	assert_float(fresh_view.modulate.r).is_less(1.0)
+	assert_str((duel.get("_status_label") as Label).text).contains("GOLD BORDER")
+
+	# A unit played this turn explains why it cannot attack instead of silently selecting.
+	duel.call("_on_board_card_pressed", 951, true, &"board", fresh_view)
+	assert_int(int(duel.get("_selected_attacker_uid"))).is_equal(-1)
+	assert_str((duel.get("_status_label") as Label).text).contains("NEXT TURN")
+
+	attacker_view = own_board.get_child(0) as CardView
+	duel.call("_on_board_card_pressed", 950, true, &"board", attacker_view)
+	assert_int(int(duel.get("_selected_attacker_uid"))).is_equal(950)
+	assert_str((duel.get("_status_label") as Label).text).contains("RED BORDER")
+	var enemy_view: CardView = (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView
+	assert_str(String(enemy_view.get("_highlight"))).is_equal("target")
+	var enemy_panel_style: StyleBoxFlat = (duel.get("_enemy_leader_panel") as PanelContainer).get_theme_stylebox("panel") as StyleBoxFlat
+	assert_str(enemy_panel_style.border_color.to_html(false)).is_equal(Palette.LIFE.to_html(false))
+
+	duel.call("_on_board_card_pressed", 952, false, &"board", enemy_view)
+	assert_int(state.player(1).board.size()).is_equal(0)
+	assert_bool(attacker.exhausted).is_true()
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_full_enemy_board_wraps_and_keeps_layout_inside_the_screen() -> void:
+	var ids: Array[StringName] = [&"donners_hammer", &"freias_golden_apples", &"valhalla_hero", &"loge", &"fricka", &"freia"]
+	var duel: Control = await _main_phase_duel_with_hand(ids, 5)
+	# Lay the duel out at a phone's width (the test window is wider than a phone).
+	duel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	duel.size = Vector2(1080, 1920)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	for index: int in Match.MAX_BOARD_SIZE:
+		state.player(1).board.add(CardInstance.new(CardDatabase.get_card(&"nibelung_miner"), 1, 960 + index))
+	duel.call("_refresh")
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	var screen_right: float = duel.get_global_rect().end.x
+	var layout: VBoxContainer = duel.get("_main_layout") as VBoxContainer
+	assert_float(layout.get_global_rect().end.x).is_less_equal(screen_right)
+	var enemy_board: HFlowContainer = duel.get("_enemy_board") as HFlowContainer
+	var first_enemy: CardView = enemy_board.get_child(0) as CardView
+	var last_enemy: CardView = enemy_board.get_child(enemy_board.get_child_count() - 1) as CardView
+	assert_float(last_enemy.get_global_rect().end.x).is_less_equal(screen_right)
+	assert_float(last_enemy.get_global_rect().position.y).is_greater(first_enemy.get_global_rect().position.y)
+	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
+	var last_hand: CardView = hand.get_child(hand.get_child_count() - 1) as CardView
+	assert_float(last_hand.get_global_rect().end.x).is_less_equal(screen_right)
+	assert_float((duel.get("_end_turn_button") as Button).get_global_rect().end.x).is_less_equal(screen_right)
 	duel.queue_free()
 	await get_tree().process_frame

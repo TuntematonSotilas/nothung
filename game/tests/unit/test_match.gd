@@ -532,3 +532,24 @@ func test_play_block_reason_explains_unplayable_cards() -> void:
 	assert_str(String(engine.play_block_reason(active, cheap.uid))).is_equal("board_full")
 	state.player(1 - active).board.add(CardInstance.new(cheap.data, 1 - active, 9200))
 	assert_str(String(engine.play_block_reason(active, targeted.uid))).is_empty()
+
+
+func test_attack_block_reason_explains_why_a_unit_cannot_attack() -> void:
+	var engine := Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), 20261022)
+	var state: GameState = engine.get_state()
+	assert_bool(engine.apply(RedrawAction.new(0))).is_true()
+	assert_bool(engine.apply(RedrawAction.new(1))).is_true()
+	var active: int = state.active_player
+	var unit_data: CardData = CardDatabase.get_card(&"fricka")
+	var fresh: CardInstance = CardInstance.new(unit_data, active, 9301)
+	var ready: CardInstance = CardInstance.new(unit_data, active, 9302)
+	ready.can_attack = true
+	var spent: CardInstance = CardInstance.new(unit_data, active, 9303)
+	spent.exhausted = true
+	for unit: CardInstance in [fresh, ready, spent]:
+		state.player(active).board.add(unit)
+
+	assert_str(String(engine.attack_block_reason(active, fresh.uid))).is_equal("summoning_sick")
+	assert_str(String(engine.attack_block_reason(active, ready.uid))).is_empty()
+	assert_str(String(engine.attack_block_reason(active, spent.uid))).is_equal("already_attacked")
+	assert_str(String(engine.attack_block_reason(1 - active, ready.uid))).is_equal("not_your_turn")
