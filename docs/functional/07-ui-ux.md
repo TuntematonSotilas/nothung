@@ -44,7 +44,7 @@ flowchart TD
 | Deck select | Deck list, Leader portrait, validity indicator |
 | Opening hand | Near full-screen panel, cards in a grid sized to fit (never scrolls); tap to mark cards to put back (dimmed + **REDRAW** badge), then **Redraw selected**; flavour title "The Norns weave your fate" |
 | Pause | Themed panel: **Resume** (primary), **Leave**; leaving asks for confirmation inside the panel. The Android back button opens / closes it during a match |
-| **Duel** | Top bar: whose turn, turn number, Götterdämmerung countdown, pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
+| **Duel** | Top bar: whose turn (no how-to instructions: the gold and red borders show what to tap, greyed cards and buttons what cannot be used), turn number, Götterdämmerung countdown, pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
 | Settings | Audio volumes, language, animation speed, reset progress |
@@ -90,12 +90,12 @@ flowchart TD
 |--------|---------|
 | Inspect card | Long press → zoomed card with full text and trait tooltips |
 | Play card | Drag from hand onto the highlighted own play area (or onto a target) — or tap-tap (below) |
-| Attack | Units that can attack now have a **gold border** (the status line says so). **Tap the unit, then a target** — or drag the unit onto the target. While a unit is selected or dragged, its valid targets get a **red border** (enemy units, and the enemy Leader panel when it can be hit); if the enemy has Guard units, the status line says they must be attacked first. Tap the unit again to cancel |
-| Unit that cannot attack | Dimmed on the board and cannot be dragged. Tapping it, or opening its details, explains why: played this turn (attacks next turn unless it has Charge), already attacked this turn, or nothing to attack |
+| Attack | **Tap-tap only** (units are never dragged). Units that can attack now have a **gold border**. **Tap the unit, then a target**: while a unit is selected, its valid targets get a **red border** (enemy units, and the enemy Leader panel when it can be hit — only Guard units while the enemy has some). Tap the unit again to cancel |
+| Unit that cannot attack | Dimmed on the board; tapping it does nothing. Its details (long press) explain why: played this turn (attacks next turn unless it has Charge), already attacked this turn, or nothing to attack |
 | Cancel drag | Release outside a valid target; the card stays where it was |
 | Undo last play | Tap **Undo play** before taking another action; the card returns to the top of the deck and the match state is restored to before it was played |
 | Tap-tap (no drag) | **1st tap selects** the card (gold border, own play area highlighted); **2nd tap** on the play area — or on a target for targeted cards — plays it. Tapping the selected card again cancels. A single tap never plays a card. |
-| Unplayable card | Greyed out in the hand, cannot be selected or dragged; tapping it or opening its details shows why (not enough Energy: X needed / Y available, board full, artifact limit, no valid target, not your turn) |
+| Unplayable card | Greyed out in the hand, cannot be selected or dragged; tapping it does nothing. Its details (long press) show why (not enough Energy: X needed / Y available, board full, artifact limit, no valid target, not your turn) |
 
 ## Feedback
 

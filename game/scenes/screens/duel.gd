@@ -283,7 +283,13 @@ func _refresh() -> void:
 		tr("UI_DOOM_IN"),
 		maxi(10 - state.turn, 0),
 	]
-	_ability_button.disabled = state.phase != GameState.Phase.MAIN or state.active_player != HUMAN_PLAYER
+	# Greyed out when the ability cannot be used now (Energy, already used, no target): no message needed.
+	_ability_button.disabled = true
+	if state.phase == GameState.Phase.MAIN and state.active_player == HUMAN_PLAYER:
+		for action: Action in _match.get_legal_actions(HUMAN_PLAYER):
+			if action is UseLeaderAbilityAction:
+				_ability_button.disabled = false
+				break
 	_end_turn_button.disabled = state.phase != GameState.Phase.MAIN or state.active_player != HUMAN_PLAYER
 	_undo_play_button.visible = _undo_snapshot != null
 	if _results_undo_button != null and is_instance_valid(_results_undo_button):
@@ -311,36 +317,18 @@ func _status_text(state: GameState) -> String:
 		return tr("UI_CHOOSE_REDRAW") if state.redraw_player == HUMAN_PLAYER else tr("UI_OPPONENT_REDRAW")
 	if state.phase == GameState.Phase.GAME_OVER:
 		return tr("UI_VICTORY") if state.winner == HUMAN_PLAYER else (tr("UI_DRAW") if state.winner < 0 else tr("UI_DEFEAT"))
-	if state.active_player != HUMAN_PLAYER:
-		return tr("UI_OPPONENT_TURN")
-	# Derived from the current selection, so a refresh never erases the instruction.
-	if _selected_attacker_uid >= 0:
-		var targets: Dictionary = _current_targets()
-		var guarded: bool = not targets["enemy_leader"] and not _match.get_state().player(AI_PLAYER).board.is_empty()
-		return tr("UI_CHOOSE_ATTACK_TARGET_GUARD") if guarded and _enemy_has_guard() else tr("UI_CHOOSE_ATTACK_TARGET")
-	if _selected_ability:
-		return tr("UI_CHOOSE_ABILITY_TARGET")
-	for unit: CardInstance in state.player(HUMAN_PLAYER).board.cards:
-		if _match.attack_block_reason(HUMAN_PLAYER, unit.uid) == &"":
-			return tr("UI_YOUR_TURN_ATTACK_HINT")
-	return tr("UI_YOUR_TURN")
+	# Turn state only: the borders (gold = can attack, red = target) show what to tap.
+	return tr("UI_OPPONENT_TURN") if state.active_player != HUMAN_PLAYER else tr("UI_YOUR_TURN")
 
 
-func _enemy_has_guard() -> bool:
-	for unit: CardInstance in _match.get_state().player(AI_PLAYER).board.cards:
-		if unit.has_keyword(&"guard"):
-			return true
-	return false
-
-
-## Valid targets of the selected (or dragged) attacker, hand card or Leader ability.
+## Valid targets of the selected attacker, of the selected or dragged hand card, or of the Leader ability.
 func _current_targets() -> Dictionary:
 	var targets: Dictionary = {"units": {}, "enemy_leader": false, "own_leader": false}
 	var attacker_uid: int = _selected_attacker_uid
 	var hand_uid: int = _selected_hand_uid
 	if not _drag_source.is_empty():
-		attacker_uid = int(_drag_source["uid"]) if _drag_source.get("kind", "") == "attacker" else -1
-		hand_uid = int(_drag_source["uid"]) if _drag_source.get("kind", "") == "hand" else -1
+		attacker_uid = -1
+		hand_uid = int(_drag_source["uid"])
 	if attacker_uid < 0 and hand_uid < 0 and not _selected_ability:
 		return targets
 	for action: Action in _match.get_legal_actions(HUMAN_PLAYER):
@@ -387,8 +375,7 @@ func _apply_highlights() -> void:
 			else:
 				view.set_highlight(&"")
 			if is_own:
-				var dragging_it: bool = _drag_source.get("kind", "") == "attacker" and int(_drag_source.get("uid", -1)) == uid
-				view.set_selected(uid == _selected_attacker_uid or dragging_it)
+				view.set_selected(uid == _selected_attacker_uid)
 				view.modulate = Color.WHITE if ready or not my_main_phase else Color(0.68, 0.68, 0.68)
 	_set_panel_border(_enemy_leader_panel, Palette.LIFE if targets["enemy_leader"] else Palette.BORDER, targets["enemy_leader"])
 	_set_panel_border(_own_leader_panel, Palette.LIFE if targets["own_leader"] else Palette.ACCENT, targets["own_leader"])
@@ -407,17 +394,12 @@ func _fill_board(row: HFlowContainer, zone: Zone, is_human: bool, zone_name: Str
 		row.remove_child(child)
 		child.queue_free()
 	for instance: CardInstance in zone.cards:
-		# Only units that can attack right now can be dragged; _apply_highlights dims the others.
-		var can_attack: bool = (
-			is_human
-			and zone_name == &"board"
-			and _match.attack_block_reason(HUMAN_PLAYER, instance.uid) == &""
-		)
+		# Board cards are never dragged: attacks are tap-tap only (unit, then target).
 		var view: CardView = _card_view(
 			instance,
-			can_attack,
+			false,
 			HUMAN_PLAYER if is_human else AI_PLAYER,
-			"attacker",
+			"board",
 			_match.get_state().phase != GameState.Phase.GAME_OVER
 		)
 		view.custom_minimum_size = Vector2(170, 200) * _board_card_scale
@@ -426,6 +408,9 @@ func _fill_board(row: HFlowContainer, zone: Zone, is_human: bool, zone_name: Str
 
 
 func _fill_hand(hand: Zone) -> void:
+	# The dragged view is about to be freed and will never report its release: drop the drag.
+	if _drag_source.get("kind", "") == "hand":
+		_cancel_drag()
 	# Detach old views right away: queue_free alone keeps them counted (and laid out) until the end of the frame.
 	for child: Node in _own_hand.get_children():
 		_own_hand.remove_child(child)
@@ -435,8 +420,9 @@ func _fill_hand(hand: Zone) -> void:
 	for instance: CardInstance in hand.cards:
 		var zoom_allowed: bool = state.phase != GameState.Phase.REDRAW and state.phase != GameState.Phase.GAME_OVER
 		# Unplayable cards are greyed out and cannot be dragged; the zoom popup tells why.
+		# Outside the own turn nothing can be dragged (the AI turn rebuilds the hand mid-drag).
 		var blocked: bool = my_main_phase and _match.play_block_reason(HUMAN_PLAYER, instance.uid) != &""
-		var view: CardView = _card_view(instance, not blocked, -1, "hand", zoom_allowed)
+		var view: CardView = _card_view(instance, my_main_phase and not blocked, -1, "hand", zoom_allowed)
 		view.set_selected(instance.uid == _selected_hand_uid)
 		if blocked:
 			view.modulate = Color(0.55, 0.55, 0.55)
@@ -692,9 +678,8 @@ func _on_hand_card_pressed(uid: int, view: CardView) -> void:
 		return
 	if _match.get_state().phase != GameState.Phase.MAIN or _match.get_state().active_player != HUMAN_PLAYER:
 		return
-	var reason: StringName = _match.play_block_reason(HUMAN_PLAYER, uid)
-	if reason != &"":
-		_status_label.text = _block_reason_text(reason, uid)
+	# Unplayable (greyed) cards ignore taps; the zoom popup tells why.
+	if _match.play_block_reason(HUMAN_PLAYER, uid) != &"":
 		return
 	# Tap-tap: the first tap only selects; tapping the same card again cancels.
 	if _selected_hand_uid == uid:
@@ -732,7 +717,6 @@ func _update_selection_feedback() -> void:
 	var zone_play: bool = false
 	if _selected_hand_uid >= 0 and state.player(HUMAN_PLAYER).hand.find(_selected_hand_uid) != null:
 		zone_play = _find_play_action(_selected_hand_uid, -1, -1) != null
-		_status_label.text = tr("UI_TAP_ZONE_TO_PLAY") if zone_play else tr("UI_CHOOSE_CARD_TARGET")
 	elif _selected_hand_uid >= 0:
 		_selected_hand_uid = -1
 	if _drag_preview != null:
@@ -789,9 +773,9 @@ func _on_board_card_pressed(uid: int, is_human: bool, zone_name: StringName, vie
 				return
 			var reason: StringName = _match.attack_block_reason(HUMAN_PLAYER, uid)
 			if reason != &"":
+				# Dimmed units cannot be selected; the zoom popup tells why.
 				_clear_selection()
 				_refresh()
-				_status_label.text = tr("UI_ATTACK_BLOCKED_%s" % String(reason).to_upper())
 				return
 			_selected_attacker_uid = uid
 			_selected_hand_uid = -1
@@ -835,7 +819,7 @@ func _on_card_drag_started(data: Dictionary) -> void:
 		return
 	_drag_source = data.duplicate()
 	# The "drop here to play" zone only makes sense for a hand card played without a target;
-	# attackers and targeted cards get their valid targets outlined in red instead.
+	# targeted cards get their valid targets outlined in red instead.
 	var zone_play: bool = (
 		data.get("kind", "") == "hand"
 		and _find_play_action(int(data.get("uid", -1)), -1, -1) != null
@@ -851,6 +835,12 @@ func _on_card_drag_started(data: Dictionary) -> void:
 func _on_card_drag_moved(_data: Dictionary, position: Vector2) -> void:
 	if _drag_preview != null:
 		_drag_preview.position = position - _drag_preview.size * 0.5
+
+
+func _cancel_drag() -> void:
+	_drop_hint.visible = false
+	_hide_drag_preview()
+	_drag_source = {}
 
 
 func _on_card_drag_released(data: Dictionary, position: Vector2) -> void:
@@ -912,29 +902,10 @@ func _find_drop_action(data: Dictionary, target_uid: int, target_player: int) ->
 			return null
 	if _match.get_state().active_player != HUMAN_PLAYER:
 			return null
-	var uid: int = int(data.get("uid", -1))
-	match String(data.get("kind", "")):
-			"hand":
-				for action: Action in _match.get_legal_actions(HUMAN_PLAYER):
-					if action is PlayCardAction:
-						var play: PlayCardAction = action as PlayCardAction
-						if (
-							play.card_uid == uid
-							and play.target_uid == target_uid
-							and play.target_player == target_player
-						):
-							return play
-			"attacker":
-				for action: Action in _match.get_legal_actions(HUMAN_PLAYER):
-					if action is AttackAction:
-						var attack: AttackAction = action as AttackAction
-						if (
-							attack.attacker_uid == uid
-							and attack.target_uid == target_uid
-							and attack.target_player == target_player
-						):
-							return attack
-	return null
+	# Only hand cards are dragged; attacks are tap-tap only.
+	if String(data.get("kind", "")) != "hand":
+		return null
+	return _find_play_action(int(data.get("uid", -1)), target_uid, target_player)
 
 
 func _on_own_leader_pressed() -> void:
@@ -956,8 +927,8 @@ func _on_ability_pressed() -> void:
 			selected = action as UseLeaderAbilityAction
 			break
 	if selected == null:
-		_set_status("UI_ABILITY_UNAVAILABLE")
-	elif selected.target_uid >= 0:
+		return
+	if selected.target_uid >= 0:
 		_selected_hand_uid = -1
 		_selected_attacker_uid = -1
 		_selected_ability = true
@@ -1122,7 +1093,6 @@ func _apply_action(action: Action) -> void:
 	var applied: bool = _match.apply(action)
 	if not applied:
 		_pending_events.clear()
-		_set_status("UI_INVALID_ACTION")
 		return
 	if action is PlayCardAction:
 		_undo_snapshot = snapshot
@@ -1380,11 +1350,6 @@ func _event_message(event: GameEvent) -> String:
 			return tr("UI_LOG_MATCH_ENDED")
 		_:
 			return ""
-
-
-func _set_status(message: String) -> void:
-	if _status_label != null:
-		_status_label.text = tr(message)
 
 
 ## Units rows keep a card's height when empty so the layout never jumps; artifact rows only take room when used.

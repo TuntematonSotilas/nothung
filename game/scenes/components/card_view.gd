@@ -209,7 +209,7 @@ func _drag_data() -> Dictionary:
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	return (
 		data is Dictionary
-		and (data as Dictionary).get("kind", "") in ["hand", "attacker"]
+		and (data as Dictionary).get("kind", "") == "hand"
 		and card_instance != null
 		and _drop_player >= 0
 	)

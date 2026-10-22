@@ -345,7 +345,8 @@ func test_unplayable_card_is_greyed_and_zoom_explains_why() -> void:
 	assert_float(view.modulate.r).is_less(1.0)
 	duel.call("_on_hand_card_pressed", 700, view)
 	assert_int(int(duel.get("_selected_hand_uid"))).is_equal(-1)
-	assert_str((duel.get("_status_label") as Label).text).contains("4")
+	# No message in the top bar: the reason is in the zoom popup.
+	assert_str((duel.get("_status_label") as Label).text).is_equal(tr("UI_YOUR_TURN"))
 
 	duel.call("_show_card_zoom", view.card_data, view.card_instance, view)
 	var reason: Label = duel.find_child("BlockedReason", true, false) as Label
@@ -426,17 +427,19 @@ func test_attack_by_tap_shows_targets_and_resolves() -> void:
 	var fresh_view: CardView = own_board.get_child(1) as CardView
 	assert_str(String(attacker_view.get("_highlight"))).is_equal("ready")
 	assert_float(fresh_view.modulate.r).is_less(1.0)
-	assert_str((duel.get("_status_label") as Label).text).contains("GOLD BORDER")
+	# The top bar only shows the turn state, no instructions; units cannot be dragged to attack.
+	assert_str((duel.get("_status_label") as Label).text).is_equal(tr("UI_YOUR_TURN"))
+	assert_bool(attacker_view.get("_draggable")).is_false()
 
 	# A unit played this turn explains why it cannot attack instead of silently selecting.
 	duel.call("_on_board_card_pressed", 951, true, &"board", fresh_view)
 	assert_int(int(duel.get("_selected_attacker_uid"))).is_equal(-1)
-	assert_str((duel.get("_status_label") as Label).text).contains("NEXT TURN")
+	assert_str((duel.get("_status_label") as Label).text).is_equal(tr("UI_YOUR_TURN"))
 
 	attacker_view = own_board.get_child(0) as CardView
 	duel.call("_on_board_card_pressed", 950, true, &"board", attacker_view)
 	assert_int(int(duel.get("_selected_attacker_uid"))).is_equal(950)
-	assert_str((duel.get("_status_label") as Label).text).contains("RED BORDER")
+	assert_str((duel.get("_status_label") as Label).text).is_equal(tr("UI_YOUR_TURN"))
 	var enemy_view: CardView = (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView
 	assert_str(String(enemy_view.get("_highlight"))).is_equal("target")
 	var enemy_panel_style: StyleBoxFlat = (duel.get("_enemy_leader_panel") as PanelContainer).get_theme_stylebox("panel") as StyleBoxFlat
@@ -474,5 +477,25 @@ func test_full_enemy_board_wraps_and_keeps_layout_inside_the_screen() -> void:
 	var last_hand: CardView = hand.get_child(hand.get_child_count() - 1) as CardView
 	assert_float(last_hand.get_global_rect().end.x).is_less_equal(screen_right)
 	assert_float((duel.get("_end_turn_button") as Button).get_global_rect().end.x).is_less_equal(screen_right)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_hand_cannot_be_dragged_outside_own_turn_and_refresh_cancels_a_drag() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"wotans_ravens"], 2)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var view: CardView = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	var start: Vector2 = view.get_global_rect().get_center()
+	view.call("_begin_press", start)
+	view.call("_cancel_moved_press", start + Vector2(0, -60))
+	assert_object(duel.get("_drag_preview")).is_not_null()
+
+	# The AI acts mid-drag: the hand is rebuilt, the drag must not stay stuck on screen.
+	state.active_player = 1
+	duel.call("_refresh")
+	assert_object(duel.get("_drag_preview")).is_null()
+	assert_bool((duel.get("_drag_source") as Dictionary).is_empty()).is_true()
+	view = (duel.get("_own_hand") as HBoxContainer).get_child(0) as CardView
+	assert_bool(view.get("_draggable")).is_false()
 	duel.queue_free()
 	await get_tree().process_frame
