@@ -67,6 +67,9 @@ var _undo_snapshot: GameState
 var _undo_card_uid: int = -1
 var _undo_state_hash: String
 var _undo_log_lines: Array[String] = []
+## Events of the action being applied, animated once it resolves (see _play_fx).
+var _pending_events: Array[GameEvent] = []
+var _fx: DuelFx
 
 
 func _ready() -> void:
@@ -123,6 +126,15 @@ func _build_ui() -> void:
 	_modal_layer.name = "ModalLayer"
 	_modal_layer.layer = 10
 	add_child(_modal_layer)
+	# Animations play above the board but below popups.
+	var fx_layer: CanvasLayer = CanvasLayer.new()
+	fx_layer.name = "FxLayer"
+	fx_layer.layer = 5
+	add_child(fx_layer)
+	_fx = DuelFx.new()
+	_fx.name = "DuelFx"
+	_fx.ui_scale = _ui_scale
+	fx_layer.add_child(_fx)
 	_build_drop_hint()
 
 	# Top bar: match / turn info, pause.
@@ -244,6 +256,7 @@ func _start_match() -> void:
 	_results_shown = false
 	_clear_undo()
 	_log_lines.clear()
+	_pending_events.clear()
 	_match = Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), int(Time.get_unix_time_from_system()))
 	_match.event_emitted.connect(_on_match_event)
 	_refresh()
@@ -665,9 +678,10 @@ func _toggle_redraw_card(uid: int, view: CardView) -> void:
 
 func _confirm_redraw() -> void:
 	var action: RedrawAction = RedrawAction.new(HUMAN_PLAYER, _redraw_selected)
+	_pending_events.clear()
 	if _match.apply(action):
 		_redraw_selected.clear()
-		_refresh()
+		_play_fx(action)
 		_continue_ai()
 
 
@@ -964,6 +978,7 @@ func _on_undo_play_pressed() -> void:
 		_clear_undo()
 		_refresh()
 		return
+	_pending_events.clear()
 	if not _match.restore_snapshot(_undo_snapshot):
 		_clear_undo()
 		_refresh()
@@ -1096,12 +1111,17 @@ func _find_attack_action(attacker_uid: int, target_uid: int, target_player: int)
 
 
 func _apply_action(action: Action) -> void:
+	# Taps are blocked by the FX layer, but drags are read in CardView._input: ignore them while animating.
+	if _fx.is_busy():
+		return
 	var snapshot: GameState
 	var previous_log_lines: Array[String] = _log_lines.duplicate()
 	if action is PlayCardAction:
 		snapshot = _match.get_state().duplicate_state()
+	_pending_events.clear()
 	var applied: bool = _match.apply(action)
 	if not applied:
+		_pending_events.clear()
 		_set_status("UI_INVALID_ACTION")
 		return
 	if action is PlayCardAction:
@@ -1114,7 +1134,7 @@ func _apply_action(action: Action) -> void:
 	_selected_hand_uid = -1
 	_selected_attacker_uid = -1
 	_selected_ability = false
-	_refresh()
+	_play_fx(action)
 
 
 func _continue_ai() -> void:
@@ -1130,6 +1150,7 @@ func _continue_ai() -> void:
 
 
 func _finish_ai_redraw() -> void:
+	await _fx_idle()
 	await get_tree().create_timer(AI_DELAY).timeout
 	var state: GameState = _match.get_state()
 	if state.phase != GameState.Phase.REDRAW or state.redraw_player != AI_PLAYER:
@@ -1144,16 +1165,18 @@ func _finish_ai_redraw() -> void:
 		return
 	var selected: Dictionary = worker.wait_to_finish()
 	var action: Action = Action.from_record(selected)
+	_pending_events.clear()
 	if action == null or not _match.apply(action):
 		push_error("EasyAI returned an invalid redraw action.")
 		_ai_busy = false
 		return
+	await _play_fx(action)
 	_ai_busy = false
-	_refresh()
 	_continue_ai()
 
 
 func _run_ai_turn() -> void:
+	await _fx_idle()
 	await get_tree().create_timer(AI_DELAY).timeout
 	var state: GameState = _match.get_state()
 	if state.phase != GameState.Phase.MAIN or state.active_player != AI_PLAYER:
@@ -1167,14 +1190,123 @@ func _run_ai_turn() -> void:
 		_ai_busy = false
 		return
 	var selected: Dictionary = worker.wait_to_finish()
-	_ai_busy = false
 	var action: Action = Action.from_record(selected)
+	_pending_events.clear()
 	if action == null or not _match.apply(action):
+		_ai_busy = false
 		push_error("EasyAI returned an invalid action.")
 		return
-	_refresh()
+	# Still busy while animating, so no second AI loop starts meanwhile.
+	await _play_fx(action)
+	_ai_busy = false
 	if _match.get_state().phase == GameState.Phase.MAIN and _match.get_state().active_player == AI_PLAYER:
 		_continue_ai()
+
+
+## Animates the events of the action just applied over the old board, then shows the new state.
+## Draws come last: they fly to the new hand slots, which only exist after the refresh.
+func _play_fx(action: Action) -> void:
+	var events: Array[GameEvent] = _pending_events.duplicate()
+	_pending_events.clear()
+	if _fx.is_instant() or not is_inside_tree():
+		_refresh()
+		return
+	_fx.begin()
+	for event: GameEvent in events:
+		match event.type:
+			&"card_played":
+				await _fx_spell(event, action)
+			&"attack_declared":
+				await _fx_attack(event)
+			&"damage_dealt":
+				_fx.play_damage(_unit_or_leader_rect(event.target_uid, 1 - event.player), event.amount)
+			&"unit_destroyed":
+				var dead: CardView = _find_view(event.card_uid)
+				if dead != null:
+					dead.modulate.a = 0.0
+					await _fx.play_death(dead.card_data, dead.shown_instance(), dead.get_global_rect())
+	_refresh()
+	var drawn: Array[GameEvent] = []
+	for event: GameEvent in events:
+		if event.type == &"card_drawn":
+			drawn.append(event)
+	if not drawn.is_empty():
+		# Let the containers place the new hand cards first.
+		await get_tree().process_frame
+		for event: GameEvent in drawn:
+			await _fx_draw(event)
+	_fx.end()
+
+
+func _fx_spell(event: GameEvent, action: Action) -> void:
+	var play: PlayCardAction = action as PlayCardAction
+	var card: CardInstance = _match.get_state().player(event.player).graveyard.find(event.card_uid)
+	if play == null or card == null or card.data.type != CardData.Type.SPELL:
+		return
+	var from: Rect2
+	var view: CardView = _find_view(event.card_uid)
+	if view != null:
+		from = view.get_global_rect()
+		view.modulate.a = 0.0
+	else:
+		# Enemy spells come out of the enemy Leader panel (its hand is hidden).
+		var card_size: Vector2 = CardView.CARD_SIZE * _ui_scale
+		from = Rect2(_enemy_leader_panel.get_global_rect().get_center() - card_size * 0.5, card_size)
+	var target: Rect2 = Rect2()
+	if play.target_uid >= 0 or play.target_player >= 0:
+		target = _unit_or_leader_rect(play.target_uid, play.target_player)
+	await _fx.play_spell(card.data, card, from, target)
+
+
+func _fx_attack(event: GameEvent) -> void:
+	var attacker: CardView = _find_view(event.card_uid)
+	if attacker == null:
+		return
+	var target: Rect2 = _unit_or_leader_rect(event.target_uid, 1 - event.player)
+	attacker.modulate.a = 0.0
+	await _fx.play_attack(attacker.card_data, attacker.shown_instance(), attacker.get_global_rect(), target)
+	attacker.modulate.a = 1.0
+
+
+func _fx_draw(event: GameEvent) -> void:
+	if event.player != HUMAN_PLAYER:
+		await _fx.play_enemy_draw(_enemy_leader_panel.get_global_rect())
+		return
+	var view: CardView = _find_view(event.card_uid)
+	if view == null:
+		return
+	var shown: Color = view.modulate
+	view.modulate.a = 0.0
+	await _fx.play_draw(view.card_data, view.card_instance, view.get_global_rect())
+	if is_instance_valid(view):
+		view.modulate = shown
+
+
+func _fx_idle() -> void:
+	if _fx.is_busy():
+		await _fx.idle
+
+
+## Card view showing this card uid (hand, boards, artifacts), or null.
+func _find_view(uid: int) -> CardView:
+	for row: Control in [_own_hand, _own_board, _enemy_board, _own_artifacts, _enemy_artifacts]:
+		for child: Node in row.get_children():
+			var view: CardView = child as CardView
+			if view != null and view.card_instance != null and view.card_instance.uid == uid:
+				return view
+	return null
+
+
+## Screen rect of a unit (uid >= 0) or else of a Leader panel; empty when neither exists.
+func _unit_or_leader_rect(uid: int, player: int) -> Rect2:
+	if uid >= 0:
+		var view: CardView = _find_view(uid)
+		return view.get_global_rect() if view != null else Rect2()
+	if player == AI_PLAYER:
+		return _enemy_leader_panel.get_global_rect()
+	if player == HUMAN_PLAYER:
+		return _own_leader_panel.get_global_rect()
+	return Rect2()
 
 
 func _show_results() -> void:
@@ -1220,7 +1352,8 @@ func _on_match_event(event: GameEvent) -> void:
 	if not message.is_empty():
 		_log_lines.append(message)
 		_log_lines = _log_lines.slice(maxi(0, _log_lines.size() - 8))
-	_refresh()
+	# No refresh here: the board keeps its old state until the action is animated (_play_fx).
+	_pending_events.append(event)
 
 
 func _event_message(event: GameEvent) -> String:

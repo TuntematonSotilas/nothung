@@ -104,7 +104,17 @@ flowchart TD
 - Valid targets glow; invalid ones dim.
 - **Undo play** is available after the most recent card play and disappears after the next action or turn end. Undo restores the state before the play, including any resolved play effects.
 - Duel controls, cards and text scale to the available viewport height to prevent bottom-edge clipping in shorter editor/debug windows. Board rows reserve card height even while empty, preventing the window from resizing when the AI plays a unit; the hand remains horizontally scrollable.
-- Every rules event has an animation + sound (damage numbers, death, draw).
+- Every rules event has an animation + sound (damage numbers, death, draw). Implemented (sounds to come), durations at 1× speed:
+
+| Moment | Animation |
+|--------|-----------|
+| Spell played | The card rises from where it was played to the centre and grows (0.25 s), glows (0.2 s), then strikes its target with a gold burst, or fades out when it has no target (0.25 s). Enemy spells come out of the enemy Leader panel |
+| Attack | The attacker lifts (0.12 s), lunges at its target (0.2 s), which flashes red, then returns (0.25 s) |
+| Damage | A red "-N" floats up from each damaged unit or Leader |
+| Unit destroyed | Red tint and shake, then the card shrinks, sinks and fades (0.35 s) |
+| Card drawn | A card back flies in from the right edge and turns into the card at its place in the hand (0.3 s). Enemy draws: a small card back slides into the enemy Leader panel |
+
+- The screen is locked while an animation plays (about 0.5–1 s); the AI waits for each animation before its next step. The **animation speed** setting (1×, 2×, instant) scales them.
 - AI turn is visible step by step; speed configurable (1×, 2×, instant).
 - Log of the last actions accessible from the duel screen.
 

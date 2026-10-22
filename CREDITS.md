@@ -12,6 +12,6 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 | `life.svg` | Hearts | Skoll |
 | `attack.svg` | Crossed swords | Lorc |
 | `pause.svg` | Pause button | Guard13007 |
-| `end_turn.svg` | Player next | Delapouite |
+| `end_turn.svg` | Next button | Delapouite |
 | `undo.svg` | Anticlockwise rotation | Delapouite |
 | `close.svg` | Cross mark | Lorc |

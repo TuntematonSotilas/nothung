@@ -95,6 +95,17 @@ func consume_long_press() -> bool:
 	return triggered
 
 
+## Copy of the card as currently drawn: the match may already have changed its stats (animations replay the old ones).
+func shown_instance() -> CardInstance:
+	if card_instance == null:
+		return null
+	var copy: CardInstance = card_instance.duplicate_instance()
+	if _stats_row != null and _stats_row.visible:
+		copy.attack = int(_attack_label.text)
+		copy.health = int(_health_label.text)
+	return copy
+
+
 func consume_drag() -> bool:
 	var triggered: bool = _drag_triggered
 	_drag_triggered = false

@@ -1,5 +1,17 @@
 extends GdUnitTestSuite
 
+var _animation_speed: float
+
+
+# Animations off: these tests check the state right after each action (animations: test_duel_fx.gd).
+func before() -> void:
+	_animation_speed = Settings.animation_speed
+	Settings.animation_speed = 0.0
+
+
+func after() -> void:
+	Settings.animation_speed = _animation_speed
+
 
 func test_wotan_portrait_is_loaded_and_displayed_in_duel() -> void:
 	var leader: LeaderData = CardDatabase.get_leader(&"wotan")

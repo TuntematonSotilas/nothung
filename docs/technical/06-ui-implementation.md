@@ -1,7 +1,7 @@
 # UI implementation
 
 > How screens and interactions from [functional/07-ui-ux.md](../functional/07-ui-ux.md) are built in Godot.
-> Status: In progress · Last updated: 2026-10-16
+> Status: In progress · Last updated: 2026-10-22
 
 ## Display settings (`project.godot`)
 
@@ -56,19 +56,22 @@
 
 ```mermaid
 sequenceDiagram
+    participant D as Duel screen
     participant M as Match (core)
-    participant A as EventAnimator
-    participant V as Views
-    M->>A: event_emitted(DamageDealt)
-    A->>A: enqueue
-    A->>V: play damage tween
-    V-->>A: finished
-    A->>A: next event…
-    A-->>V: queue empty → unlock input
+    participant F as DuelFx (FxLayer)
+    D->>M: apply(action)
+    M-->>D: event_emitted × n (queued in _pending_events)
+    D->>F: begin() — input blocked
+    D->>F: spell / attack / damage / death ghosts over the old board
+    D->>D: _refresh() — new state shown
+    D->>F: draws fly to the new hand slots
+    D->>F: end() — idle, input unlocked
 ```
 
-- `EventAnimator` serialises `GameEvent`s into `Tween`s; game logic is already resolved, animations only catch up.
-- Animation speed multiplier from `Settings` (1×, 2×, instant).
+- The rules are resolved at once; animations only catch up (`duel.gd` `_play_fx`). The board is rebuilt **once per action**, after the events that need the old positions (spell, attack, damage, death), and before the draws, which need the new hand slots.
+- `scenes/components/duel_fx.gd` (`DuelFx`, on the `FxLayer` canvas layer, between the board and the modal layer) tweens **ghost** copies of cards; the duel hides the real view while its ghost plays. `CardView.shown_instance()` gives the stats as drawn, since the match has already changed them.
+- While a sequence runs, `DuelFx` stops taps (`MOUSE_FILTER_STOP`) and `_apply_action` ignores drags; the AI waits for `idle` before its next step, so each AI action is seen.
+- Speed from `Settings.animation_speed`: durations are divided by it (1×, 2×); `0` (instant) skips the animations and refreshes at once. UI integration tests run at instant speed; `tests/integration/test_duel_fx.gd` checks the animations.
 
 ## Localisation
 
