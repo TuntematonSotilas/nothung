@@ -499,3 +499,28 @@ func test_hand_cannot_be_dragged_outside_own_turn_and_refresh_cancels_a_drag() -
 	assert_bool(view.get("_draggable")).is_false()
 	duel.queue_free()
 	await get_tree().process_frame
+
+
+func test_leader_ability_is_greyed_when_unusable_and_selected_by_tap_tap() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 2)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	state.player(1).board.add(CardInstance.new(CardDatabase.get_card(&"nibelung_miner"), 1, 952))
+	duel.call("_refresh")
+	var ability: Button = duel.get("_ability_button") as Button
+	# Spear of Treaties costs 3: greyed with 2 Energy.
+	assert_bool(ability.disabled).is_true()
+
+	state.player(0).energy = 3
+	duel.call("_refresh")
+	assert_bool(ability.disabled).is_false()
+	duel.call("_on_ability_pressed")
+	assert_bool(duel.get("_selected_ability")).is_true()
+	assert_str(String(ability.theme_type_variation)).is_equal("ButtonPrimary")
+	var enemy_view: CardView = (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView
+	assert_str(String(enemy_view.get("_highlight"))).is_equal("target")
+
+	duel.call("_on_ability_pressed")
+	assert_bool(duel.get("_selected_ability")).is_false()
+	assert_str(String(ability.theme_type_variation)).is_equal("")
+	duel.queue_free()
+	await get_tree().process_frame

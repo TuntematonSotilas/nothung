@@ -290,6 +290,11 @@ func _refresh() -> void:
 			if action is UseLeaderAbilityAction:
 				_ability_button.disabled = false
 				break
+	if _ability_button.disabled:
+		_selected_ability = false
+	# Selected ability (waiting for a target): gold like a primary button; unusable: dimmed.
+	_ability_button.theme_type_variation = &"ButtonPrimary" if _selected_ability else &""
+	_ability_button.modulate = Color(0.6, 0.6, 0.6) if _ability_button.disabled else Color.WHITE
 	_end_turn_button.disabled = state.phase != GameState.Phase.MAIN or state.active_player != HUMAN_PLAYER
 	_undo_play_button.visible = _undo_snapshot != null
 	if _results_undo_button != null and is_instance_valid(_results_undo_button):
@@ -927,6 +932,11 @@ func _on_ability_pressed() -> void:
 			selected = action as UseLeaderAbilityAction
 			break
 	if selected == null:
+		return
+	# Tap-tap like cards: a second tap on the selected ability cancels it.
+	if _selected_ability:
+		_clear_selection()
+		_refresh()
 		return
 	if selected.target_uid >= 0:
 		_selected_hand_uid = -1
