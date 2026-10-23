@@ -524,3 +524,98 @@ func test_leader_ability_is_greyed_when_unusable_and_selected_by_tap_tap() -> vo
 	assert_str(String(ability.theme_type_variation)).is_equal("")
 	duel.queue_free()
 	await get_tree().process_frame
+
+
+func test_first_gotterdammerung_opens_an_explanation_closed_by_a_tap_only_once() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 2)
+	var fx: DuelFx = duel.get("_fx") as DuelFx
+	(duel.get("_pending_events") as Array).append(GameEvent.new(&"gotterdammerung_damage", 1, -1, -1, 1))
+	duel.call("_play_fx", null)
+	await get_tree().process_frame
+	var panel: PanelContainer = duel.find_child("DoomPanel", true, false) as PanelContainer
+	assert_object(panel).is_not_null()
+	# No auto-close: it stays, and the AI waits, until the player taps.
+	await get_tree().create_timer(0.5).timeout
+	assert_object(duel.find_child("DoomPanel", true, false)).is_not_null()
+	assert_bool(fx.is_busy()).is_true()
+
+	# A tap outside the panel (on the dimmed overlay) closes it, like the button.
+	var release: InputEventMouseButton = InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	(duel.find_child("DoomOverlay", true, false) as ColorRect).gui_input.emit(release)
+	await get_tree().process_frame
+	assert_object(duel.find_child("DoomPanel", true, false)).is_null()
+	assert_bool(fx.is_busy()).is_false()
+
+	# Later Götterdämmerung damage does not open it again.
+	(duel.get("_pending_events") as Array).append(GameEvent.new(&"gotterdammerung_damage", 0, -1, -1, 1))
+	duel.call("_play_fx", null)
+	await get_tree().process_frame
+	assert_object(duel.find_child("DoomPanel", true, false)).is_null()
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_gotterdammerung_countdown_follows_each_players_turns_and_triggers_the_popup() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 2)
+	var current_match: Match = duel.get("_match") as Match
+	var state: GameState = current_match.get_state()
+	var turn_label: Label = duel.get("_turn_label") as Label
+	# Global turn 10 is only each player's 5th turn: no countdown yet.
+	state.turn = 10
+	state.player(0).turns_taken = 5
+	duel.call("_refresh")
+	assert_bool(turn_label.text.contains(tr("UI_DOOM_IN"))).is_false()
+	state.player(0).turns_taken = 7
+	duel.call("_refresh")
+	assert_str(turn_label.text).contains("%s 3" % tr("UI_DOOM_IN"))
+
+	# The AI ends its turn and the human starts their 10th: real engine event, popup opens.
+	state.player(0).turns_taken = 9
+	state.active_player = 1
+	duel.call("_refresh")
+	assert_bool(current_match.apply(EndTurnAction.new(1))).is_true()
+	duel.call("_play_fx", null)
+	await get_tree().process_frame
+	assert_object(duel.find_child("DoomPanel", true, false)).is_not_null()
+	assert_str(turn_label.text).contains(tr("UI_DOOM_TITLE"))
+	(duel.find_child("DoomCloseButton", true, false) as Button).pressed.emit()
+	await get_tree().process_frame
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_dragging_targeted_spells_onto_units_plays_them() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"freias_golden_apples", &"donners_hammer"], 6)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var own: CardInstance = CardInstance.new(CardDatabase.get_card(&"fricka"), 0, 950)
+	state.player(0).board.add(own)
+	var enemy: CardInstance = CardInstance.new(CardDatabase.get_card(&"hoard_bearers"), 1, 952)
+	state.player(1).board.add(enemy)
+	duel.call("_refresh")
+	await get_tree().process_frame
+	var own_attack: int = own.attack
+	var enemy_health: int = enemy.health
+
+	# Buff spell dropped on an own unit.
+	_drag_hand_card_onto(duel, 700, (duel.get("_own_board") as HFlowContainer).get_child(0) as CardView)
+	await get_tree().process_frame
+	assert_int(own.attack).is_equal(own_attack + 1)
+	assert_object(state.player(0).hand.find(700)).is_null()
+
+	# Damage spell dropped on an enemy unit.
+	_drag_hand_card_onto(duel, 701, (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView)
+	await get_tree().process_frame
+	assert_int(enemy.health).is_equal(enemy_health - 3)
+	assert_object(state.player(0).hand.find(701)).is_null()
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func _drag_hand_card_onto(duel: Control, uid: int, target: CardView) -> void:
+	var view: CardView = duel.call("_find_view", uid) as CardView
+	var start: Vector2 = view.get_global_rect().get_center()
+	view.call("_begin_press", start)
+	view.call("_cancel_moved_press", start + Vector2(0, -60))
+	view.call("_end_press", target.get_global_rect().get_center())

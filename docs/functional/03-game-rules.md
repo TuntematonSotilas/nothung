@@ -117,6 +117,7 @@ The end-game clock, themed on the burning of Valhalla.
 - From the start of **turn 10** of each player, Valhalla burns: at the start of their turn, that player's Leader takes **1 damage**, then 2, then 3, and so on (+1 each turn).
 - It cannot be prevented, except by specific legendary cards (e.g. Brünnhilde's sacrifice).
 - The UI shows a countdown from turn 7 so the player can anticipate it.
+- When it starts (first Götterdämmerung damage of the match), a popup opens on its own and explains it: increasing damage every turn, cannot be stopped, a draw if both Leaders fall together. It closes with its **Understood** button or a tap outside the panel (ignored during its first 0.4 s, so a tap already under way does not close it), and the match (AI included) waits until then. Shown once per match.
 - It replaces deck-out *fatigue*: drawing from an empty deck simply draws nothing.
 
 > **Decision (2026-10-15):** Start at **turn 10**; move it earlier (e.g. turn 8) only if measured match length exceeds the [target](#target-match-length). The countdown stays 3 turns before the start.

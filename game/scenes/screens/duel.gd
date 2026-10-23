@@ -70,6 +70,8 @@ var _undo_log_lines: Array[String] = []
 ## Events of the action being applied, animated once it resolves (see _play_fx).
 var _pending_events: Array[GameEvent] = []
 var _fx: DuelFx
+## The Götterdämmerung explanation pops up once per match.
+var _doom_explained: bool = false
 
 
 func _ready() -> void:
@@ -254,6 +256,7 @@ func _build_ui() -> void:
 
 func _start_match() -> void:
 	_results_shown = false
+	_doom_explained = false
 	_clear_undo()
 	_log_lines.clear()
 	_pending_events.clear()
@@ -277,12 +280,7 @@ func _refresh() -> void:
 		human, _own_leader_label, _own_life_label, _energy_label,
 		_own_leader_artwork, _own_portrait_initial, _ability_button
 	)
-	_turn_label.text = "%s %d  ·  %s %d" % [
-		tr("UI_TURN"),
-		state.turn,
-		tr("UI_DOOM_IN"),
-		maxi(10 - state.turn, 0),
-	]
+	_turn_label.text = _turn_text(state)
 	# Greyed out when the ability cannot be used now (Energy, already used, no target): no message needed.
 	_ability_button.disabled = true
 	if state.phase == GameState.Phase.MAIN and state.active_player == HUMAN_PLAYER:
@@ -315,6 +313,19 @@ func _refresh() -> void:
 		_overlay = null
 	if state.phase == GameState.Phase.GAME_OVER:
 		_show_results()
+
+
+## Turn number of the active player (each player counts their own turns, like the Götterdämmerung rule).
+## The countdown appears 3 turns before the Götterdämmerung, then the clock stays shown once it burns.
+func _turn_text(state: GameState) -> String:
+	var turn: int = maxi(state.player(state.active_player).turns_taken, 1)
+	var text: String = "%s %d" % [tr("UI_TURN"), turn]
+	var remaining: int = Match.DOOM_START_TURN - turn
+	if remaining <= 0:
+		text += "  ·  %s" % tr("UI_DOOM_TITLE")
+	elif remaining <= 3:
+		text += "  ·  %s %d" % [tr("UI_DOOM_IN"), remaining]
+	return text
 
 
 func _status_text(state: GameState) -> String:
@@ -629,20 +640,10 @@ func _show_redraw_overlay() -> void:
 	for instance: CardInstance in hand:
 		var view: CardView = _card_view(instance)
 		var marked: bool = _redraw_selected.has(instance.uid)
+		# Marked cards: gold border and dimmed.
 		view.set_selected(marked)
 		if marked:
 			view.modulate = Color(0.75, 0.75, 0.75)
-			var badge: Label = _label("UI_REDRAW_BADGE", 18, Palette.INK)
-			badge.name = "RedrawBadge"
-			badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			var badge_style: StyleBoxFlat = StyleBoxFlat.new()
-			badge_style.bg_color = Palette.ACCENT
-			badge_style.set_corner_radius_all(roundi(6 * _ui_scale))
-			badge.add_theme_stylebox_override("normal", badge_style)
-			badge.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-			badge.position.y = -10.0 * _ui_scale
-			view.add_child(badge)
 		view.pressed.connect(_toggle_redraw_card.bind(instance.uid, view))
 		cards.add_child(view)
 	var confirm: Button = _button("UI_REDRAW_CONFIRM", 360)
@@ -910,6 +911,9 @@ func _find_drop_action(data: Dictionary, target_uid: int, target_player: int) ->
 	# Only hand cards are dragged; attacks are tap-tap only.
 	if String(data.get("kind", "")) != "hand":
 		return null
+	# A unit target is identified by its uid alone: the engine's actions then have no target player.
+	if target_uid >= 0:
+		target_player = -1
 	return _find_play_action(int(data.get("uid", -1)), target_uid, target_player)
 
 
@@ -1190,6 +1194,8 @@ func _play_fx(action: Action) -> void:
 	_pending_events.clear()
 	if _fx.is_instant() or not is_inside_tree():
 		_refresh()
+		if _doom_popup_due(events):
+			await _show_doom_popup()
 		return
 	_fx.begin()
 	for event: GameEvent in events:
@@ -1200,6 +1206,8 @@ func _play_fx(action: Action) -> void:
 				await _fx_attack(event)
 			&"damage_dealt":
 				_fx.play_damage(_unit_or_leader_rect(event.target_uid, 1 - event.player), event.amount)
+			&"gotterdammerung_damage":
+				_fx.play_damage(_unit_or_leader_rect(-1, event.player), event.amount)
 			&"unit_destroyed":
 				var dead: CardView = _find_view(event.card_uid)
 				if dead != null:
@@ -1215,6 +1223,70 @@ func _play_fx(action: Action) -> void:
 		await get_tree().process_frame
 		for event: GameEvent in drawn:
 			await _fx_draw(event)
+	# The match waits (input and AI) until the player closes the explanation.
+	if _doom_popup_due(events):
+		await _show_doom_popup()
+	_fx.end()
+
+
+## The first Götterdämmerung damage of the match opens the explanation, unless that damage ended the match.
+func _doom_popup_due(events: Array[GameEvent]) -> bool:
+	if _doom_explained or _match.get_state().phase == GameState.Phase.GAME_OVER:
+		return false
+	for event: GameEvent in events:
+		if event.type == &"gotterdammerung_damage":
+			return true
+	return false
+
+
+## Explains the end-game clock; closed only with its button.
+func _show_doom_popup() -> void:
+	_doom_explained = true
+	var overlay: ColorRect = ColorRect.new()
+	overlay.name = "DoomOverlay"
+	overlay.color = Color(Palette.BG, 0.88)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_modal_layer.add_child(overlay)
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.LIFE)
+	panel.name = "DoomPanel"
+	panel.custom_minimum_size.x = roundi(760 * _ui_scale)
+	center.add_child(panel)
+	var content: VBoxContainer = VBoxContainer.new()
+	content.add_theme_constant_override("separation", roundi(18 * _ui_scale))
+	panel.add_child(content)
+	var title: Label = _label("UI_DOOM_TITLE", 30, Palette.LIFE)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+	var text: Label = _label("UI_DOOM_TEXT", 20, Palette.TEXT)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.custom_minimum_size.x = roundi(700 * _ui_scale)
+	content.add_child(text)
+	var close: Button = _button("UI_DOOM_CLOSE", 420)
+	close.name = "DoomCloseButton"
+	close.theme_type_variation = &"ButtonPrimary"
+	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	content.add_child(close)
+	# A tap outside the panel closes it too (taps on the panel itself stop there),
+	# but not a tap that was already under way when it opened.
+	var opened_at: int = Time.get_ticks_msec()
+	overlay.gui_input.connect(func(event: InputEvent) -> void:
+		if Time.get_ticks_msec() - opened_at < 400:
+			return
+		var released: bool = (
+			(event is InputEventMouseButton and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT and not event.is_pressed())
+			or (event is InputEventScreenTouch and not event.is_pressed())
+		)
+		if released:
+			close.pressed.emit()
+	)
+	# Counts as a running animation, so the AI waits for it even at instant speed.
+	_fx.begin()
+	await close.pressed
+	overlay.queue_free()
 	_fx.end()
 
 
