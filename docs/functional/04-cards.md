@@ -1,23 +1,25 @@
 # Cards
 
 > Card anatomy, types, traits, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-19
+> Status: Draft · Last updated: 2026-10-23
 
 ## Card anatomy
 
 ```
-┌─────────────────────────┐
-│ (3)          WOTAN  ◆   │  cost · name · rarity gem
+┌─────────────────────────┐  frame: thin border in the faction colour; its shape gives the type
+│ ⚡3              ☉  ◆   │  cost · faction icon (faction colour) · rarity gem
+│█ Wotan █████████████████│  name on a full-width banner in the faction colour
 │                         │
-│        [ artwork ]      │
+│        [ artwork ]      │  illustration (when drawn)
 │                         │
-│ Unit — God      Gods ☉  │  type — subtype · faction
 │ Guard.                  │  traits
 │ On play: draw a card.   │  rules text
-│ "Ending! Ending!"       │  flavour text (italic)
-│ ⚔ 3              ♥ 5    │  attack · health
+│ [       BEARER        ] │  ribbon, relics only
+│ ⚔ 3  ♥ 5        Unit ▣  │  attack · health (units) · type name + icon
 └─────────────────────────┘
 ```
+
+> **Updated (2026-10-23):** layout as built in the game ([card frames](08-art-and-audio.md#card-frames)). Frames are drawn by the game, not painted: the faction colour is on the border and the name banner, the background stays dark until the illustration covers it. The **frame shape** encodes the type (unit: rectangle · spell: very rounded · artifact: octagon · relic: octagon + Bearer ribbon). Subtype and flavour text are not shown on the card face yet (planned for the zoomed card).
 
 | Field | Required | Notes |
 |-------|----------|-------|

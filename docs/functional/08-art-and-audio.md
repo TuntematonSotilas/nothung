@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-21
+> Status: Draft · Last updated: 2026-10-23
 
 ## Art direction
 
@@ -27,7 +27,7 @@ Why faction rather than type: decks are one faction + Neutral, so colour tells a
 
 **Thematic exception:** the Ring and **Cursed** cards use a **dark-gold** frame whatever their faction. Dark gold is reserved for them and used by no faction.
 
-**Accessibility:** every faction also has an **icon**, shown on the frame next to the type line, so cards can be identified without relying on colour (colour-blind players).
+**Accessibility:** every faction also has an **icon**, shown in the top-right corner of the card, so cards can be identified without relying on colour (colour-blind players).
 
 ### Faction palette (draft)
 
@@ -100,16 +100,32 @@ Game logo for *Nothung: The Ring Card Game* built around the sword Nothung (e.g.
 
 ### Card frames
 
-Frames follow the [card colour system](#card-colour-system): 4 shapes (unit, spell, artifact, relic) × 5 faction colours + the dark-gold Ring / Cursed variant. Produced as separate layers so Godot assembles them at runtime ([tools/art-tools.md](../tools/art-tools.md)).
+> **Decision (2026-10-23):** Frames are **drawn by the game** (Godot `StyleBox` shapes and colours, no image), not painted. They stay sharp at any size and need no art. Only the illustrations and the card-type icons are drawn by hand. **Update (2026-10-23):** the faction colour is on the frame (thin border) and on the name banner only; the card background stays dark until the illustrations, which include their own background.
+
+Frames follow the [card colour system](#card-colour-system): 4 shapes × the faction colours + the dark-gold Ring / Cursed variant. Colours: `game/ui/theme/card_palette.gd` (checked against the tables above by a test).
+
+| Type | Frame |
+|------|-------|
+| Unit | Rectangle with small corners; Attack and Health (icon + number) at the bottom left (still visible when hand cards overlap) |
+| Spell | Very rounded corners |
+| Artifact | **Octagon** (cut corners) |
+| Relic | Octagon + a **Bearer** ribbon in the trim colour above the bottom edge |
+
+- Every frame: a thin border in the **faction frame colour** (dark gold for the Ring) and the card **name on a banner** in that colour (full-width band), on a **dark background** (`#16181D`) that the card illustration will cover. Top row: cost (left), then the **faction icon** in the faction colour and the **gem** (rarity, small diamond) on the right. Bottom row: attack and health (units, left) and the **card type** (name, then its icon once drawn) on the right. Cost, attack and health are bare icon + number, without a pill.
+- The illustration (`assets/art/cards/<id>.png`) is shown between the name and the rules text when it exists.
+- Selection, "ready to attack" and "target" are an outer **glow** (gold / red), so the faction frame stays visible.
+- Rules text is always light (`#F4EFE4`) on the dark background; the name uses the "Card text" colour of the [faction palette](#faction-palette-draft) on its banner (dark ink on Valkyries and Neutral).
 
 ### Icons
 
-> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, pause, end turn, undo, close…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). **Faction and card-type icons are hand-drawn** by the author, like the rest of the artwork.
+> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, pause, end turn, undo, close…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). Card-type icons are hand-drawn by the author, like the rest of the artwork.
+
+> **Decision (2026-10-23):** **Faction icons** come from game-icons.net too (the author no longer draws them), all by Lorc: Gods — *Barbed spear*, Nibelungs — *Anvil*, Wälsungs — *Broadsword*, Valkyries — *Winged emblem*, Neutral — *Waves*. Shown in the top-right corner of every card, tinted with the faction frame colour.
 
 - Format: **SVG** rather than an icon font. Godot imports SVG as a crisp texture at any size and tints it in game; icon fonts need codepoints and rich-text labels.
 - In-game icons are single-colour on a transparent background (white or black, any shade): the game tints them (`modulate`).
-- Hand-drawn icons to deliver, in `game/ui/icons/`:
-  - Factions: `faction_gods.svg` (spear), `faction_nibelungs.svg` (anvil), `faction_walsungs.svg` (sword), `faction_valkyries.svg` (winged helm), `faction_neutral.svg` (Rhine wave).
+- Faction icons: `game/ui/icons/faction_<faction id>.svg` (`faction_gods.svg`, `faction_nibelungs.svg`, `faction_walsungs.svg`, `faction_valkyries.svg`, `faction_neutral.svg`); a new faction only needs its file.
+- Hand-drawn icons still to deliver, in `game/ui/icons/`:
   - Card types: `type_unit.svg`, `type_spell.svg`, `type_artifact.svg`, `type_relic.svg`.
   - SVG (vectorised in Inkscape from a scanned drawing) or PNG **256 × 256**; one solid shape, no thin details: they are shown at 24–48 px.
 
@@ -148,7 +164,7 @@ Buttons can get a painted frame instead of the flat theme colours:
 ## Asset rights checklist
 
 - [ ] All artwork hand-drawn for the project by the author — no AI-generated images, no public-domain placeholders left ([artwork policy](../tools/art-tools.md#artwork-policy)).
-- [ ] Standard UI icons from game-icons.net credited in `CREDITS.md` (CC BY 3.0) — the only third-party images allowed ([icons](#icons)).
+- [ ] Standard UI icons and faction icons from game-icons.net credited in `CREDITS.md` (CC BY 3.0) — the only third-party images allowed ([icons](#icons)).
 - [ ] Every audio file has a documented source + licence (keep a `CREDITS.md`).
 - [ ] Fonts licensed for embedding in apps (e.g. SIL OFL).
 - [ ] Libretto quotes: German original is public domain; translations must be public domain or our own.

@@ -1,7 +1,7 @@
 # Art tools
 
-> Recommended software and workflow for card artwork, frames, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-21
+> Recommended software and workflow for card artwork, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
+> Status: Draft · Last updated: 2026-10-23
 
 Prices and licences change — check them before buying.
 
@@ -10,14 +10,16 @@ Prices and licences change — check them before buying.
 A final card is **not** a single image. It is composed at runtime by the `CardView` scene ([technical/06-ui-implementation.md](../technical/06-ui-implementation.md)):
 
 ```
-CardView = frame (by type / rarity) + artwork + faction icon + gem
+CardView = frame + gem drawn by Godot (shape by type, colour by faction, gem by rarity)
+         + artwork + faction icon
          + text rendered by Godot (name, cost, rules, stats)
 ```
 
 Why: the text must be translated into 4 languages and must reflect runtime stats (a buffed unit shows 5/6, not 3/4). So artists deliver:
 - **Illustrations** without text (one per card),
-- **Frame pieces** (per type and rarity) as separate layers,
-- **Icons** (factions, traits, Energy, Life).
+- **Icons** for card types and traits (Energy, Life, faction icons… come from game-icons.net).
+
+Frames are not drawn: the game draws them ([card frames](../functional/08-art-and-audio.md#card-frames)).
 
 ## Recommended tools
 
@@ -26,8 +28,8 @@ Why: the text must be translated into 4 languages and must reflect runtime stats
 | **Painting the illustrations** | **Krita** | — (Krita is free) | Open source, excellent brushes, PSD export. Best default choice |
 | Painting (paid option) | Clip Studio Paint | Krita | Very good for line art + colouring |
 | Painting on tablet | Procreate (iPad) | Krita on Android tablet | Cheap one-time purchase, natural feel |
-| **Card frames, icons (vector)** | **Inkscape** | — (free) | SVG → exported to PNG at the needed sizes |
-| Frames / photo editing (all-in-one) | Affinity (by Canva) | GIMP | Affinity was relaunched as a free app in late 2025 — check its current licence terms |
+| **Icons (vector)** | **Inkscape** | — (free) | SVG → exported to PNG at the needed sizes |
+| Photo editing (all-in-one) | Affinity (by Canva) | GIMP | Affinity was relaunched as a free app in late 2025 — check its current licence terms |
 | **UI mockups, screen flows** | **Figma** (free tier) | Penpot (open source) | Mock up the duel screen and the card layout before building in Godot |
 | Paper prototype cards (playtest) | nanDECK (Windows, free) | Spreadsheet + mail merge | Generates printable cards from a CSV — useful before any art exists |
 
@@ -78,7 +80,8 @@ the project author; AI-assisted cleanup is allowed as described in the workflow 
   reviews and approves every final export.
 - Public-domain works (Rackham, etc.) are used only as **reference** and **temporary placeholders**
   during prototyping; every placeholder is replaced before release.
-- **Exception — standard UI icons** (Life, Energy, pause…): taken from game-icons.net (CC BY 3.0, see `CREDITS.md`). Faction and card-type icons stay hand-drawn ([icons](../functional/08-art-and-audio.md#icons)).
+- **Card frames** are not artwork: Godot draws them (shapes and colours, no image) — [card frames](../functional/08-art-and-audio.md#card-frames).
+- **Exception — standard UI icons and faction icons** (Life, Energy, pause…, faction symbols): taken from game-icons.net (CC BY 3.0, see `CREDITS.md`). Card-type icons stay hand-drawn ([icons](../functional/08-art-and-audio.md#icons)).
 
 ## Export specs for Godot
 
@@ -86,7 +89,6 @@ the project author; AI-assisted cleanup is allowed as described in the workflow 
 |-------|--------|--------------|
 | Card illustration | PNG (source kept as `.kra` / `.psd` outside `res://`) | 1024 × 768, displayed smaller |
 | Leader portrait | PNG (master kept outside `res://`) | Portrait crop, displayed with aspect ratio preserved |
-| Frame pieces | PNG with transparency, 9-slice-friendly where possible | Per reference resolution 1080×1920 |
 | Icons | SVG (Godot imports SVG) or PNG @2x | 64–128 px |
 
 - Source files (`.kra`, `.psd`, `.svg` masters) live in a separate folder or repository (large files → consider Git LFS).
