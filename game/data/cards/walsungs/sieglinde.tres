@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_gp62n"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_j4bcs"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_5egid"]
+
+[sub_resource type="Resource" id="Resource_w1maq"]
+script = ExtResource("2_j4bcs")
+kind = 4
+target = 2
+amount = 2
+
+[sub_resource type="Resource" id="Resource_u71xb"]
+script = ExtResource("1_gp62n")
+effects = Array[ExtResource("2_j4bcs")]([SubResource("Resource_w1maq")])
+
+[resource]
+script = ExtResource("3_5egid")
+id = &"sieglinde"
+faction = &"walsungs"
+subtypes = Array[StringName]([&"walsung"])
+rarity = 2
+cost = 3
+attack = 3
+health = 4
+abilities = Array[ExtResource("1_gp62n")]([SubResource("Resource_u71xb")])
+leitmotifs = Array[StringName]([&"love"])

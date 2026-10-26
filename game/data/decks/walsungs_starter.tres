@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="DeckData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_wouuo"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/wolfing.tres" id="2_ymex5"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/forest_wolf.tres" id="3_dg2ig"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/siegfrieds_bear.tres" id="4_2oy00"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/grane.tres" id="5_jnq3f"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/winterstuerme.tres" id="6_m06u6"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/sword_in_the_ash_tree.tres" id="7_tl6el"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/horn_call.tres" id="8_v4buw"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/notung.tres" id="9_c25m0"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/siegmund.tres" id="10_cbfn0"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/sieglinde.tres" id="11_goehq"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/walse.tres" id="12_gbwup"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/brunnhilde_protector.tres" id="13_nv482"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/nothung_broken.tres" id="14_kk1rp"]
+[ext_resource type="Resource" path="res://data/leaders/siegfried.tres" id="15_kgrpf"]
+[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="16_pw62h"]
+
+[resource]
+script = ExtResource("16_pw62h")
+id = &"walsungs_starter"
+leader = ExtResource("15_kgrpf")
+cards = Array[ExtResource("1_wouuo")]([ExtResource("2_ymex5"), ExtResource("3_dg2ig"), ExtResource("4_2oy00"), ExtResource("5_jnq3f"), ExtResource("6_m06u6"), ExtResource("7_tl6el"), ExtResource("8_v4buw"), ExtResource("2_ymex5"), ExtResource("3_dg2ig"), ExtResource("4_2oy00"), ExtResource("5_jnq3f"), ExtResource("6_m06u6"), ExtResource("7_tl6el"), ExtResource("8_v4buw"), ExtResource("9_c25m0"), ExtResource("10_cbfn0"), ExtResource("11_goehq"), ExtResource("12_gbwup"), ExtResource("13_nv482"), ExtResource("14_kk1rp")])

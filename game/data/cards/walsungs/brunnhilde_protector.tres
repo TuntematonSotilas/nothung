@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_gvhrr"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_un135"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/nothung_broken.tres" id="3_7njwy"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="4_sqxwh"]
+
+[sub_resource type="Resource" id="Resource_3shyd"]
+script = ExtResource("2_un135")
+kind = 12
+card = ExtResource("3_7njwy")
+
+[sub_resource type="Resource" id="Resource_eanxq"]
+script = ExtResource("1_gvhrr")
+effects = Array[ExtResource("2_un135")]([SubResource("Resource_3shyd")])
+
+[resource]
+script = ExtResource("4_sqxwh")
+id = &"brunnhilde_protector"
+faction = &"walsungs"
+subtypes = Array[StringName]([&"valkyrie"])
+rarity = 2
+cost = 4
+attack = 3
+health = 4
+keywords = Array[StringName]([&"flying"])
+abilities = Array[ExtResource("1_gvhrr")]([SubResource("Resource_eanxq")])
+leitmotifs = Array[StringName]([&"ride"])

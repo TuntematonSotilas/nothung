@@ -1,21 +1,22 @@
 [gd_resource type="Resource" script_class="DeckData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_7g5pj"]
-[ext_resource type="Resource" path="res://data/cards/gods/wotans_ravens.tres" id="2_f13cy"]
-[ext_resource type="Resource" path="res://data/cards/gods/valhalla_hero.tres" id="3_ongqr"]
-[ext_resource type="Resource" path="res://data/cards/gods/fricka.tres" id="4_8qi4n"]
-[ext_resource type="Resource" path="res://data/cards/gods/wotans_valkyries.tres" id="5_ivvhg"]
-[ext_resource type="Resource" path="res://data/cards/gods/freia.tres" id="6_h70fp"]
-[ext_resource type="Resource" path="res://data/cards/gods/blessing_of_valhalla.tres" id="7_5bfwj"]
-[ext_resource type="Resource" path="res://data/cards/gods/loge.tres" id="8_ay5oy"]
-[ext_resource type="Resource" path="res://data/cards/gods/freias_golden_apples.tres" id="9_6u5ch"]
-[ext_resource type="Resource" path="res://data/cards/gods/donners_hammer.tres" id="10_iduiq"]
-[ext_resource type="Resource" path="res://data/cards/gods/donner.tres" id="11_pstvx"]
-[ext_resource type="Resource" path="res://data/leaders/wotan.tres" id="12_mmkfa"]
-[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="13_wq703"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_f13cy"]
+[ext_resource type="Resource" path="res://data/cards/gods/wotans_ravens.tres" id="2_ongqr"]
+[ext_resource type="Resource" path="res://data/cards/gods/valhalla_hero.tres" id="3_8qi4n"]
+[ext_resource type="Resource" path="res://data/cards/gods/fricka.tres" id="4_ivvhg"]
+[ext_resource type="Resource" path="res://data/cards/gods/wotans_valkyries.tres" id="5_h70fp"]
+[ext_resource type="Resource" path="res://data/cards/gods/freia.tres" id="6_5bfwj"]
+[ext_resource type="Resource" path="res://data/cards/gods/blessing_of_valhalla.tres" id="7_ay5oy"]
+[ext_resource type="Resource" path="res://data/cards/gods/loge.tres" id="8_6u5ch"]
+[ext_resource type="Resource" path="res://data/cards/gods/freias_golden_apples.tres" id="9_iduiq"]
+[ext_resource type="Resource" path="res://data/cards/gods/donners_hammer.tres" id="10_pstvx"]
+[ext_resource type="Resource" path="res://data/cards/gods/donner.tres" id="11_mmkfa"]
+[ext_resource type="Resource" path="res://data/cards/gods/wotans_spear.tres" id="12_wq703"]
+[ext_resource type="Resource" path="res://data/leaders/wotan.tres" id="13_yuykg"]
+[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="14_npb5l"]
 
 [resource]
-script = ExtResource("13_wq703")
+script = ExtResource("14_npb5l")
 id = &"gods_starter"
-leader = ExtResource("12_mmkfa")
-cards = Array[ExtResource("1_7g5pj")]([ExtResource("2_f13cy"), ExtResource("3_ongqr"), ExtResource("4_8qi4n"), ExtResource("5_ivvhg"), ExtResource("6_h70fp"), ExtResource("7_5bfwj"), ExtResource("8_ay5oy"), ExtResource("9_6u5ch"), ExtResource("10_iduiq"), ExtResource("11_pstvx"), ExtResource("2_f13cy"), ExtResource("3_ongqr"), ExtResource("4_8qi4n"), ExtResource("5_ivvhg"), ExtResource("6_h70fp"), ExtResource("7_5bfwj"), ExtResource("8_ay5oy"), ExtResource("9_6u5ch"), ExtResource("10_iduiq"), ExtResource("11_pstvx")])
+leader = ExtResource("13_yuykg")
+cards = Array[ExtResource("1_f13cy")]([ExtResource("2_ongqr"), ExtResource("3_8qi4n"), ExtResource("4_ivvhg"), ExtResource("5_h70fp"), ExtResource("6_5bfwj"), ExtResource("7_ay5oy"), ExtResource("8_6u5ch"), ExtResource("9_iduiq"), ExtResource("10_pstvx"), ExtResource("11_mmkfa"), ExtResource("2_ongqr"), ExtResource("3_8qi4n"), ExtResource("4_ivvhg"), ExtResource("5_h70fp"), ExtResource("6_5bfwj"), ExtResource("12_wq703"), ExtResource("8_6u5ch"), ExtResource("9_iduiq"), ExtResource("10_pstvx"), ExtResource("11_mmkfa")])

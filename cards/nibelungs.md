@@ -13,3 +13,4 @@
 | alberichs_curse | Alberich's Curse | spell | | rare | 3 | | | | | on_play: damage(selected_unit, 2); on_play: draw(1) | ring | "Cursed be this ring!" — Alberich, Das Rheingold |
 | mimes_brew | Mime's Brew | spell | | rare | 3 | | | | | on_play: damage(selected_unit, 3) | | |
 | giant_serpent | The Giant Serpent | unit | beast | rare | 5 | 5 | 5 | | | | tarnhelm | |
+| tarnhelm | Tarnhelm | artifact | relic | legendary | 2 | 2 | 2 | invisible | | | ring | "Night and mist, like no one!" — Alberich, Das Rheingold |

@@ -37,6 +37,11 @@ func duplicate_instance() -> CardInstance:
 	return copy
 
 
+## Invisible and not yet revealed by an attack: the opponent cannot attack or target it.
+func is_hidden() -> bool:
+	return has_keyword(&"invisible") and not statuses.has(&"revealed")
+
+
 ## Returns whether this card currently has the given keyword.
 func has_keyword(keyword: StringName) -> bool:
 	if statuses.has(keyword):

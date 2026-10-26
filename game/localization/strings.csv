@@ -129,3 +129,69 @@ On death: Gain 1 Energy."
 "LEADER_ALBERICH_ABILITY_NAME","Lord of the Nibelungs","Lord of the Nibelungs","Lord of the Nibelungs","Lord of the Nibelungs"
 "LEADER_WOTAN_ABILITY_TEXT","Deal 2 damage to a unit.","Deal 2 damage to a unit.","Deal 2 damage to a unit.","Deal 2 damage to a unit."
 "LEADER_ALBERICH_ABILITY_TEXT","Summon Nibelung Miner.","Summon Nibelung Miner.","Summon Nibelung Miner.","Summon Nibelung Miner."
+"CARD_FOREST_WOLF_NAME","Forest Wolf","Forest Wolf","Forest Wolf","Forest Wolf"
+"CARD_SIEGFRIEDS_BEAR_NAME","Siegfried's Bear","Siegfried's Bear","Siegfried's Bear","Siegfried's Bear"
+"CARD_GRANE_NAME","Grane","Grane","Grane","Grane"
+"CARD_GRANE_FLAVOUR","""Grane, my horse, I greet you!"" — Brünnhilde, Götterdämmerung","""Grane, my horse, I greet you!"" — Brünnhilde, Götterdämmerung","""Grane, my horse, I greet you!"" — Brünnhilde, Götterdämmerung","""Grane, my horse, I greet you!"" — Brünnhilde, Götterdämmerung"
+"CARD_SIEGLINDE_NAME","Sieglinde","Sieglinde","Sieglinde","Sieglinde"
+"CARD_SIEGLINDE_FLAVOUR","""You are the spring."" — Sieglinde, Die Walküre","""You are the spring."" — Sieglinde, Die Walküre","""You are the spring."" — Sieglinde, Die Walküre","""You are the spring."" — Sieglinde, Die Walküre"
+"CARD_WALSE_NAME","Wälse (Wotan)","Wälse (Wotan)","Wälse (Wotan)","Wälse (Wotan)"
+"CARD_BRUNNHILDE_PROTECTOR_NAME","Brünnhilde, Protector","Brünnhilde, Protector","Brünnhilde, Protector","Brünnhilde, Protector"
+"CARD_BRUNNHILDE_PROTECTOR_FLAVOUR","""The noblest hero in the world you bear, o woman, in your sheltering womb!"" — Brünnhilde, Die Walküre","""The noblest hero in the world you bear, o woman, in your sheltering womb!"" — Brünnhilde, Die Walküre","""The noblest hero in the world you bear, o woman, in your sheltering womb!"" — Brünnhilde, Die Walküre","""The noblest hero in the world you bear, o woman, in your sheltering womb!"" — Brünnhilde, Die Walküre"
+"CARD_SIEGMUND_NAME","Siegmund","Siegmund","Siegmund","Siegmund"
+"CARD_SIEGMUND_FLAVOUR","""Nothung! Nothung! So I name you, sword."" — Siegmund, Die Walküre","""Nothung! Nothung! So I name you, sword."" — Siegmund, Die Walküre","""Nothung! Nothung! So I name you, sword."" — Siegmund, Die Walküre","""Nothung! Nothung! So I name you, sword."" — Siegmund, Die Walküre"
+"CARD_HORN_CALL_NAME","Siegfried's Horn Call","Siegfried's Horn Call","Siegfried's Horn Call","Siegfried's Horn Call"
+"CARD_WINTERSTUERME_NAME","Winterstürme","Winterstürme","Winterstürme","Winterstürme"
+"CARD_WINTERSTUERME_FLAVOUR","""Winter storms have yielded to the month of May."" — Siegmund, Die Walküre","""Winter storms have yielded to the month of May."" — Siegmund, Die Walküre","""Winter storms have yielded to the month of May."" — Siegmund, Die Walküre","""Winter storms have yielded to the month of May."" — Siegmund, Die Walküre"
+"CARD_DRAGONS_BLOOD_NAME","Dragon's Blood","Dragon's Blood","Dragon's Blood","Dragon's Blood"
+"CARD_SWORD_IN_THE_ASH_TREE_NAME","The Sword in the Ash Tree","The Sword in the Ash Tree","The Sword in the Ash Tree","The Sword in the Ash Tree"
+"CARD_SWORD_IN_THE_ASH_TREE_FLAVOUR","""My father promised me a sword."" — Siegmund, Die Walküre","""My father promised me a sword."" — Siegmund, Die Walküre","""My father promised me a sword."" — Siegmund, Die Walküre","""My father promised me a sword."" — Siegmund, Die Walküre"
+"CARD_NOTUNG_NAME","Notung! Notung!","Notung! Notung!","Notung! Notung!","Notung! Notung!"
+"CARD_NOTUNG_FLAVOUR","""Nothung! Nothung! Coveted sword!"" — Siegfried, Siegfried","""Nothung! Nothung! Coveted sword!"" — Siegfried, Siegfried","""Nothung! Nothung! Coveted sword!"" — Siegfried, Siegfried","""Nothung! Nothung! Coveted sword!"" — Siegfried, Siegfried"
+"CARD_NOTHUNG_BROKEN_NAME","Nothung (broken)","Nothung (broken)","Nothung (broken)","Nothung (broken)"
+"CARD_NOTHUNG_NAME","Nothung","Nothung","Nothung","Nothung"
+"LEADER_SIEGFRIED_NAME","Siegfried","Siegfried","Siegfried","Siegfried"
+"LEADER_SIEGFRIED_FLAVOUR","""He who never learned fear forges Nothung anew."" — The Wanderer, Siegfried","""He who never learned fear forges Nothung anew."" — The Wanderer, Siegfried","""He who never learned fear forges Nothung anew."" — The Wanderer, Siegfried","""He who never learned fear forges Nothung anew."" — The Wanderer, Siegfried"
+"LEADER_SIEGFRIED_ABILITY_NAME","Spear-breaker","Spear-breaker","Spear-breaker","Spear-breaker"
+"CARD_FOREST_WOLF_RULES","Charge.","Charge.","Charge.","Charge."
+"CARD_GRANE_RULES","Charge.","Charge.","Charge.","Charge."
+"CARD_SIEGLINDE_RULES","On play: Restore 2 to your Leader.","On play: Restore 2 to your Leader.","On play: Restore 2 to your Leader.","On play: Restore 2 to your Leader."
+"CARD_WALSE_RULES","On play: Summon Wölfing.","On play: Summon Wölfing.","On play: Summon Wölfing.","On play: Summon Wölfing."
+"CARD_BRUNNHILDE_PROTECTOR_RULES","Flying.
+On play: Put Nothung (broken) into your artifacts.","Flying.
+On play: Put Nothung (broken) into your artifacts.","Flying.
+On play: Put Nothung (broken) into your artifacts.","Flying.
+On play: Put Nothung (broken) into your artifacts."
+"CARD_SIEGMUND_RULES","Valhalla.
+On play, if you control Nothung (broken): Forge Nothung.","Valhalla.
+On play, if you control Nothung (broken): Forge Nothung.","Valhalla.
+On play, if you control Nothung (broken): Forge Nothung.","Valhalla.
+On play, if you control Nothung (broken): Forge Nothung."
+"CARD_HORN_CALL_RULES","On play: Give a unit +2/+0 and Charge.","On play: Give a unit +2/+0 and Charge.","On play: Give a unit +2/+0 and Charge.","On play: Give a unit +2/+0 and Charge."
+"CARD_WINTERSTUERME_RULES","On play: Give a unit +2/+2.","On play: Give a unit +2/+2.","On play: Give a unit +2/+2.","On play: Give a unit +2/+2."
+"CARD_DRAGONS_BLOOD_RULES","On play: Draw 2 cards.","On play: Draw 2 cards.","On play: Draw 2 cards.","On play: Draw 2 cards."
+"CARD_SWORD_IN_THE_ASH_TREE_RULES","On play: Draw 1 card.
+On play, if you control Siegmund: Give all your units +1/+0.","On play: Draw 1 card.
+On play, if you control Siegmund: Give all your units +1/+0.","On play: Draw 1 card.
+On play, if you control Siegmund: Give all your units +1/+0.","On play: Draw 1 card.
+On play, if you control Siegmund: Give all your units +1/+0."
+"CARD_NOTUNG_RULES","On play, if you control Nothung (broken): Forge Nothung.","On play, if you control Nothung (broken): Forge Nothung.","On play, if you control Nothung (broken): Forge Nothung.","On play, if you control Nothung (broken): Forge Nothung."
+"CARD_NOTHUNG_RULES","Bearer: Wälsung.
+Bearer gets +3/+0.
+When its bearer dies, it shatters into Nothung (broken).","Bearer: Wälsung.
+Bearer gets +3/+0.
+When its bearer dies, it shatters into Nothung (broken).","Bearer: Wälsung.
+Bearer gets +3/+0.
+When its bearer dies, it shatters into Nothung (broken).","Bearer: Wälsung.
+Bearer gets +3/+0.
+When its bearer dies, it shatters into Nothung (broken)."
+"LEADER_SIEGFRIED_RULES","Ability (2 Energy): Deal 1 damage to a unit (double against Gods).","Ability (2 Energy): Deal 1 damage to a unit (double against Gods).","Ability (2 Energy): Deal 1 damage to a unit (double against Gods).","Ability (2 Energy): Deal 1 damage to a unit (double against Gods)."
+"LEADER_SIEGFRIED_ABILITY_TEXT","Deal 1 damage to a unit (double against Gods).","Deal 1 damage to a unit (double against Gods).","Deal 1 damage to a unit (double against Gods).","Deal 1 damage to a unit (double against Gods)."
+"CARD_SIEGFRIEDS_BEAR_RULES","Guard.","Guard.","Guard.","Guard."
+"CARD_WOLFING_NAME","Wölfing","Wölfing","Wölfing","Wölfing"
+"CARD_WOTANS_SPEAR_NAME","Wotan's Spear","Wotan's Spear","Wotan's Spear","Wotan's Spear"
+"CARD_WOTANS_SPEAR_FLAVOUR","""What you are, you are only through treaties."" — Fasolt, Das Rheingold","""What you are, you are only through treaties."" — Fasolt, Das Rheingold","""What you are, you are only through treaties."" — Fasolt, Das Rheingold","""What you are, you are only through treaties."" — Fasolt, Das Rheingold"
+"CARD_TARNHELM_NAME","Tarnhelm","Tarnhelm","Tarnhelm","Tarnhelm"
+"CARD_TARNHELM_FLAVOUR","""Night and mist, like no one!"" — Alberich, Das Rheingold","""Night and mist, like no one!"" — Alberich, Das Rheingold","""Night and mist, like no one!"" — Alberich, Das Rheingold","""Night and mist, like no one!"" — Alberich, Das Rheingold"
+"CARD_WOTANS_SPEAR_RULES","At the start of your turn: Deal 1 damage to the enemy Leader.","At the start of your turn: Deal 1 damage to the enemy Leader.","At the start of your turn: Deal 1 damage to the enemy Leader.","At the start of your turn: Deal 1 damage to the enemy Leader."
+"CARD_TARNHELM_RULES","Bearer gets +2/+2 and Invisible.","Bearer gets +2/+2 and Invisible.","Bearer gets +2/+2 and Invisible.","Bearer gets +2/+2 and Invisible."

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_luu7t"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_4tk0e"]
+
+[resource]
+script = ExtResource("2_4tk0e")
+id = &"wolfing"
+faction = &"walsungs"
+subtypes = Array[StringName]([&"wolf"])
+cost = 1
+attack = 2
+health = 1

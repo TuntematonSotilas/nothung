@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-10-16
+> Status: Draft · Last updated: 2026-10-26
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -14,8 +14,8 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 0 | [Foundations](#0--foundations) | Tests run headless from the command line | Done |
 | 1 | [Rules engine](#1--rules-engine-headless) | A scripted match runs to the end in a test | Done |
 | 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | Done |
-| 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | In progress |
-| 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | To do |
+| 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
+| 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | In progress |
 | 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | To do |
 | 6 | [Campaign](#6--campaign) | Prologue + chapter 1 playable | To do |
 | 7 | [Release](#7--release) | Internal build on Google Play | To do |
@@ -74,6 +74,8 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] Easy AI on a worker thread ([AI opponent](technical/05-ai-opponent.md))
 - [x] Results screen
 - [x] **Play a full match on the phone**
+- [x] Animations: spell, attack (lunge + damage numbers), draw, unit destroyed; speed setting respected
+- [x] Götterdämmerung explanation popup; per-player turn counter and countdown from turn 7
 
 ## 4 — AI & balancing
 
@@ -81,8 +83,13 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [ ] Normal and Hard difficulties; AI profiles
 - [x] AI vs AI soak tests: no crash, no illegal move ([testing](technical/09-testing.md))
 - [x] Match-length and win-rate stats per starter deck ([AI soak baseline](technical/09-testing.md#ai-soak))
-- [ ] Tune Götterdämmerung start (turn 10 vs 8) and the Ring curse from the stats ([game rules](functional/03-game-rules.md))
+- [x] Tune Götterdämmerung start from the stats: stays at turn 10 (fires in 45–58 % of matches, 8.7–9.6 turns per player) ([AI soak](technical/09-testing.md#ai-soak))
+- [ ] Tune the Ring curse once a starter deck creates the Ring
 - [ ] Remaining cards to ~80 (4 factions + Neutral) ([cards](functional/04-cards.md))
+  - [x] Wälsungs: 15 cards, Leader Siegfried, starter deck
+  - [x] One Legendary per faction: Wotan's Spear (Gods), Tarnhelm (Nibelungs), Nothung (Wälsungs); Invisible trait. Balance: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs
+  - [ ] Valkyries
+  - [ ] Neutral
 
 ## 5 — Menus & meta
 
@@ -120,7 +127,8 @@ No code dependency: can start now ([art & audio](functional/08-art-and-audio.md)
 - [ ] Mood board (validates the faction palette)
 - [ ] Paper workflow test on 2–3 cards: ink + digital colour vs watercolour
 - [ ] Full logo with the title, built on the icon emblem
-- [ ] Card frames: 4 shapes × 5 faction colours + Ring / Cursed
-- [ ] Faction and trait icons
+- [x] Card frames drawn by the game: shape by type, faction colour on border + name banner, rarity letter badge ([card frames](functional/08-art-and-audio.md#card-frames))
+- [x] Faction icons (game-icons.net)
+- [ ] Card-type and trait icons
 - [ ] Leitmotif stingers and first music loop ([audio tools](tools/audio-tools.md))
 - [ ] Sound effects: draw, play, attack, damage, death, end turn

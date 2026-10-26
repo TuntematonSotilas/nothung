@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_hylr3"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_yu61d"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/nothung_broken.tres" id="3_gatj8"]
+
+[resource]
+script = ExtResource("2_yu61d")
+id = &"nothung"
+faction = &"walsungs"
+type = 2
+subtypes = Array[StringName]([&"relic", &"weapon"])
+rarity = 3
+bearer = Array[StringName]([&"walsung"])
+leitmotifs = Array[StringName]([&"sword"])
+relic_attack_bonus = 3
+shatters_into = ExtResource("3_gatj8")

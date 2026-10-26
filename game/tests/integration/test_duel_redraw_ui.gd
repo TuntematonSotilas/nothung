@@ -619,3 +619,21 @@ func _drag_hand_card_onto(duel: Control, uid: int, target: CardView) -> void:
 	view.call("_begin_press", start)
 	view.call("_cancel_moved_press", start + Vector2(0, -60))
 	view.call("_end_press", target.get_global_rect().get_center())
+
+
+func test_invisible_units_are_drawn_see_through_until_they_attack() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 2)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var hidden: CardInstance = CardInstance.new(CardDatabase.get_card(&"mime"), 1, 960)
+	hidden.relic = CardInstance.new(CardDatabase.get_card(&"tarnhelm"), 1, 961)
+	state.player(1).board.add(hidden)
+	duel.call("_refresh")
+	var view: CardView = (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView
+	assert_float(view.modulate.a).is_less(1.0)
+
+	hidden.statuses.append(&"revealed")
+	duel.call("_refresh")
+	view = (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView
+	assert_float(view.modulate.a).is_equal(1.0)
+	duel.queue_free()
+	await get_tree().process_frame

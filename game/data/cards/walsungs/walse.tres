@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_3rgnt"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_3we3h"]
+[ext_resource type="Resource" path="res://data/cards/walsungs/wolfing.tres" id="3_5vy3i"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="4_n8mcl"]
+
+[sub_resource type="Resource" id="Resource_l44p7"]
+script = ExtResource("2_3we3h")
+kind = 3
+card = ExtResource("3_5vy3i")
+
+[sub_resource type="Resource" id="Resource_mofgn"]
+script = ExtResource("1_3rgnt")
+effects = Array[ExtResource("2_3we3h")]([SubResource("Resource_l44p7")])
+
+[resource]
+script = ExtResource("4_n8mcl")
+id = &"walse"
+faction = &"walsungs"
+subtypes = Array[StringName]([&"god", &"wolf"])
+rarity = 2
+cost = 4
+attack = 4
+health = 4
+abilities = Array[ExtResource("1_3rgnt")]([SubResource("Resource_mofgn")])

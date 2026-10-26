@@ -78,7 +78,7 @@ flowchart TD
 ```
 
 - **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
-- Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*.
+- Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*, Siegfried — *Spear-breaker*.
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
 - **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.
 - **Play areas wrap**: when units do not fit on one line (up to 6 per side), they continue on a second line instead of widening the screen.
@@ -104,6 +104,7 @@ flowchart TD
 - The own-side drop zone spans the artifact and unit rows and is visibly highlighted while dragging a card.
 - A complete card preview follows the pointer during a drag; Godot's platform-native drag preview is disabled to keep Android rendering consistent.
 - Valid targets glow; invalid ones dim.
+- **Invisible** units (Tarnhelm) are drawn see-through (45 % opacity) on both boards until they attack; the opponent can never select them as a target meanwhile.
 - **Undo play** is available after the most recent card play and disappears after the next action or turn end. Undo restores the state before the play, including any resolved play effects.
 - Duel controls, cards and text scale to the available viewport height to prevent bottom-edge clipping in shorter editor/debug windows. Board rows reserve card height even while empty, preventing the window from resizing when the AI plays a unit; the hand remains horizontally scrollable.
 - Every rules event has an animation + sound (damage numbers, death, draw). Implemented (sounds to come), durations at 1× speed:

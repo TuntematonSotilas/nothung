@@ -7,6 +7,8 @@ const MAX_UI_SCALE: float = 1.15
 const MIN_UI_SCALE: float = 0.8
 const UI_SCALE_REFERENCE_HEIGHT: float = 2300.0
 const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
+## Opacity of Invisible units that have not attacked yet.
+const HIDDEN_ALPHA: float = 0.45
 
 ## Board art to show behind the duel (campaign duels will set it; see assets/art/boards/).
 @export var board_id: String = "default"
@@ -393,6 +395,11 @@ func _apply_highlights() -> void:
 			if is_own:
 				view.set_selected(uid == _selected_attacker_uid)
 				view.modulate = Color.WHITE if ready or not my_main_phase else Color(0.68, 0.68, 0.68)
+			else:
+				view.modulate = Color.WHITE
+			# Invisible (Tarnhelm) units are drawn see-through on both sides until they attack.
+			if view.card_instance.is_hidden():
+				view.modulate.a = HIDDEN_ALPHA
 	_set_panel_border(_enemy_leader_panel, Palette.LIFE if targets["enemy_leader"] else Palette.BORDER, targets["enemy_leader"])
 	_set_panel_border(_own_leader_panel, Palette.LIFE if targets["own_leader"] else Palette.ACCENT, targets["own_leader"])
 

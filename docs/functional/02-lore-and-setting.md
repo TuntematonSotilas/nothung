@@ -24,7 +24,7 @@
 |---------|---------|--------------------|
 | **Gods** | Wotan, Fricka, Donner, Froh, Freia, Loge | Control, contracts/pacts, powerful but bound by law |
 | **Nibelungs** | Alberich, Mime, Nibelung dwarves | Energy economy, forging artifacts, swarm |
-| **Wälsungs & Heroes** | Siegmund, Sieglinde, Siegfried | Aggression, growing units, weapon synergies |
+| **Wälsungs & Heroes** | Siegfried (Leader), Siegmund, Sieglinde, Wälse (Wotan in a wolf's pelt), the wolf tribe, Brünnhilde as protector of the Wälsungs, Grane, Siegfried's bear | Aggression, Charge, buffs, the sword Nothung |
 | **Valkyries** | Brünnhilde and her 8 sisters — [one card each](#the-valkyries) | Resurrecting fallen units, flying |
 | *Neutral* | Rhinemaidens, Norns, Erda, Woodbird · Giants (Fasolt, Fafner) · Gibichungs (Gunther, Gutrune, Hagen) | Utility, fate / foresight, big Giant units, Gibichung deception |
 
@@ -52,9 +52,9 @@ The eight sisters have no individual story beyond the Ride: their cards can diff
 
 - **The Ring** — unique legendary; huge power, carries the curse. Anyone can hold it; full power only for Alberich, its forger ([canon notes](#canon-notes-libretto)).
 - **The Rhinegold** — resource / win-condition theme.
-- **Tarnhelm** — invisibility / transformation; a Relic any unit can wear, with bonuses for its bearers in the libretto (Alberich, Fafner, Siegfried).
-- **Nothung** — sword, broken then reforged (two-state card); wielded only by a Wälsung, reforged only by Siegfried.
-- **Wotan's spear** — contracts carved on it; enforces rules.
+- **Tarnhelm** — invisibility / transformation; the Nibelungs' Legendary, a Relic any unit can wear (+2/+2, Invisible).
+- **Nothung** — sword, broken then reforged (two-state card): brought in pieces by Brünnhilde, drawn by Siegmund, reforged in a Siegfried deck.
+- **Wotan's spear** — contracts carved on it; enforces rules. The Gods' Legendary artifact: deals 1 damage to the enemy Leader at the start of your turn.
 - **Potion of forgetfulness** — mind control / steal.
 - **Magic fire** — protective barrier around a unit.
 
@@ -64,10 +64,12 @@ Principle: **follow the libretto whenever it creates good gameplay**; when the g
 
 | Subject | What the libretto says | Game rule |
 |---------|------------------------|-----------|
-| **Nothung — wielders** | Wotan drives the sword into the ash tree; only Siegmund, a Wälsung, can draw it (*Die Walküre*, Act I). It shatters on Wotan's spear during Siegmund's fight with Hunding (Act II). | Bearer (Wälsung): only Siegmund or Siegfried can carry *Nothung*. When its bearer dies, it shatters back into *Nothung (broken)*. |
-| **Nothung — reforging** | Mime cannot reforge it. The Wanderer: *„Nur wer das Fürchten nie erfuhr, schmiedet Notung neu"* — "only he who never learned fear forges Nothung anew" (*Siegfried*, Act I). Siegfried does. | *Nothung (broken)* can be forged into *Nothung* only if you control Siegfried. |
-| **Tarnhelm** | Forged by Mime for Alberich, who uses it to become invisible, then a serpent and a toad (*Das Rheingold*, Scene 3). Fafner uses it to become a dragon; Siegfried takes it from the cave and uses it to take Gunther's form (*Götterdämmerung*, Act I). | Any unit can wear it (Invisible). Bonus when worn by Alberich, Fafner or Siegfried. |
-| **Siegfried vs the gods** | Siegfried shatters Wotan's spear with Nothung — the end of the gods' power, since their treaties were carved on it (*Siegfried*, Act III). | Siegfried's **Spear-breaker** skill: double damage against Gods. |
+| **Nothung — wielders** | Wotan drives the sword into the ash tree; only Siegmund, a Wälsung, can draw it (*Die Walküre*, Act I). It shatters on Wotan's spear during Siegmund's fight with Hunding (Act II). | **Bearer (Wälsung)**: a Wälsung unit (Siegmund, Sieglinde) carries *Nothung*. *Deliberate extension: in the libretto only Siegmund and Siegfried wield it; Siegfried is the Leader, so Sieglinde can carry it too.* When its bearer dies, it shatters back into *Nothung (broken)*. *Brünnhilde, Protector* brings the fragments (she gives them to Sieglinde, *Die Walküre* III). |
+| **Nothung — reforging** | Mime cannot reforge it. The Wanderer: *„Nur wer das Fürchten nie erfuhr, schmiedet Notung neu"* — "only he who never learned fear forges Nothung anew" (*Siegfried*, Act I). Siegfried does. | *Nothung (broken)* is reforged by playing **Siegmund** (he draws the sword himself) or the spell ***Notung! Notung!*** (the forging song). Both belong to the Wälsungs, whose Leader is always Siegfried. |
+| **Tarnhelm** | Forged by Mime for Alberich, who uses it to become invisible, then a serpent and a toad (*Das Rheingold*, Scene 3). Fafner uses it to become a dragon; Siegfried takes it from the cave and uses it to take Gunther's form (*Götterdämmerung*, Act I). | Any unit can wear it: +2/+2 and **Invisible**. *Deliberate simplification: Alberich and Siegfried are Leaders, so their bonuses were dropped (2026-10-26).* |
+| **Siegfried vs the gods** | Siegfried shatters Wotan's spear with Nothung — the end of the gods' power, since their treaties were carved on it (*Siegfried*, Act III). | Siegfried's Leader ability **Spear-breaker**: 1 damage to a unit, **double against Gods**. |
+| **Wälse** | Siegmund's father, "Wolfe", lived with him in the forest as a wolf; he is Wotan in disguise (*Die Walküre*, Act I). | *Wälse (Wotan)* is a Wälsung unit card (god, wolf): an alternative version of Wotan, separate from the Gods Leader. The **wolf tribe** (*Wölfing*, *Forest Wolf*) stands for Siegmund's childhood as a "Wölfing". |
+| **Brünnhilde saves Sieglinde** | Brünnhilde defies Wotan, saves the pregnant Sieglinde and gives her the fragments of Nothung (*Die Walküre*, Act III). | *Brünnhilde, Protector* is a Wälsung card, an alternative version of Brünnhilde; the Valkyries faction keeps her own card. |
 | **Fall of Valhalla** | Brünnhilde lights Siegfried's funeral pyre and returns the Ring to the Rhine; Valhalla burns (*Götterdämmerung*, finale). | The Götterdämmerung end-game clock is not triggered by Siegfried. Candidate for a Brünnhilde legendary card. |
 | **The Ring — forging** | *„Nur wer der Minne Macht versagt…"* — only one who renounces love can forge the gold into a ring (*Das Rheingold*, Scene 1). Alberich does. | Cards that create the Ring belong to the Nibelungs. |
 | **The Ring — owners & curse** | Alberich curses it: death to whoever owns it (*Das Rheingold*, Scene 4). It passes Alberich → Wotan → Fafner (who kills Fasolt for it) → Siegfried → Brünnhilde; Hagen kills Siegfried to get it. | Anyone can hold the Ring and every holder suffers the curse. Full bonus only for Alberich, the one who renounced love; reduced bonus for others. *Deliberate simplification: in the libretto no one but Alberich really uses its power.* |

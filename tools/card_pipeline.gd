@@ -11,7 +11,7 @@ const RARITIES: Dictionary = {
 	"epic": CardData.Rarity.EPIC,
 	"legendary": CardData.Rarity.LEGENDARY,
 }
-const KEYWORDS: Array[String] = ["guard", "charge", "flying", "valhalla"]
+const KEYWORDS: Array[String] = ["guard", "charge", "flying", "valhalla", "invisible"]
 const TRIGGERS: Array[String] = [
 	"on_play",
 	"on_death",
@@ -50,6 +50,8 @@ const CARD_HEADER: PackedStringArray = [
 const LEADER_HEADER: PackedStringArray = ["id", "name", "faction", "life", "ability_name", "ability_cost", "ability", "flavour"]
 const DECK_HEADER: PackedStringArray = ["id", "leader", "cards"]
 const ART_DIRECTORY: String = "res://assets/art/cards"
+## Display names of subtypes used in generated rules text (e.g. "Bearer: Wälsung.").
+const SUBTYPE_NAMES: Dictionary = {"walsung": "Wälsung"}
 
 var _repo_root: String
 var _errors: Array[String] = []
@@ -262,7 +264,15 @@ func _parse_card(row: Dictionary, faction: String, path: String) -> CardData:
 	card.subtypes = _name_list(String(row["subtypes"]))
 	card.bearer = _name_list(String(row["bearer"]))
 	card.leitmotifs = _name_list(String(row["leitmotifs"]))
-	card.keywords = _name_list(String(row["keywords"]))
+	# Relics may also say what they shatter into: shatters_into(card_id) in the keywords column.
+	var keyword_cells: PackedStringArray = []
+	for cell: String in String(row["keywords"]).split(",", false):
+		var token: String = cell.strip_edges()
+		if token.begins_with("shatters_into(") and token.ends_with(")"):
+			_add_card_ref(card, "shatters_into", token.substr(14, token.length() - 15).strip_edges(), "artifact")
+		else:
+			keyword_cells.append(token)
+	card.keywords = _name_list(",".join(keyword_cells))
 	for keyword: StringName in card.keywords:
 		if not KEYWORDS.has(String(keyword)):
 			_error(path, line, "Unknown or unimplemented trait: %s" % keyword)
@@ -272,8 +282,18 @@ func _parse_card(row: Dictionary, faction: String, path: String) -> CardData:
 		_error(path, line, "Units need non-negative attack and positive health.")
 	if card.type == CardData.Type.SPELL and String(row["abilities"]).strip_edges().is_empty():
 		_error(path, line, "Spells need at least one ability.")
-	if card.type != CardData.Type.UNIT and (attack != 0 or health != 0):
-		_error(path, line, "Only units can have attack or health.")
+	if card.is_relic():
+		# A relic's atk / hp / traits are what its bearer gains.
+		card.relic_attack_bonus = attack
+		card.relic_health_bonus = health
+		card.attack = 0
+		card.health = 0
+		card.relic_keywords = card.keywords
+		card.keywords = []
+	elif card.type != CardData.Type.UNIT and (attack != 0 or health != 0):
+		_error(path, line, "Only units (and relics, for their bearer bonus) can have attack or health.")
+	if not card.is_relic() and (card.shatters_into != null or _has_pending_ref(card, "shatters_into")):
+		_error(path, line, "Only relics can shatter into another card.")
 	_parse_abilities(String(row["abilities"]), card.abilities, path, line)
 	if _errors.size() > error_count:
 		return null
@@ -404,6 +424,10 @@ func _parse_effect(source: String, path: String, line: int) -> EffectData:
 	match kind:
 		"damage":
 			effect.kind = EffectData.Kind.DEAL_DAMAGE
+			# Optional third argument: a faction that takes double damage, e.g. damage(selected_unit, 2, gods).
+			if args.size() == 3:
+				effect.bonus_faction = StringName(args[2])
+				args.resize(2)
 			if not _read_target_and_amount(args, effect, path, line):
 				return null
 		"draw":
@@ -459,6 +483,10 @@ func _parse_effect(source: String, path: String, line: int) -> EffectData:
 				return null
 			if not args.is_empty():
 				_add_card_ref(effect, "card", args[0], "unit")
+		"create_artifact":
+			effect.kind = EffectData.Kind.CREATE_ARTIFACT
+			if not _read_card_ref(args, effect, "artifact", path, line):
+				return null
 		"forge":
 			effect.kind = EffectData.Kind.FORGE_CARD
 			if args.size() != 2:
@@ -502,6 +530,13 @@ func _set_target(value: String, effect: EffectData, path: String, line: int) -> 
 		return false
 	effect.target = TARGETS[value]
 	return true
+
+
+func _has_pending_ref(resource: Resource, property: String) -> bool:
+	for reference: Dictionary in _pending_card_refs:
+		if reference["resource"] == resource and reference["property"] == property:
+			return true
+	return false
 
 
 func _add_card_ref(resource: Resource, property: String, card_id: String, expected_type: String) -> void:
@@ -642,10 +677,26 @@ func _rules_text(card: CardData) -> String:
 	var lines: Array[String] = []
 	for keyword: StringName in card.keywords:
 		lines.append(String(keyword).capitalize() + ".")
+	if card.is_relic():
+		if not card.bearer.is_empty():
+			var bearers: Array[String] = []
+			for bearer: StringName in card.bearer:
+				bearers.append(_card_names.get(String(bearer), SUBTYPE_NAMES.get(String(bearer), String(bearer).capitalize())))
+			lines.append("Bearer: %s." % " or ".join(bearers))
+		var gains: Array[String] = []
+		if card.relic_attack_bonus != 0 or card.relic_health_bonus != 0:
+			gains.append("+%d/+%d" % [card.relic_attack_bonus, card.relic_health_bonus])
+		for keyword: StringName in card.relic_keywords:
+			gains.append(String(keyword).capitalize())
+		if not gains.is_empty():
+			lines.append("Bearer gets %s." % " and ".join(gains))
+		if card.shatters_into != null:
+			lines.append("When its bearer dies, it shatters into %s." % _referenced_card_name(card.shatters_into))
 	for ability: AbilityData in card.abilities:
 		var trigger: String = _trigger_text(ability.trigger)
 		if ability.condition != null:
-			trigger += ", %s" % _condition_text(ability.condition).to_lower()
+			# Lower-case only the leading "If": card names keep their capitals.
+			trigger += ", %s" % _condition_text(ability.condition).replace("If ", "if ")
 		lines.append("%s: %s" % [trigger, _effect_text(ability.effects[0])])
 	return "\n".join(lines)
 
@@ -685,7 +736,11 @@ func _effect_text(effect: EffectData) -> String:
 	var target: String = _target_name(effect.target)
 	match effect.kind:
 		EffectData.Kind.DEAL_DAMAGE:
+			if effect.bonus_faction != &"":
+				return "Deal %d damage to %s (double against %s)." % [effect.amount, target, String(effect.bonus_faction).capitalize()]
 			return "Deal %d damage to %s." % [effect.amount, target]
+		EffectData.Kind.CREATE_ARTIFACT:
+			return "Put %s into your artifacts." % _referenced_card_name(effect.card)
 		EffectData.Kind.DRAW_CARDS:
 			return "Draw %d %s." % [effect.amount, "card" if effect.amount == 1 else "cards"]
 		EffectData.Kind.GAIN_ENERGY:
@@ -696,7 +751,7 @@ func _effect_text(effect: EffectData) -> String:
 			return "Restore %d to %s." % [effect.amount, target]
 		EffectData.Kind.BUFF:
 			var stats: String = "+%d/+%d" % [effect.amount, effect.health_amount]
-			var trait_text: String = " and %s" % effect.keyword if effect.keyword != &"" else ""
+			var trait_text: String = " and %s" % String(effect.keyword).capitalize() if effect.keyword != &"" else ""
 			return "Give %s %s%s." % [target, stats, trait_text]
 		EffectData.Kind.TRANSFORM:
 			return "Transform %s into %s." % [target, _referenced_card_name(effect.card)]
@@ -709,6 +764,8 @@ func _effect_text(effect: EffectData) -> String:
 		EffectData.Kind.RESURRECT:
 			return "Resurrect %s." % (_referenced_card_name(effect.card) if effect.card != null else "a Valhalla unit")
 		EffectData.Kind.FORGE_CARD:
+			if effect.amount == 0:
+				return "Forge %s." % _referenced_card_name(effect.card)
 			return "Forge %s for %d extra Energy." % [_referenced_card_name(effect.card), effect.amount]
 		_:
 			return ""

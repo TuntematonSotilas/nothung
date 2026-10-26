@@ -67,9 +67,26 @@ static func _evaluate_play(state: GameState, action: PlayCardAction) -> float:
 	if card.data.is_ring and state.ring_holder == -1:
 		score += 25.0
 	for ability: AbilityData in card.data.abilities:
-		if ability.trigger == &"on_play":
+		if ability.trigger == &"on_play" and _condition_met(ability.condition, state, action.player):
 			score += _effects_value(ability.effects, state, action.player, action.target_uid) * 4.0
 	return score
+
+
+## Mirrors Match._condition_is_met on public information: a conditional effect only counts when it will happen.
+static func _condition_met(condition: ConditionData, state: GameState, player_id: int) -> bool:
+	if condition == null or condition.kind == ConditionData.Kind.NONE:
+		return true
+	if condition.kind == ConditionData.Kind.HOLDS_RING:
+		return state.ring_holder == player_id
+	if condition.kind == ConditionData.Kind.CONTROLS_CARD:
+		var player: PlayerState = state.player(player_id)
+		if player.leader.id == condition.card_id:
+			return true
+		for zone: Zone in [player.board, player.artifacts]:
+			for card: CardInstance in zone.cards:
+				if card.data.id == condition.card_id:
+					return true
+	return false
 
 
 static func _evaluate_attack(state: GameState, action: AttackAction) -> float:
@@ -133,13 +150,17 @@ static func _effects_value(
 			EffectData.Kind.DEAL_DAMAGE:
 				var targets: Array[CardInstance] = _effect_units(state, player_id, effect.target, target_uid)
 				for target: CardInstance in targets:
-					value += float(mini(effect.amount, target.health)) * 5.0
-					if effect.amount >= target.health:
-						value += _unit_value(target.data) * 3.0
+					var damage: int = effect.amount * (2 if effect.bonus_faction != &"" and target.data.faction == effect.bonus_faction else 1)
+					var unit_value: float = float(mini(damage, target.health)) * 5.0
+					if damage >= target.health:
+						unit_value += _unit_value(target.data) * 3.0
+					# Damaging your own unit is a loss, not a gain.
+					value += unit_value if target.owner != player_id else -unit_value
 				if effect.target == EffectData.Target.ENEMY_LEADER:
 					var enemy: PlayerState = state.player(1 - player_id)
-					value += float(effect.amount) * 4.0
-					if effect.amount >= enemy.life:
+					var leader_damage: int = effect.amount * (2 if effect.bonus_faction != &"" and enemy.leader.faction == effect.bonus_faction else 1)
+					value += float(leader_damage) * 4.0
+					if leader_damage >= enemy.life:
 						value += 1000.0
 			EffectData.Kind.DRAW_CARDS:
 				value += float(effect.amount) * 12.0
@@ -155,9 +176,14 @@ static func _effects_value(
 			EffectData.Kind.BUFF:
 				var buff_targets: Array[CardInstance] = _effect_units(state, player_id, effect.target, target_uid)
 				for target: CardInstance in buff_targets:
-					value += float(effect.amount) * 5.0 + float(effect.health_amount) * 3.0
+					var buff_value: float = float(effect.amount) * 5.0 + float(effect.health_amount) * 3.0
 					if effect.keyword != &"" and not target.has_keyword(effect.keyword):
-						value += 5.0
+						buff_value += 5.0
+						# Charge on a unit that could not attack yet means an attack this turn.
+						if effect.keyword == &"charge" and not target.can_attack and not target.exhausted:
+							buff_value += float(target.attack + effect.amount) * 3.0
+					# Buffing an enemy unit helps the opponent.
+					value += buff_value if target.owner == player_id else -buff_value
 			EffectData.Kind.CREATE_RING, EffectData.Kind.STEAL_RING:
 				if state.ring_holder != player_id:
 					value += 35.0
@@ -165,6 +191,10 @@ static func _effects_value(
 				value += 20.0
 			EffectData.Kind.FORGE_CARD:
 				value += 15.0
+				if effect.card != null:
+					value += float(effect.card.relic_attack_bonus) * 4.0 + float(effect.card.relic_health_bonus) * 2.0
+			EffectData.Kind.CREATE_ARTIFACT:
+				value += 10.0
 	return value
 
 

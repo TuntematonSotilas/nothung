@@ -56,7 +56,7 @@
 | **Forge X** | Spend X extra Energy when playing to upgrade the card |
 | **Leitmotif (Y)** | Bonus if you played another card with motif Y this turn |
 | **Cursed** | Holder suffers a drawback (Ring and related cards) |
-| **Invisible** | Cannot be targeted until it attacks (Tarnhelm) |
+| **Invisible** | Cannot be attacked or targeted by the opponent until it attacks (Tarnhelm). Effects that hit all units still hit it; a hidden Guard does not force attacks |
 | **Fated** | Effect triggers when the Norns' prophecy condition is met |
 | **Bearer (X)** | Relic only: can be attached only to a unit of subtype or name X (e.g. *Bearer (Wälsung)*) |
 
@@ -76,7 +76,9 @@
 On the card, rarity is a **letter in a coloured badge** in the top-right corner: **C** Common · **R** Rare · **E** Epic · **L** Legendary ([rarity colours](08-art-and-audio.md#rarity-colours)).
 
 > **Decision (2026-10-19):** Rarity of **named characters** depends on their weight in the story, not on having a name.
-> - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm…
+> - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm… (Wotan, Alberich and Siegfried are Leaders, not cards)
+>
+> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its forged form count as one sword). Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
 > - **Common / Rare / Epic** (by power): the secondary named characters — Fricka, Freia, Donner, Froh, Loge, the eight sister Valkyries, Mime, Sieglinde, the Rhinemaidens…
 >
 > A card named after a character must come from the libretto: no figure from Norse mythology that Wagner does not use ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).
@@ -98,7 +100,7 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 |---------|-------|--------|-----------|-------|
 | Gods | 10 | 4 | 1 | 15 |
 | Nibelungs | 9 | 3 | 3 | 15 |
-| Wälsungs & Heroes | 10 | 3 | 2 | 15 |
+| Wälsungs & Heroes | 8 | 5 | 2 | 15 (done: [`cards/walsungs.md`](../../cards/walsungs.md)) |
 | Valkyries | 10 | 4 | 1 | 15 |
 | Neutral | 13 | 5 | 2 | 20 |
 | **Total** | | | | **~80** |
@@ -118,19 +120,19 @@ Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card 
 
 These cards follow the [canon notes](02-lore-and-setting.md#canon-notes-libretto). Numbers are drafts to balance in playtests.
 
-> **Decision (2026-10-13):** **Nothung** is carried only by a Wälsung (Siegmund, Siegfried) and can be reforged only if you control Siegfried.
+> **Decision (2026-10-13, updated 2026-10-26):** **Nothung** is carried by a Wälsung unit (Siegmund, Sieglinde). It is reforged in a Wälsungs deck — led by Siegfried — by playing Siegmund or *Notung! Notung!*.
 
-> **Decision (2026-10-13):** **Tarnhelm** can be worn by any unit, with a bonus when worn by its bearers in the libretto: Alberich, Fafner, Siegfried.
+> **Decision (2026-10-13, updated 2026-10-26):** **Tarnhelm** is the **Nibelungs' Legendary** (Mime forged it for Alberich). Any unit can wear it. The bonuses for Alberich and Siegfried were dropped: both became Leaders, so they cannot wear it.
 
-> **Decision (2026-10-13):** **Siegfried** gets a bonus skill against the Gods (*Spear-breaker*). He does not trigger the Götterdämmerung.
+> **Decision (2026-10-13, updated 2026-10-26):** **Siegfried** is the **Wälsungs Leader**, not a card. His ability **Spear-breaker** (2 Energy) deals 1 damage to a unit, double against Gods. At 2 damage (4 against Gods) the Wälsungs won 94 % of their matches against the Gods in the AI soak, so the base damage is 1. He does not trigger the Götterdämmerung.
 
 | Name | Cost | Type | Faction | Stats | Text |
 |------|------|------|---------|-------|------|
-| Nothung (broken) | 1 | Artifact — Relic, Weapon | Heroes | – | Stays in the artifact zone; cannot be attached. **Forge 4**, only if you control **Siegfried**: becomes *Nothung*. |
-| Nothung | – | Artifact — Relic, Weapon | Heroes | – | Created by forging only. **Bearer (Wälsung).** Bearer gets +3 Attack. When the bearer dies, put *Nothung (broken)* into your artifact zone (the sword shatters, as with Siegmund). |
-| Tarnhelm | 3 | Artifact — Relic | Neutral | – | Bearer gains **Invisible**. If worn by **Alberich**: the first time he would be destroyed, return him to your hand instead (the toad). By **Fafner**: +3/+3 and **Guard** (the dragon). By **Siegfried**: he may ignore **Guard** when attacking (Gunther's form). |
-| Siegfried | 6 | Unit — Wälsung, Hero | Heroes | 5/5 | **Valhalla.** **Spear-breaker:** deals double damage to God units and to a God Leader. |
-| Siegmund | 4 | Unit — Wälsung, Hero | Heroes | 4/3 | **Valhalla.** On play: if *Nothung* is in your artifact zone or graveyard, attach it to Siegmund. |
+| Nothung (broken) | 1 | Artifact — Weapon | Wälsungs | – | Stays in your artifacts; reforged into *Nothung* by Siegmund or *Notung! Notung!*. Also brought by *Brünnhilde, Protector*. |
+| Nothung | – | Artifact — Relic, Weapon | Wälsungs | – | Created by forging only. **Bearer (Wälsung).** Bearer gets +3/+0. When its bearer dies, it shatters into *Nothung (broken)* in your artifacts (as with Siegmund). |
+| Tarnhelm | 2 | Artifact — Relic | Nibelungs | – | Bearer gets +2/+2 and **Invisible** (cannot be attacked or targeted by the opponent until it attacks). |
+| Wotan's Spear | 5 | Artifact — Weapon | Gods | – | At the start of your turn: deal 1 damage to the enemy Leader (the treaties carved on it bind his foes). |
+| Siegmund | 4 | Unit — Wälsung, Hero | Wälsungs | 5/4 | **Valhalla.** On play: if you control *Nothung (broken)*, forge *Nothung* — he carries it. |
+| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, forge *Nothung* onto a Wälsung. |
 | The Ring | 0 | Artifact | Neutral | – | Created by Nibelung cards only. Held by a player. Start of your turn: +1 Energy — or, if you control **Alberich**, +2 Energy and draw 1. **Cursed** (see [The Ring](03-game-rules.md#the-ring-signature-mechanic)). |
 
-*Tarnhelm is Neutral so that Nibelung (Alberich), Heroes (Siegfried) and Neutral (Fafner) decks can all use it.*

@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_o7fnv"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_s838t"]
+[ext_resource type="Script" path="res://data/cards/condition_data.gd" id="3_f0qhh"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="4_a8086"]
+
+[sub_resource type="Resource" id="Resource_mnvbq"]
+script = ExtResource("2_s838t")
+kind = 1
+amount = 1
+
+[sub_resource type="Resource" id="Resource_bph2w"]
+script = ExtResource("1_o7fnv")
+effects = Array[ExtResource("2_s838t")]([SubResource("Resource_mnvbq")])
+
+[sub_resource type="Resource" id="Resource_cy1v7"]
+script = ExtResource("3_f0qhh")
+kind = 1
+card_id = &"siegmund"
+
+[sub_resource type="Resource" id="Resource_u8tbg"]
+script = ExtResource("2_s838t")
+kind = 5
+target = 4
+amount = 1
+
+[sub_resource type="Resource" id="Resource_5cl5e"]
+script = ExtResource("1_o7fnv")
+condition = SubResource("Resource_cy1v7")
+effects = Array[ExtResource("2_s838t")]([SubResource("Resource_u8tbg")])
+
+[resource]
+script = ExtResource("4_a8086")
+id = &"sword_in_the_ash_tree"
+faction = &"walsungs"
+type = 1
+rarity = 1
+cost = 2
+abilities = Array[ExtResource("1_o7fnv")]([SubResource("Resource_bph2w"), SubResource("Resource_5cl5e")])
+leitmotifs = Array[StringName]([&"sword"])

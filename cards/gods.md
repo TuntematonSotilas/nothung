@@ -12,3 +12,4 @@
 | freias_golden_apples | Freia's Golden Apples | spell | | common | 2 | | | | | on_play: buff(selected_unit, 1, 1) | | |
 | donners_hammer | Donner's Hammer | spell | | rare | 4 | | | | | on_play: damage(selected_unit, 3) | thunder | "Heda! Heda! Hedo!" — Donner, Das Rheingold |
 | donner | Donner | unit | god | rare | 4 | 4 | 4 | | | on_play: damage(enemy_leader, 2) | thunder | "Sultry vapours hang in the air." — Donner, Das Rheingold |
+| wotans_spear | Wotan's Spear | artifact | weapon | legendary | 5 | | | | | start_of_turn: damage(enemy_leader, 1) | valhalla | "What you are, you are only through treaties." — Fasolt, Das Rheingold |

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_vlavr"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_47vhq"]
+
+[resource]
+script = ExtResource("2_47vhq")
+id = &"tarnhelm"
+faction = &"nibelungs"
+type = 2
+subtypes = Array[StringName]([&"relic"])
+rarity = 3
+cost = 2
+leitmotifs = Array[StringName]([&"ring"])
+relic_attack_bonus = 2
+relic_health_bonus = 2
+relic_keywords = Array[StringName]([&"invisible"])

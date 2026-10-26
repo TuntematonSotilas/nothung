@@ -22,13 +22,14 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 
 
 func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
-	assert_int(CardDatabase.card_count()).is_equal(21)
+	assert_int(CardDatabase.card_count()).is_equal(38)
 	var gods_deck: DeckData = CardDatabase.get_deck(&"gods_starter")
 	var nibelungs_deck: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
-	assert_object(gods_deck).is_not_null()
-	assert_object(nibelungs_deck).is_not_null()
-	assert_int(gods_deck.cards.size()).is_equal(20)
-	assert_int(nibelungs_deck.cards.size()).is_equal(20)
+	for deck_id: StringName in [&"gods_starter", &"nibelungs_starter", &"walsungs_starter"]:
+		var deck: DeckData = CardDatabase.get_deck(deck_id)
+		assert_object(deck).is_not_null()
+		assert_int(deck.cards.size()).is_equal(20)
+	assert_str(String(CardDatabase.get_deck(&"walsungs_starter").leader.id)).is_equal("siegfried")
 	assert_int(CardDatabase.get_card(&"loge").abilities[0].effects[0].amount).is_equal(2)
 	assert_int(CardDatabase.get_leader(&"wotan").ability.cost).is_equal(3)
 
@@ -454,6 +455,98 @@ func test_ring_curse_and_gotterdammerung_apply_at_their_turn_boundaries() -> voi
 	assert_bool(engine.apply(EndTurnAction.new(1))).is_true()
 	assert_int(state.player(0).turns_taken).is_equal(Match.DOOM_START_TURN)
 	assert_int(state.player(0).life).is_equal(starting_life - 2)
+
+
+func test_nothung_is_brought_drawn_shattered_and_reforged() -> void:
+	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 140)
+	_prepare_main_phase(engine)
+	var state := engine.get_state()
+	var player := state.player(0)
+	var brunnhilde := CardInstance.new(CardDatabase.get_card(&"brunnhilde_protector"), 0, 141)
+	var siegmund := CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 142)
+	var sieglinde := CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 143)
+	var notung := CardInstance.new(CardDatabase.get_card(&"notung"), 0, 144)
+	for card: CardInstance in [brunnhilde, siegmund, sieglinde, notung]:
+		player.hand.add(card)
+
+	# Brünnhilde brings the fragments.
+	assert_bool(engine.apply(PlayCardAction.new(0, brunnhilde.uid))).is_true()
+	assert_str(String(player.artifacts.cards[0].data.id)).is_equal("nothung_broken")
+	# Siegmund draws the sword: he carries Nothung himself.
+	assert_bool(engine.apply(PlayCardAction.new(0, siegmund.uid))).is_true()
+	assert_object(siegmund.relic).is_not_null()
+	assert_str(String(siegmund.relic.data.id)).is_equal("nothung")
+	assert_int(siegmund.attack).is_equal(8)
+	assert_int(player.artifacts.size()).is_equal(0)
+	# The sword shatters when its bearer dies.
+	siegmund.health = 0
+	engine.call("_check_deaths")
+	assert_str(String(player.artifacts.cards[0].data.id)).is_equal("nothung_broken")
+	# Notung! Notung! reforges it onto another Wälsung.
+	player.energy = 10
+	assert_bool(engine.apply(PlayCardAction.new(0, sieglinde.uid))).is_true()
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_true()
+	assert_str(String(sieglinde.relic.data.id)).is_equal("nothung")
+	assert_int(sieglinde.attack).is_equal(6)
+
+
+func test_horn_call_lets_a_unit_played_this_turn_attack() -> void:
+	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 150)
+	_prepare_main_phase(engine)
+	var player := engine.get_state().player(0)
+	var bear := CardInstance.new(CardDatabase.get_card(&"siegfrieds_bear"), 0, 151)
+	var horn := CardInstance.new(CardDatabase.get_card(&"horn_call"), 0, 152)
+	player.hand.add(bear)
+	player.hand.add(horn)
+	assert_bool(engine.apply(PlayCardAction.new(0, bear.uid))).is_true()
+	assert_str(String(engine.attack_block_reason(0, bear.uid))).is_equal("summoning_sick")
+	assert_bool(engine.apply(PlayCardAction.new(0, horn.uid, bear.uid))).is_true()
+	assert_int(bear.attack).is_equal(4)
+	assert_str(String(engine.attack_block_reason(0, bear.uid))).is_equal("")
+
+
+func test_tarnhelm_hides_its_bearer_until_it_attacks() -> void:
+	var engine := Match.new(_deck(&"nibelungs"), _deck(&"gods"), 170)
+	_prepare_main_phase(engine)
+	var state := engine.get_state()
+	var bearer := _unit(&"dwarf", 1, 171, 2, 3, [])
+	bearer.can_attack = true
+	state.player(1).board.add(bearer)
+	var tarnhelm := CardInstance.new(CardDatabase.get_card(&"tarnhelm"), 1, 172)
+	state.player(1).hand.add(tarnhelm)
+	state.player(0).leader = CardDatabase.get_leader(&"wotan")
+	var attacker := _unit(&"god", 0, 173, 3, 5, [&"charge"])
+	attacker.can_attack = true
+	state.player(0).board.add(attacker)
+
+	state.active_player = 1
+	assert_bool(engine.apply(PlayCardAction.new(1, tarnhelm.uid, bearer.uid))).is_true()
+	assert_int(bearer.attack).is_equal(4)
+	# Hidden: the opponent can neither attack it nor target it with Wotan's ability.
+	state.active_player = 0
+	assert_bool(engine.is_legal(AttackAction.new(0, attacker.uid, bearer.uid))).is_false()
+	assert_bool(engine.is_legal(UseLeaderAbilityAction.new(0, bearer.uid))).is_false()
+	# Once it has attacked, it can be targeted again.
+	state.active_player = 1
+	assert_bool(engine.apply(AttackAction.new(1, bearer.uid, attacker.uid))).is_true()
+	state.active_player = 0
+	attacker.exhausted = false
+	attacker.can_attack = true
+	assert_bool(engine.is_legal(AttackAction.new(0, attacker.uid, bearer.uid))).is_true()
+	assert_bool(engine.is_legal(UseLeaderAbilityAction.new(0, bearer.uid))).is_true()
+
+
+func test_spear_breaker_deals_double_damage_to_gods() -> void:
+	var siegfried_deck := _deck(&"walsungs")
+	siegfried_deck.leader = CardDatabase.get_leader(&"siegfried")
+	var engine := Match.new(siegfried_deck, _deck(&"gods"), 160)
+	_prepare_main_phase(engine)
+	var god := _unit(&"some_god", 1, 161, 1, 6, [])
+	god.data.faction = &"gods"
+	engine.get_state().player(1).board.add(god)
+	var ability: UseLeaderAbilityAction = UseLeaderAbilityAction.new(0, god.uid)
+	assert_bool(engine.apply(ability)).is_true()
+	assert_int(god.health).is_equal(4)
 
 
 func _prepare_main_phase(engine: Match) -> void:

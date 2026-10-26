@@ -2,18 +2,30 @@ extends GdUnitTestSuite
 
 const MATCH_COUNT: int = 40
 const ACTION_LIMIT: int = 300
+## Every starter deck meets every other one.
+const PAIRINGS: Array = [
+	[&"gods_starter", &"nibelungs_starter"],
+	[&"walsungs_starter", &"gods_starter"],
+	[&"walsungs_starter", &"nibelungs_starter"],
+]
 
 
 func test_easy_ai_soak_completes_matches_with_legal_actions() -> void:
-	var deck_wins: Dictionary = {"gods_starter": 0, "nibelungs_starter": 0}
+	for pairing: Array in PAIRINGS:
+		_soak(pairing[0], pairing[1])
+
+
+func _soak(deck_a: StringName, deck_b: StringName) -> void:
+	var deck_wins: Dictionary = {deck_a: 0, deck_b: 0}
 	var draws: int = 0
 	var total_turns: int = 0
 	var total_actions: int = 0
 
 	for match_index: int in MATCH_COUNT:
-		var gods_first: bool = match_index % 2 == 0
-		var first_deck_id: StringName = &"gods_starter" if gods_first else &"nibelungs_starter"
-		var second_deck_id: StringName = &"nibelungs_starter" if gods_first else &"gods_starter"
+		# Alternate who plays first.
+		var a_first: bool = match_index % 2 == 0
+		var first_deck_id: StringName = deck_a if a_first else deck_b
+		var second_deck_id: StringName = deck_b if a_first else deck_a
 		var engine := Match.new(
 			CardDatabase.get_deck(first_deck_id),
 			CardDatabase.get_deck(second_deck_id),
@@ -29,23 +41,25 @@ func test_easy_ai_soak_completes_matches_with_legal_actions() -> void:
 
 			var selected: Action = Action.from_record(EasyAI.choose_action(records))
 			assert_object(selected).override_failure_message(
-				"AI returned no action in match %d, turn %d" % [match_index, state.turn]
+				"AI returned no action in %s vs %s match %d, turn %d" % [deck_a, deck_b, match_index, state.turn]
 			).is_not_null()
 			assert_bool(engine.is_legal(selected)).override_failure_message(
-				"AI returned an illegal action in match %d, turn %d: %s" % [
+				"AI returned an illegal action in %s vs %s match %d, turn %d: %s" % [
+					deck_a,
+					deck_b,
 					match_index,
 					state.turn,
 					selected.to_record(),
 				]
 			).is_true()
 			assert_bool(engine.apply(selected)).override_failure_message(
-				"Rules engine rejected AI action in match %d, turn %d" % [match_index, state.turn]
+				"Rules engine rejected AI action in %s vs %s match %d, turn %d" % [deck_a, deck_b, match_index, state.turn]
 			).is_true()
 			action_count += 1
 
 		var result: GameState = engine.get_state()
 		assert_int(result.phase).override_failure_message(
-			"AI match %d did not finish within %d actions" % [match_index, ACTION_LIMIT]
+			"AI match %d (%s vs %s) did not finish within %d actions" % [match_index, deck_a, deck_b, ACTION_LIMIT]
 		).is_equal(GameState.Phase.GAME_OVER)
 		total_actions += action_count
 		total_turns += result.turn
@@ -55,15 +69,15 @@ func test_easy_ai_soak_completes_matches_with_legal_actions() -> void:
 			var winning_deck_id: StringName = first_deck_id if result.winner == 0 else second_deck_id
 			deck_wins[winning_deck_id] = int(deck_wins[winning_deck_id]) + 1
 
-	print("AI soak: %d matches, average %.1f turns, %.1f actions; gods %d wins, nibelungs %d wins, %d draws." % [
+	print("AI soak %s vs %s: %d matches, average %.1f turns, %.1f actions; %d / %d wins, %d draws (%.1f%% / %.1f%%)." % [
+		deck_a,
+		deck_b,
 		MATCH_COUNT,
 		float(total_turns) / MATCH_COUNT,
 		float(total_actions) / MATCH_COUNT,
-		int(deck_wins["gods_starter"]),
-		int(deck_wins["nibelungs_starter"]),
+		int(deck_wins[deck_a]),
+		int(deck_wins[deck_b]),
 		draws,
-	])
-	print("AI soak win rate: gods_starter %.1f%%, nibelungs_starter %.1f%%." % [
-		float(deck_wins["gods_starter"]) * 100.0 / MATCH_COUNT,
-		float(deck_wins["nibelungs_starter"]) * 100.0 / MATCH_COUNT,
+		float(deck_wins[deck_a]) * 100.0 / MATCH_COUNT,
+		float(deck_wins[deck_b]) * 100.0 / MATCH_COUNT,
 	])

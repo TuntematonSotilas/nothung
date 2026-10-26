@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="LeaderData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_dxesw"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="2_5ushx"]
+[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="3_jiuua"]
+
+[sub_resource type="Resource" id="Resource_42tn0"]
+script = ExtResource("1_dxesw")
+amount = 1
+bonus_faction = &"gods"
+
+[sub_resource type="Resource" id="Resource_t26fu"]
+script = ExtResource("2_5ushx")
+cost = 2
+effects = Array[ExtResource("1_dxesw")]([SubResource("Resource_42tn0")])
+
+[resource]
+script = ExtResource("3_jiuua")
+id = &"siegfried"
+faction = &"walsungs"
+ability = SubResource("Resource_t26fu")

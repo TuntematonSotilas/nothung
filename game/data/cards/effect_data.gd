@@ -16,6 +16,7 @@ enum Kind {
 	RETURN_RING,
 	RESURRECT,
 	FORGE_CARD,
+	CREATE_ARTIFACT,
 }
 
 enum Target {
@@ -36,3 +37,5 @@ enum Target {
 @export var health_amount: int = 0
 @export var keyword: StringName
 @export var card: CardData
+## DEAL_DAMAGE only: targets of this faction (unit or Leader) take double damage.
+@export var bonus_faction: StringName

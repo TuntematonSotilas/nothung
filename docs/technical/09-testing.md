@@ -154,6 +154,46 @@ Matches are slightly above the 8–10 turns per player target.
 
 Matches are back inside the 8–10 turns per player target, but the Gods gain more from the extra Energy (their 2-cost units come down on turn 1). Next lever if needed: *Nibelung Host* at 2/4.
 
+**400-match baseline and the Wälsungs (2026-10-26).** 40 matches are too few to judge balance: the same Gods vs Nibelungs decks over **400 seeded matches** give 56 % / 44 % (not 67.5 / 32.5), 9.6 turns per player, and the Götterdämmerung fires in 58 % of matches. Balance runs now use 400 matches per pairing; the soak test keeps 40 per pairing for speed and plays all three starter decks against each other.
+
+Easy AI fixes in the same pass (see [AI opponent](05-ai-opponent.md)): conditional effects only count when their condition is met, buffs on enemy units and damage to own units count as losses, Charge on a unit that could not attack is valued as an attack. They do not change the Gods vs Nibelungs figures.
+
+Wälsungs starter variants (400 matches per pairing, Wälsungs win rate):
+
+| Variant | vs Gods | vs Nibelungs |
+|---------|---------|--------------|
+| First draft, Spear-breaker 2 damage (×2 vs Gods), before the AI fixes | 18 % | 4 % |
+| Same, after the AI fixes | 84 % | 4 % |
+| Sturdier units, Spear-breaker 1 damage, cost 3 | 13 % | 6 % |
+| + Spear-breaker cost 2, *Winterstürme* +2/+2, *Horn Call* +2/+0, *Siegfried's Bear* Guard | 40 % | 25 % |
+| Same with Spear-breaker 2 damage, cost 3 | 94 % | 38 % |
+| + *Wolf Cub* (now *Wölfing*) 2/1, *Sword in the Ash Tree*: with Siegmund, units +1/+0 | 43 % | 26 % |
+| **+ stronger key units (Sieglinde 3/4, Wälse 4/4, Siegmund 5/4, Grane 4/3, Brünnhilde 3/4) — retained** | **59 %** | **44 %** |
+
+The ×2 against the Gods is very sensitive: the Spear-breaker stays at 1 damage. Retained triangle (row wins against column, 400 matches each):
+
+| | vs Gods | vs Nibelungs | vs Wälsungs |
+|---|---|---|---|
+| Gods | — | 56 % | 41 % |
+| Nibelungs | 44 % | — | 56 % |
+| Wälsungs | 59 % | 44 % | — |
+
+Average length 8.7–9.6 turns per player; the Götterdämmerung fires in 45–58 % of matches, so its start stays at turn 10.
+
+**One Legendary per faction (2026-10-26).** *Wotan's Spear* joins the Gods starter (replacing one *Blessing of Valhalla*), the *Tarnhelm* the Nibelungs starter (replacing one *Nibelung Hoard*); Siegmund became Epic. Variants (400 matches per pairing, row deck's win rate):
+
+| Variant | Gods vs Nibelungs | Wälsungs vs Gods | Wälsungs vs Nibelungs |
+|---------|-------------------|------------------|-----------------------|
+| Spear (4): start of turn, 1 damage to all enemy units · Tarnhelm (3): +1/+1, Invisible | 66 % | 57 % | 46 % |
+| Spear (4): start of turn, 1 damage to the enemy Leader | 65 % | 52 % | 46 % |
+| Spear (4): on play, 1 damage to all enemy units; start of turn, heal 1 | 72 % | 45 % | 46 % |
+| Spear (4, Leader version) with the Nibelungs keeping 2 Hoards (no Tarnhelm) | 61 % | — | — |
+| No Spear (2 Blessings), Tarnhelm (3) in the Nibelungs deck | 60 % | — | — |
+| Spear (5, Leader version) · Tarnhelm (2): +2/+1 | 60 % | 53 % | 46 % |
+| **Spear (5, Leader version) · Tarnhelm (2): +2/+2 — retained** | **59 %** | **53 %** | **45 %** |
+
+Both cards shift the Gods vs Nibelungs matchup by 4–5 points each, so both were tuned. Retained triangle: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs.
+
 ## Manual test checklist (release)
 
 - [ ] Install on reference device + one low-end device + one tall-aspect (20:9+) device

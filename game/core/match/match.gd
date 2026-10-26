@@ -121,6 +121,8 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 			actions.append(AttackAction.new(player_id, attacker.uid, -1, 1 - player_id))
 		var targets: Array[CardInstance] = guards if not guards.is_empty() and not may_ignore_guard else opponent.board.cards
 		for target: CardInstance in targets:
+			if _is_hidden(target):
+				continue
 			actions.append(AttackAction.new(player_id, attacker.uid, target.uid))
 
 	if _can_use_leader_ability(player_id):
@@ -448,7 +450,7 @@ func _is_legal_attack(action: AttackAction) -> bool:
 	if action.target_player != -1 or action.target_uid < 0:
 		return false
 	var target := _state.player(1 - action.player).board.find(action.target_uid)
-	if target == null:
+	if target == null or _is_hidden(target):
 		return false
 	var guards := _guard_units(_state.player(1 - action.player))
 	return guards.is_empty() or attacker.has_keyword(&"flying") or target.has_keyword(&"guard")
@@ -459,6 +461,9 @@ func _attack(action: AttackAction) -> void:
 	attacker.exhausted = true
 	attacker.can_attack = false
 	_emit(&"attack_declared", action.player, attacker.uid, action.target_uid)
+	# Attacking reveals an Invisible unit for good.
+	if attacker.has_keyword(&"invisible") and not attacker.statuses.has(&"revealed"):
+		attacker.statuses.append(&"revealed")
 	var defender := _find_unit(action.target_uid)
 	if defender != null:
 		var attacker_damage: int = _effective_attack(attacker, defender)
@@ -648,13 +653,15 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 		EffectData.Kind.DEAL_DAMAGE:
 			for target: Variant in _effect_targets(effect.target, player_id, source, selected):
 				if target is CardInstance:
-					(target as CardInstance).health -= effect.amount
-					_emit(&"damage_dealt", player_id, source.uid if source != null else -1, (target as CardInstance).uid, effect.amount)
+					var damage: int = effect.amount * (2 if effect.bonus_faction != &"" and (target as CardInstance).data.faction == effect.bonus_faction else 1)
+					(target as CardInstance).health -= damage
+					_emit(&"damage_dealt", player_id, source.uid if source != null else -1, (target as CardInstance).uid, damage)
 					_queue_card_trigger(&"on_damage", target as CardInstance, (target as CardInstance).owner, source)
 				else:
 					var target_player: int = int(target)
-					_state.player(target_player).life -= effect.amount
-					_emit(&"damage_dealt", player_id, source.uid if source != null else -1, -1, effect.amount)
+					var leader_damage: int = effect.amount * (2 if effect.bonus_faction != &"" and _state.player(target_player).leader.faction == effect.bonus_faction else 1)
+					_state.player(target_player).life -= leader_damage
+					_emit(&"damage_dealt", player_id, source.uid if source != null else -1, -1, leader_damage)
 		EffectData.Kind.DRAW_CARDS:
 			for _index: int in maxi(effect.amount, 0):
 				_draw_card(player_id)
@@ -688,6 +695,9 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 					unit.health += effect.health_amount
 					if effect.keyword != &"" and not unit.statuses.has(effect.keyword):
 						unit.statuses.append(effect.keyword)
+						# Gaining Charge lets a unit that has not attacked yet attack this turn.
+						if effect.keyword == &"charge" and not unit.exhausted:
+							unit.can_attack = true
 		EffectData.Kind.TRANSFORM:
 			if effect.card != null and effect.card.type == CardData.Type.UNIT:
 				for target: Variant in _effect_targets(effect.target, player_id, source, selected):
@@ -709,6 +719,13 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 			_resurrect(player_id, effect.card)
 		EffectData.Kind.FORGE_CARD:
 			_forge_card(source, player_id, effect.card)
+		EffectData.Kind.CREATE_ARTIFACT:
+			if effect.card != null and effect.card.type == CardData.Type.ARTIFACT:
+				var owner := _state.player(player_id)
+				if owner.artifacts.size() < MAX_ARTIFACTS:
+					var created := _new_instance(effect.card, player_id)
+					owner.artifacts.add(created)
+					_emit(&"artifact_created", player_id, created.uid)
 
 
 func _effect_targets(target_kind: EffectData.Target, player_id: int, source: CardInstance, selected: CardInstance) -> Array[Variant]:
@@ -790,12 +807,24 @@ func _forge_card(source: CardInstance, player_id: int, forged_data: CardData) ->
 	if source == null or forged_data == null:
 		return
 	var player := _state.player(player_id)
+	var unit_source: CardInstance = source if source.data.is_unit() else null
 	if player.artifacts.find(source.uid) == null:
-		return
+		# Reforging from a spell or a unit: the material is the relic's shattered form among your artifacts
+		# (e.g. Nothung (broken) becomes Nothung again).
+		source = null
+		for artifact: CardInstance in player.artifacts.cards:
+			if forged_data.shatters_into != null and artifact.data.id == forged_data.shatters_into.id:
+				source = artifact
+				break
+		if source == null:
+			return
 	if forged_data.is_relic():
 		var bearer: CardInstance
+		# A unit that forges the relic carries it when it can (Siegmund draws Nothung himself).
+		if unit_source != null and _can_bear(unit_source, forged_data):
+			bearer = unit_source
 		for unit: CardInstance in player.board.cards:
-			if _can_bear(unit, forged_data):
+			if bearer == null and _can_bear(unit, forged_data):
 				bearer = unit
 				break
 		if bearer == null:
@@ -823,6 +852,9 @@ func _condition_is_met(condition: ConditionData, player_id: int) -> bool:
 			return true
 		for unit: CardInstance in player.board.cards:
 			if unit.data.id == condition.card_id:
+				return true
+		for artifact: CardInstance in player.artifacts.cards:
+			if artifact.data.id == condition.card_id:
 				return true
 	return false
 
@@ -918,6 +950,8 @@ func _is_legal_selected_target(card: CardData, player_id: int, target: CardInsta
 		for effect: EffectData in ability.effects:
 			if not _effect_requires_selected_unit(effect):
 				continue
+			if target.owner != player_id and _is_hidden(target):
+				return false
 			if effect.kind == EffectData.Kind.DEAL_DAMAGE and target.owner == player_id:
 				return false
 			if effect.kind in [EffectData.Kind.HEAL, EffectData.Kind.BUFF] and target.owner != player_id:
@@ -936,6 +970,8 @@ func _ability_target_is_legal(ability: AbilityData, player_id: int, target: Card
 	for effect: EffectData in ability.effects:
 		if not _effect_requires_selected_unit(effect):
 			continue
+		if target.owner != player_id and _is_hidden(target):
+			return false
 		if effect.kind == EffectData.Kind.DEAL_DAMAGE and target.owner == player_id:
 			return false
 		if effect.kind in [EffectData.Kind.HEAL, EffectData.Kind.BUFF] and target.owner != player_id:
@@ -943,10 +979,16 @@ func _ability_target_is_legal(ability: AbilityData, player_id: int, target: Card
 	return true
 
 
+## Invisible units cannot be attacked or targeted by the opponent until they attack.
+func _is_hidden(unit: CardInstance) -> bool:
+	return unit.is_hidden()
+
+
+## Guard units the enemy must attack first; a hidden Guard cannot be attacked, so it does not force anything.
 func _guard_units(player: PlayerState) -> Array[CardInstance]:
 	var guards: Array[CardInstance] = []
 	for unit: CardInstance in player.board.cards:
-		if unit.has_keyword(&"guard"):
+		if unit.has_keyword(&"guard") and not _is_hidden(unit):
 			guards.append(unit)
 	return guards
 

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_bx21r"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_hwu2y"]
+
+[resource]
+script = ExtResource("2_hwu2y")
+id = &"nothung_broken"
+faction = &"walsungs"
+type = 2
+subtypes = Array[StringName]([&"weapon"])
+rarity = 3
+cost = 1
+leitmotifs = Array[StringName]([&"sword"])

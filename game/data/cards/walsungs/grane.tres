@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_w7com"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_ocrrt"]
+
+[resource]
+script = ExtResource("2_ocrrt")
+id = &"grane"
+faction = &"walsungs"
+subtypes = Array[StringName]([&"beast"])
+rarity = 1
+cost = 3
+attack = 4
+health = 3
+keywords = Array[StringName]([&"charge"])
+leitmotifs = Array[StringName]([&"ride"])

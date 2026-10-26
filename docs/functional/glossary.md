@@ -27,7 +27,7 @@
 | **Curse** | Drawback attached to the Ring and cursed cards |
 | **Relic** | Artifact attached to one of your units (equipment), e.g. Nothung, Tarnhelm |
 | **Bearer** | The unit carrying a Relic; *Bearer (X)* restricts which units can carry it |
-| **Spear-breaker** | Siegfried's skill: double damage against Gods (he shatters Wotan's spear) |
+| **Spear-breaker** | Siegfried's Leader ability: damage to a unit, double against Gods (he shatters Wotan's spear) |
 
 > **Decision (2026-10-15):** The game uses **Trait** (not "keyword") and **Redraw** / **Opening hand**. Code and data use the same terms where they are player-facing concepts.
 
