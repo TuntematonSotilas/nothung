@@ -1,7 +1,7 @@
 class_name CardPalette
 extends RefCounted
-## Card frame colours: frame colour = faction, gem = rarity, dark gold for the Ring.
-## Source of truth: docs/functional/08-art-and-audio.md (faction palette, gem colours).
+## Card colours: frame colour = faction, rarity badge colour = rarity, dark gold for the Ring.
+## Source of truth: docs/functional/08-art-and-audio.md (faction palette, rarity colours).
 
 const TEXT_LIGHT: Color = Color("#F4EFE4")
 const TEXT_DARK: Color = Color("#1C1A17")
@@ -24,7 +24,8 @@ const FACTIONS: Dictionary = {
 ## The Ring (and Cursed cards) use dark gold whatever their faction.
 const RING: Dictionary = {"frame": Color("#7A5A14"), "trim": Color("#C9A33A"), "text": TEXT_LIGHT}
 
-const GEMS: Dictionary = {
+## Rarity badge colours (behind the rarity letter).
+const RARITY_COLORS: Dictionary = {
 	CardData.Rarity.COMMON: Color("#9A9A9A"),
 	CardData.Rarity.RARE: Color("#3A7BD5"),
 	CardData.Rarity.EPIC: Color("#8E44AD"),
@@ -41,8 +42,21 @@ static func colors_for(data: CardData) -> Dictionary:
 	return FACTIONS.get(data.faction, FACTIONS[&"neutral"])
 
 
-static func gem_for(rarity: CardData.Rarity) -> Color:
-	return GEMS.get(rarity, GEMS[CardData.Rarity.COMMON])
+## Rarity letters: the same in every language (not translated).
+const RARITY_LETTERS: Dictionary = {
+	CardData.Rarity.COMMON: "C",
+	CardData.Rarity.RARE: "R",
+	CardData.Rarity.EPIC: "E",
+	CardData.Rarity.LEGENDARY: "L",
+}
+
+
+static func rarity_letter(rarity: CardData.Rarity) -> String:
+	return RARITY_LETTERS.get(rarity, "C")
+
+
+static func rarity_color(rarity: CardData.Rarity) -> Color:
+	return RARITY_COLORS.get(rarity, RARITY_COLORS[CardData.Rarity.COMMON])
 
 
 ## Light or dark text, whichever reads best on this background.

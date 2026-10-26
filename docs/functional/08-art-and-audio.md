@@ -15,13 +15,13 @@ Readability at phone size is the priority: one clear subject per illustration, h
 
 ### Card colour system
 
-> **Decision (2026-10-13):** Card colour encodes the **faction**, not the type. Type is shown by the **frame shape**, rarity by the **gem**. Each visual cue carries one piece of information.
+> **Decision (2026-10-13):** Card colour encodes the **faction**, not the type. Type is shown by the **frame shape**, rarity by the **rarity badge** (a gem until 2026-10-23). Each visual cue carries one piece of information.
 
 | Visual cue | Encodes | Values |
 |------------|---------|--------|
 | **Frame colour** | Faction | See faction palette below |
 | **Frame shape** | Type | **Unit**: rectangular frame with Attack ⚔ and Health ♥ stones · **Spell**: rounded, parchment-like frame · **Artifact**: octagonal frame · **Relic**: octagonal frame + "Bearer" ribbon |
-| **Gem** (top right) | Rarity | Common grey · Rare blue · Epic purple · Legendary gold (see [gem colours](#gem-colours)) |
+| **Rarity badge** (top right) | Rarity | A letter on the rarity colour: **C** Common grey · **R** Rare blue · **E** Epic purple · **L** Legendary gold (see [rarity colours](#rarity-colours)) |
 
 Why faction rather than type: decks are one faction + Neutral, so colour tells at a glance which side a card belongs to (collection, deck builder, enemy board). With only 3 types, shape is enough to tell them apart.
 
@@ -48,16 +48,18 @@ Shared text colours: **Light** = `#F4EFE4` (warm off-white), **Dark** = `#1C1A17
 
 *Nibelungs moved from "dark gold / black" to purple so they don't clash with the dark-gold Ring / Cursed frame. Values are a starting point: adjust them on the mood board, keeping the contrast target and the hue spacing.*
 
-### Gem colours
+### Rarity colours
 
-| Rarity | Gem |
-|--------|-----|
-| Common | `#9A9A9A` |
-| Rare | `#3A7BD5` |
-| Epic | `#8E44AD` |
-| Legendary | `#E0B33A` |
+| Rarity | Letter | Badge colour |
+|--------|--------|--------------|
+| Common | C | `#9A9A9A` |
+| Rare | R | `#3A7BD5` |
+| Epic | E | `#8E44AD` |
+| Legendary | L | `#E0B33A` |
 
-Gems are brighter than frames so they stand out as small jewels. Legendary gold is bright and saturated, unlike the dark-gold Ring / Cursed frame.
+> **Decision (2026-10-23):** rarity is a **letter in a small badge** (C / R / E / L, the same in every language, not translated) instead of a coloured gem: it reads at board size and does not rely on colour alone (colour-blind players). The badge keeps the former gem colours; the letter is dark or light, whichever reads best on it.
+
+Badge colours are brighter than frames so they stand out. Legendary gold is bright and saturated, unlike the dark-gold Ring / Cursed frame.
 
 ### UI palette
 
@@ -78,7 +80,7 @@ Gems are brighter than frames so they stand out as small jewels. Legendary gold 
 | `energy` | `#5BA8CC` | Energy (Rhine blue) | 7.2 / 5.8 |
 | `heal` | `#5FA873` | Healing, buffs, success | 6.7 / 5.4 |
 
-- The UI gold is paler and duller than the Ring / Cursed frame gold and the Legendary gem: it is for the interface, never for a card frame.
+- The UI gold is paler and duller than the Ring / Cursed frame gold and the Legendary rarity badge: it is for the interface, never for a card frame.
 - Life, Energy and heal are always paired with an icon or a number (colour-blind players).
 - Menus, dropdowns and popups use the theme too (`surface` panel, `text`), never the engine defaults.
 
@@ -111,7 +113,7 @@ Frames follow the [card colour system](#card-colour-system): 4 shapes × the fac
 | Artifact | **Octagon** (cut corners) |
 | Relic | Octagon + a **Bearer** ribbon in the trim colour above the bottom edge |
 
-- Every frame: a thin border in the **faction frame colour** (dark gold for the Ring) and the card **name on a banner** in that colour (full-width band), on a **dark background** (`#16181D`) that the card illustration will cover. Top row: cost (left), then the **faction icon** in the faction colour and the **gem** (rarity, small diamond) on the right. Bottom row: attack and health (units, left) and the **card type** (name, then its icon once drawn) on the right. Cost, attack and health are bare icon + number, without a pill.
+- Every frame: a thin border in the **faction frame colour** (dark gold for the Ring) and the card **name on a banner** in that colour (full-width band), on a **dark background** (`#16181D`) that the card illustration will cover. Top row: cost (left), then the **faction icon** in the faction colour and the **rarity badge** (letter C / R / E / L on the rarity colour) on the right. Bottom row: attack and health (units, left) and the **card type** (name, then its icon once drawn) on the right. Cost, attack and health are bare icon + number, without a pill.
 - The illustration (`assets/art/cards/<id>.png`) is shown between the name and the rules text when it exists.
 - Selection, "ready to attack" and "target" are an outer **glow** (gold / red), so the faction frame stays visible.
 - Rules text is always light (`#F4EFE4`) on the dark background; the name uses the "Card text" colour of the [faction palette](#faction-palette-draft) on its banner (dark ink on Valkyries and Neutral).

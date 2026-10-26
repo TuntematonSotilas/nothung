@@ -15,8 +15,8 @@ func test_palette_matches_the_art_doc() -> void:
 	for colors: Dictionary in CardPalette.FACTIONS.values():
 		for key: String in ["frame", "trim"]:
 			assert_str(doc).contains("`#%s`" % (colors[key] as Color).to_html(false).to_upper())
-	for gem: Color in CardPalette.GEMS.values():
-		assert_str(doc).contains("`#%s`" % gem.to_html(false).to_upper())
+	for rarity_color: Color in CardPalette.RARITY_COLORS.values():
+		assert_str(doc).contains("`#%s`" % rarity_color.to_html(false).to_upper())
 	assert_str(doc).contains("`#%s`" % CardPalette.RING["frame"].to_html(false).to_upper())
 
 
@@ -48,8 +48,10 @@ func test_card_view_colours_follow_faction_rarity_and_ring() -> void:
 	assert_str(rules_label.get_theme_color("font_color").to_html(false)).is_equal("f4efe4")
 	# Cost, attack and health have no pill around them.
 	assert_object(valkyrie.find_child("AttackStone", true, false).get_theme_stylebox("panel")).is_instanceof(StyleBoxEmpty)
-	var gem: Panel = valkyrie.find_child("GemShape", true, false) as Panel
-	assert_str((gem.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.to_html(false)).is_equal("8e44ad")
+	# Rarity: a letter on the rarity colour.
+	var badge_panel: PanelContainer = valkyrie.find_child("RarityBadge", true, false) as PanelContainer
+	assert_str((badge_panel.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.to_html(false)).is_equal("8e44ad")
+	assert_str((valkyrie.find_child("RarityLabel", true, false) as Label).text).is_equal("E")
 
 	var ring: CardView = await _view(CardData.Type.ARTIFACT, &"nibelungs", CardData.Rarity.LEGENDARY, true)
 	assert_str((ring.get_theme_stylebox("normal") as StyleBoxFlat).border_color.to_html(false)).is_equal("7a5a14")

@@ -7,7 +7,7 @@
 
 ```
 ┌─────────────────────────┐  frame: thin border in the faction colour; its shape gives the type
-│ ⚡3              ☉  ◆   │  cost · faction icon (faction colour) · rarity gem
+│ ⚡3              ☉  [R]  │  cost · faction icon (faction colour) · rarity badge
 │█ Wotan █████████████████│  name on a full-width banner in the faction colour
 │                         │
 │        [ artwork ]      │  illustration (when drawn)
@@ -72,6 +72,8 @@
 | Rare | 2 | ~30 % |
 | Epic | 1 | ~15 % |
 | Legendary | 1 | ~10 % (major characters, the Ring, Nothung…) |
+
+On the card, rarity is a **letter in a coloured badge** in the top-right corner: **C** Common · **R** Rare · **E** Epic · **L** Legendary ([rarity colours](08-art-and-audio.md#rarity-colours)).
 
 > **Decision (2026-10-19):** Rarity of **named characters** depends on their weight in the story, not on having a name.
 > - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm…

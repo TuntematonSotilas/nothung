@@ -67,7 +67,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 ## 3 — Playable match
 
 - [x] Duel screen layout (portrait) ([UI / UX](functional/07-ui-ux.md#duel-screen-layout-portrait-draft))
-- [x] `CardView` with placeholder art (frame colour by faction, gem, generated rules text)
+- [x] `CardView` with placeholder art (frame colour by faction, rarity badge, generated rules text)
 - [x] Hand, board, Leader, Energy and Life views driven by `Match` events
 - [x] Input: drag-and-drop + tap-tap mode; long press → zoom
 - [x] Opening hand screen with Redraw
@@ -114,7 +114,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 No code dependency: can start now ([art & audio](functional/08-art-and-audio.md), [art tools](tools/art-tools.md)).
 
-- [x] Card colour system, faction palette, gem colours
+- [x] Card colour system, faction palette, rarity colours (letter badge)
 - [x] Art direction: Romantic painting
 - [x] App icon: Nothung through the Ring
 - [ ] Mood board (validates the faction palette)

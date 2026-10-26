@@ -10,7 +10,7 @@ Prices and licences change — check them before buying.
 A final card is **not** a single image. It is composed at runtime by the `CardView` scene ([technical/06-ui-implementation.md](../technical/06-ui-implementation.md)):
 
 ```
-CardView = frame + gem drawn by Godot (shape by type, colour by faction, gem by rarity)
+CardView = frame + rarity badge drawn by Godot (shape by type, colour by faction, letter by rarity)
          + artwork + faction icon
          + text rendered by Godot (name, cost, rules, stats)
 ```

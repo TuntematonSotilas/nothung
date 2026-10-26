@@ -45,8 +45,8 @@ var _cost_label: Label
 var _faction_icon: TextureRect
 var _type_label: Label
 var _type_icon: TextureRect
-var _gem: Control
-var _gem_shape: Panel
+var _rarity_badge: PanelContainer
+var _rarity_label: Label
 var _name_label: Label
 var _art: TextureRect
 var _rules_label: Label
@@ -258,6 +258,7 @@ func _refresh_text() -> void:
 	_cost_label.text = str(card_data.cost)
 	var type_id: String = "relic" if card_data.is_relic() else String(CardData.Type.keys()[card_data.type]).to_lower()
 	_type_label.text = type_id.capitalize()
+	_rarity_label.text = CardPalette.rarity_letter(card_data.rarity)
 	_set_icon(_type_icon, "res://ui/icons/type_%s.svg" % type_id)
 	_name_label.text = card_name
 	_rules_label.text = rules
@@ -276,7 +277,7 @@ func _refresh_text() -> void:
 	tooltip_text = "%s\n%s" % [card_name, rules]
 
 
-## Card face: cost, faction icon and rarity gem; name banner; illustration (when drawn); rules text;
+## Card face: cost, faction icon and rarity badge; name banner; illustration (when drawn); rules text;
 ## "Bearer" ribbon for relics; attack / health (units) and the card type at the bottom.
 ## Children of a Button do not change its size, so the card keeps its fixed size whatever the text.
 func _ensure_content() -> void:
@@ -304,20 +305,20 @@ func _ensure_content() -> void:
 	top_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top_gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(top_gap)
-	# Faction icon top right, in the faction colour, next to the gem.
+	# Faction icon top right, in the faction colour, next to the rarity badge.
 	_faction_icon = _make_icon_slot("FactionIcon")
 	top.add_child(_faction_icon)
-	# Rarity gem: a small diamond (a square turned by 45 degrees) in the top-right corner.
-	_gem = Control.new()
-	_gem.name = "Gem"
-	_gem.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_gem.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	top.add_child(_gem)
-	_gem_shape = Panel.new()
-	_gem_shape.name = "GemShape"
-	_gem_shape.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_gem_shape.rotation_degrees = 45.0
-	_gem.add_child(_gem_shape)
+	# Rarity badge in the corner: a letter (C / R / E / L) on the rarity colour, so colour is never the only cue.
+	_rarity_badge = PanelContainer.new()
+	_rarity_badge.name = "RarityBadge"
+	_rarity_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_rarity_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top.add_child(_rarity_badge)
+	_rarity_label = _make_label("RarityLabel", CardPalette.TEXT_DARK)
+	_rarity_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_rarity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_rarity_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_rarity_badge.add_child(_rarity_label)
 
 	_name_label = _make_label("NameLabel", Palette.TEXT)
 	# Left-aligned with the stats, so they stay visible when hand cards overlap.
@@ -485,11 +486,8 @@ func _apply_face_scale() -> void:
 		icon.custom_minimum_size = Vector2.ONE * roundi(18 * k)
 	_faction_icon.custom_minimum_size = Vector2.ONE * roundi(26 * k)
 	_type_icon.custom_minimum_size = Vector2.ONE * roundi(18 * k)
-	var gem_size: float = roundf(16 * k)
-	_gem.custom_minimum_size = Vector2.ONE * gem_size
-	_gem_shape.size = Vector2.ONE * gem_size * 0.72
-	_gem_shape.pivot_offset = _gem_shape.size * 0.5
-	_gem_shape.position = (Vector2.ONE * gem_size - _gem_shape.size) * 0.5
+	_rarity_label.add_theme_font_size_override("font_size", roundi(14 * k))
+	_rarity_badge.custom_minimum_size = Vector2.ONE * roundi(20 * k)
 	_apply_styles()
 
 
@@ -498,7 +496,7 @@ func _notification(what: int) -> void:
 		_apply_face_scale()
 
 
-## Frame, name banner, gem, stones and ribbon styles; called when the card, its state or its size changes.
+## Frame, name banner, rarity badge, stones and ribbon styles; called when the card, its state or its size changes.
 func _apply_styles() -> void:
 	add_theme_stylebox_override("normal", _card_style())
 	add_theme_stylebox_override("hover", _card_style(true))
@@ -520,11 +518,14 @@ func _apply_styles() -> void:
 	banner.content_margin_top = 3.0 * k
 	banner.content_margin_bottom = 3.0 * k
 	_name_banner.add_theme_stylebox_override("panel", banner)
-	var gem: StyleBoxFlat = StyleBoxFlat.new()
-	gem.bg_color = CardPalette.gem_for(card_data.rarity if card_data != null else CardData.Rarity.COMMON)
-	gem.border_color = CardPalette.TEXT_DARK
-	gem.set_border_width_all(maxi(1, roundi(1.5 * k)))
-	_gem_shape.add_theme_stylebox_override("panel", gem)
+	var rarity_color: Color = CardPalette.rarity_color(card_data.rarity if card_data != null else CardData.Rarity.COMMON)
+	var badge: StyleBoxFlat = StyleBoxFlat.new()
+	badge.bg_color = rarity_color
+	badge.set_corner_radius_all(roundi(4 * k))
+	badge.content_margin_left = 3.0 * k
+	badge.content_margin_right = 3.0 * k
+	_rarity_badge.add_theme_stylebox_override("panel", badge)
+	_rarity_label.add_theme_color_override("font_color", CardPalette.ink_on(rarity_color))
 	# Cost, attack and health are bare icon + number (no pill around them).
 	for stone: PanelContainer in [_cost_stone, _attack_stone, _health_stone]:
 		stone.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
