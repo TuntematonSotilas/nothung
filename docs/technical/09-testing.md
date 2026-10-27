@@ -1,7 +1,7 @@
 # Testing
 
 > Test strategy and tooling.
-> Status: Draft · Last updated: 2026-10-21
+> Status: Draft · Last updated: 2026-10-27
 
 ## Framework
 
@@ -213,7 +213,7 @@ Retained matrix (row deck's win rate, 400 matches each; average length 8.0–9.5
 | Wälsungs | 53 % | 45 % | — | 53 % |
 | Valkyries | 60 % | 47 % | 47 % | — |
 
-**Neutral cards (2026-10-27).** No starter deck contains Neutral cards, so the soak test adds a **Neutral test deck**: Alberich with each of the 20 Neutral cards once, against the Gods and Nibelungs starters. It checks that the AI only plays legal Neutral actions (Ring theft, relic, double summons, damage to all units). As a pure-Neutral deck it wins about a third of its matches (32.5 % vs Gods, 35 % vs Nibelungs, 40 matches each), which is expected: Neutral cards complete a faction deck. Their real balance comes with built decks (milestone 5).
+**Neutral cards (2026-10-27).** No starter deck contains Neutral cards, so the soak test adds a **Neutral test deck**: Alberich with 20 of the Neutral cards once (all but *Woglinde*; *Potion of Forgetfulness* replaced her on 2026-10-27, same win rates), against the Gods and Nibelungs starters. It checks that the AI only plays legal Neutral actions (Ring theft, relic, double summons, damage to all units). As a pure-Neutral deck it wins about a third of its matches (32.5 % vs Gods, 35 % vs Nibelungs, 40 matches each), which is expected: Neutral cards complete a faction deck. Their real balance comes with built decks (milestone 5).
 
 **Gods and Nibelungs at 15 cards (2026-10-27).** New cards in the starter decks: Gods — *The Wanderer* (replacing a *Fricka*) and *Rainbow Bridge* (replacing the last *Blessing of Valhalla*); Nibelungs — *Alberich, the Toad* (replacing a *Nibelung Miner*) and *The Anvils of Nibelheim* (replacing an *Alberich's Whip*). *Froh*, *Fricka's Rams* and *Mime's Forge* stay in the card pool. Variants (400 matches per pairing):
 
@@ -231,6 +231,10 @@ Retained matrix (row deck's win rate, 400 matches each; 8.0–9.5 turns per play
 | Nibelungs | 43 % | — | 56 % | 55 % |
 | Wälsungs | 47 % | 44 % | — | 53 % |
 | Valkyries | 50 % | 45 % | 47 % | — |
+
+**Difficulty ladder (2026-10-27).** `test_difficulty_ladder` plays each difficulty against the one below it with the Gods and Nibelungs starters, alternating decks and who goes first, and checks that every action is legal. Hard uses a fixed **60 iterations** per action instead of its time budget, so the result is reproducible (seeded) and the test takes about 20 s. Current result: Normal beats Easy **29 / 40** (asserted > 60 %), Hard beats Normal **7 / 10** (asserted > 50 %). With 200 iterations, Hard beats Normal 18 / 20 (≈ 180 ms per action on desktop). The starter balance matrix above stays measured Easy vs Easy.
+
+`tests/unit/test_ai.gd` covers the hidden-information mask (the opponent's hand is redealt from their own cards, the live state is untouched), lethal attacks for Normal and Hard, Normal refusing a losing trade, and Hard's time budget.
 
 ## Manual test checklist (release)
 

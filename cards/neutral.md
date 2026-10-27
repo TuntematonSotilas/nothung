@@ -1,6 +1,6 @@
 # Neutral
 
-Usable by every faction (one faction + Neutral per deck). The Rhinemaidens and the Rhinegold, the Woodbird, the Norns and Erda; the Giants (Fasolt, Fafner) and the Gibichungs (Gunther, Gutrune, Hagen) — candidates for later factions; Hunding and his kinsmen, the Wälsungs' enemies. Fafner, Hagen and *The Giants' Wage* can take the Ring from its holder.
+Usable by every faction (one faction + Neutral per deck). The Rhinemaidens and the Rhinegold, the Woodbird, the Norns and Erda; the Giants (Fasolt, Fafner) and the Gibichungs (Gunther, Gutrune, Hagen) — candidates for later factions; Hunding and his kinsmen, the Wälsungs' enemies. Fafner, Hagen and *The Giants' Wage* can take the Ring from its holder; Hagen's *Potion of Forgetfulness* takes an enemy unit.
 
 | id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
 |----|------|------|----------|--------|------|-----|----|----------|--------|-----------|------------|---------|
@@ -21,6 +21,7 @@ Usable by every faction (one faction + Neutral per deck). The Rhinemaidens and t
 | giants_wage | The Giants' Wage | spell | | rare | 2 | | | | | on_play: steal_ring(); on_play: draw(1) | ring | |
 | the_norns | The Norns | spell | | rare | 3 | | | | | on_play: draw(2) | | "Do you know what will come of it?" — The Norns, Götterdämmerung |
 | hagens_call | Hoiho! Hagen's Call | spell | | common | 4 | | | | | on_play: summon(gibichung_vassal); on_play: summon(gibichung_vassal) | | "Hoiho! Hoihohoho!" — Hagen, Götterdämmerung |
+| potion_of_forgetfulness | Potion of Forgetfulness | spell | | epic | 5 | | | | | on_play: take_control(selected_unit, 4) | | "Were I to forget all you gave me, one lesson I would never forsake." — Siegfried, before drinking, Götterdämmerung |
 | valhalla_in_flames | Valhalla in Flames | spell | | epic | 6 | | | | | on_play: damage(all_units, 2) | valhalla | |
 | the_rhinegold | The Rhinegold | artifact | | rare | 2 | | | | | start_of_turn: gain_energy(1) | rhinegold | |
 | hagens_spear | Hagen's Spear | artifact | relic, weapon | rare | 3 | 2 | 0 | | | | curse | |

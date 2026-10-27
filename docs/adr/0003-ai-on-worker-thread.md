@@ -14,6 +14,8 @@ The AI search runs on a worker thread (`WorkerThreadPool`) from the start, on a 
 
 > **Implementation update (2026-10-16):** The first Easy opponent uses a dedicated `Thread` rather than `WorkerThreadPool`: its bounded legal-action selection returns a value directly through `wait_to_finish()`, avoiding shared result state. The AI receives serialized legal actions rather than a game-state copy. Deeper search can move to the pool if it needs task scheduling/cancellation.
 
+> **Implementation update (2026-10-27):** Normal and Hard receive a **masked copy** of the game state (opponent's hand redealt from their deck, decks reshuffled) and simulate on their own `Match.from_state()` copies. Still a dedicated `Thread`, but the duel screen now polls `is_alive()` each frame and only joins it once it is done, so Hard's 700 ms search never blocks the main thread. Hard stops on its own time budget, so no cancellation is needed ([AI opponent](../technical/05-ai-opponent.md#threading)).
+
 ## Alternatives considered
 
 | Option | Pros | Cons |

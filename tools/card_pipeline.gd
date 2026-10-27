@@ -489,6 +489,14 @@ func _parse_effect(source: String, path: String, line: int) -> EffectData:
 			effect.kind = EffectData.Kind.CREATE_ARTIFACT
 			if not _read_card_ref(args, effect, "artifact", path, line):
 				return null
+		"take_control":
+			# take_control(selected_unit, max_cost): 0 = any cost.
+			effect.kind = EffectData.Kind.TAKE_CONTROL
+			if not _read_target_and_amount(args, effect, path, line):
+				return null
+			if effect.target != EffectData.Target.SELECTED_UNIT:
+				_error(path, line, "take_control only targets selected_unit.")
+				return null
 		"forge":
 			effect.kind = EffectData.Kind.FORGE_CARD
 			if args.size() != 2:
@@ -781,6 +789,10 @@ func _effect_text(effect: EffectData) -> String:
 			return "Return the Ring."
 		EffectData.Kind.RESURRECT:
 			return "Resurrect %s." % (_referenced_card_name(effect.card) if effect.card != null else "a Valhalla unit")
+		EffectData.Kind.TAKE_CONTROL:
+			if effect.amount == 0:
+				return "Take control of an enemy unit."
+			return "Take control of an enemy unit costing %d or less." % effect.amount
 		EffectData.Kind.FORGE_CARD:
 			if effect.amount == 0:
 				return "Forge %s." % _referenced_card_name(effect.card)

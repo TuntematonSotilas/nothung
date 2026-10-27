@@ -17,6 +17,8 @@ enum Kind {
 	RESURRECT,
 	FORGE_CARD,
 	CREATE_ARTIFACT,
+	## Moves a selected enemy unit to your board; amount = highest cost it can take (0 = any).
+	TAKE_CONTROL,
 }
 
 enum Target {

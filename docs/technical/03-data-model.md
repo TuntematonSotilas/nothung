@@ -1,7 +1,7 @@
 # Data model
 
 > How cards, decks and effects are represented as data. Implements [functional/04-cards.md](../functional/04-cards.md).
-> Status: Draft · Last updated: 2026-10-20
+> Status: Draft · Last updated: 2026-10-27
 
 ## Principles
 
@@ -119,7 +119,7 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 - `faction` comes from the file name.
 - `bearer` is filled for Relics only (subtypes or card ids, comma-separated); empty = any unit.
 - **Relics** (artifact with the `relic` subtype): `atk` / `hp` are the bearer bonus and `keywords` the traits the bearer gains. `shatters_into(card_id)` in `keywords` names the artifact the relic leaves in your artifacts when its bearer dies (e.g. `nothung`: `shatters_into(nothung_broken)`).
-- Effect arguments worth knowing: `damage(target, amount, faction)` doubles the damage against that faction (Siegfried: `damage(selected_unit, 1, gods)`); `create_artifact(card_id)` puts an artifact into your artifacts; `forge(card_id, extra_cost)` turns an artifact into `card_id` — from the artifact itself, or from another card when the result's `shatters_into` form is among your artifacts (Siegmund and *Notung! Notung!* reforge *Nothung (broken)*); `buff(target, atk, hp, charge)` lets the unit attack this turn.
+- Effect arguments worth knowing: `damage(target, amount, faction)` doubles the damage against that faction (Siegfried: `damage(selected_unit, 1, gods)`); `create_artifact(card_id)` puts an artifact into your artifacts; `take_control(selected_unit, max_cost)` moves an enemy unit costing `max_cost` or less (0 = any) to your board, with its relic — it cannot attack that turn, and there must be room on your board; `forge(card_id, extra_cost)` turns an artifact into `card_id` — from the artifact itself, or from another card when the result's `shatters_into` form is among your artifacts (Siegmund and *Notung! Notung!* reforge *Nothung (broken)*); `buff(target, atk, hp, charge)` lets the unit attack this turn.
 - `name` and `flavour` are the **English** source text; the converter writes them into the `en` column of the localisation file. Until translated, new strings are copied to other locale columns; existing translations are preserved.
 - `abilities` uses a small syntax: `trigger[condition]: effect(args); …`. Each clause has one effect; multiple effects use multiple clauses. Every trigger, condition, effect, target and trait must be implemented by the engine; unknown names are errors.
 - Rules text shown on the card is **generated from `keywords` + `abilities`**, so it can never disagree with the actual behaviour.

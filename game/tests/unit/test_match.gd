@@ -22,7 +22,7 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 
 
 func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
-	assert_int(CardDatabase.card_count()).is_equal(80)
+	assert_int(CardDatabase.card_count()).is_equal(81)
 	var gods_deck: DeckData = CardDatabase.get_deck(&"gods_starter")
 	var nibelungs_deck: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
 	for deck_id: StringName in [&"gods_starter", &"nibelungs_starter", &"walsungs_starter", &"valkyries_starter"]:
@@ -391,6 +391,53 @@ func test_hagen_takes_the_ring_only_from_the_opponent_and_never_creates_it() -> 
 	assert_bool(engine.apply(PlayCardAction.new(0, hagen.uid))).is_true()
 	assert_int(state.ring_holder).is_equal(0)
 	assert_int(state.ring_turns_held).is_equal(0)
+
+
+func test_potion_of_forgetfulness_takes_an_enemy_unit_with_its_relic() -> void:
+	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 178)
+	_prepare_main_phase(engine)
+	var state := engine.get_state()
+	var potion := CardInstance.new(CardDatabase.get_card(&"potion_of_forgetfulness"), 0, 180)
+	state.player(0).hand.add(potion)
+	var own := _unit(&"own_unit", 0, 181, 2, 2, [])
+	var cheap := _unit(&"cheap_enemy", 1, 182, 3, 3, [])
+	cheap.data.cost = 4
+	var spear := CardInstance.new(CardDatabase.get_card(&"hagens_spear"), 1, 183)
+	cheap.relic = spear
+	cheap.attack += spear.data.relic_attack_bonus
+	var costly := _unit(&"costly_enemy", 1, 184, 6, 6, [])
+	costly.data.cost = 5
+	var hidden := _unit(&"hidden_enemy", 1, 185, 1, 1, [&"invisible"])
+	for unit: CardInstance in [own, cheap, costly, hidden]:
+		state.player(unit.owner).board.add(unit)
+
+	# Only a visible enemy unit costing 4 or less can be taken.
+	var targets: Array[int] = []
+	for action: Action in engine.get_legal_actions(0):
+		if action is PlayCardAction and (action as PlayCardAction).card_uid == potion.uid:
+			targets.append((action as PlayCardAction).target_uid)
+	assert_array(targets).is_equal([cheap.uid])
+
+	assert_bool(engine.apply(PlayCardAction.new(0, potion.uid, cheap.uid))).is_true()
+	assert_object(state.player(0).board.find(cheap.uid)).is_same(cheap)
+	assert_object(state.player(1).board.find(cheap.uid)).is_null()
+	assert_int(cheap.owner).is_equal(0)
+	assert_int(cheap.relic.owner).is_equal(0)
+	assert_int(cheap.attack).is_equal(5)
+	# Like a unit just played, it cannot attack this turn.
+	assert_bool(cheap.can_attack).is_false()
+
+
+func test_potion_of_forgetfulness_needs_room_on_the_board() -> void:
+	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 179)
+	_prepare_main_phase(engine)
+	var state := engine.get_state()
+	var potion := CardInstance.new(CardDatabase.get_card(&"potion_of_forgetfulness"), 0, 190)
+	state.player(0).hand.add(potion)
+	for index: int in Match.MAX_BOARD_SIZE:
+		state.player(0).board.add(_unit(&"filler", 0, 191 + index, 1, 1, []))
+	state.player(1).board.add(_unit(&"enemy", 1, 199, 2, 2, []))
+	assert_str(String(engine.play_block_reason(0, potion.uid))).is_equal("no_target")
 
 
 func test_only_nibelung_effects_create_the_ring_once() -> void:

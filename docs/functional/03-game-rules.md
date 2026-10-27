@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-21
+> Status: Draft · Last updated: 2026-10-27
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -76,6 +76,7 @@ stateDiagram-v2
 - Damage is **permanent**: a damaged unit stays damaged until healed or destroyed.
 - A unit at 0 Health is destroyed and goes to the graveyard.
 - **Guard** units must be attacked before other targets.
+- **Taking control** (*Potion of Forgetfulness*): an enemy unit moves to your board with its relic, keeping its damage and bonuses. Like a unit just played, it cannot attack that turn (unless it has Charge). It needs a free place on your board, and a hidden (Invisible) unit cannot be chosen. If it dies, it goes to your graveyard.
 
 ## Relics (equipment)
 

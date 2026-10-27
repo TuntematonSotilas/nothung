@@ -17,6 +17,10 @@ var _match: Match
 var _ui_scale: float = 1.0
 var _board_card_scale: float = 1.0
 var _ai_busy: bool = false
+## Opponent difficulty (the quick match menu will set it).
+var ai_difficulty: AIProfile.Difficulty = AIProfile.Difficulty.NORMAL
+var _ai_profile: AIProfile
+var _ai_thread: Thread
 var _selected_hand_uid: int = -1
 var _selected_attacker_uid: int = -1
 var _selected_ability: bool = false
@@ -95,6 +99,10 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	if _ai_busy:
 		_ai_busy = false
+	# A Thread must be joined before it is freed; the search stops on its own time budget.
+	if _ai_thread != null and _ai_thread.is_started():
+		_ai_thread.wait_to_finish()
+		_ai_thread = null
 
 
 func _build_ui() -> void:
@@ -262,6 +270,7 @@ func _start_match() -> void:
 	_clear_undo()
 	_log_lines.clear()
 	_pending_events.clear()
+	_ai_profile = AIProfile.preset(ai_difficulty)
 	_match = Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), int(Time.get_unix_time_from_system()))
 	_match.event_emitted.connect(_on_match_event)
 	_refresh()
@@ -1142,23 +1151,20 @@ func _continue_ai() -> void:
 
 func _finish_ai_redraw() -> void:
 	await _fx_idle()
-	await get_tree().create_timer(AI_DELAY).timeout
 	var state: GameState = _match.get_state()
 	if state.phase != GameState.Phase.REDRAW or state.redraw_player != AI_PLAYER:
 		_ai_busy = false
 		return
-	var records: Array[Dictionary] = EasyAI.prepare_actions(state, _match.get_legal_actions(AI_PLAYER))
-	var worker: Thread = Thread.new()
-	var error: Error = worker.start(EasyAI.choose_action.bind(records))
-	if error != OK:
-		push_error("Could not start EasyAI redraw worker: %s" % error_string(error))
+	var engine: Match = _match
+	var selected: Dictionary = await _think()
+	if engine != _match:
 		_ai_busy = false
+		_continue_ai()
 		return
-	var selected: Dictionary = worker.wait_to_finish()
 	var action: Action = Action.from_record(selected)
 	_pending_events.clear()
 	if action == null or not _match.apply(action):
-		push_error("EasyAI returned an invalid redraw action.")
+		push_error("AI returned an invalid redraw action.")
 		_ai_busy = false
 		return
 	await _play_fx(action)
@@ -1168,30 +1174,45 @@ func _finish_ai_redraw() -> void:
 
 func _run_ai_turn() -> void:
 	await _fx_idle()
-	await get_tree().create_timer(AI_DELAY).timeout
 	var state: GameState = _match.get_state()
 	if state.phase != GameState.Phase.MAIN or state.active_player != AI_PLAYER:
 		_ai_busy = false
 		return
-	var records: Array[Dictionary] = EasyAI.prepare_actions(state, _match.get_legal_actions(AI_PLAYER))
-	var worker: Thread = Thread.new()
-	var error: Error = worker.start(EasyAI.choose_action.bind(records))
-	if error != OK:
-		push_error("Could not start EasyAI worker: %s" % error_string(error))
+	var engine: Match = _match
+	var selected: Dictionary = await _think()
+	# A rematch started meanwhile: that match has its own AI loop.
+	if engine != _match:
 		_ai_busy = false
+		_continue_ai()
 		return
-	var selected: Dictionary = worker.wait_to_finish()
 	var action: Action = Action.from_record(selected)
 	_pending_events.clear()
 	if action == null or not _match.apply(action):
 		_ai_busy = false
-		push_error("EasyAI returned an invalid action.")
+		push_error("AI returned an invalid action.")
 		return
 	# Still busy while animating, so no second AI loop starts meanwhile.
 	await _play_fx(action)
 	_ai_busy = false
 	if _match.get_state().phase == GameState.Phase.MAIN and _match.get_state().active_player == AI_PLAYER:
 		_continue_ai()
+
+
+## Runs the AI on a worker thread while the short AI pause plays, without blocking the main thread.
+func _think() -> Dictionary:
+	var job: Dictionary = AIPlayer.prepare(_match, AI_PLAYER, _ai_profile, randi())
+	_ai_thread = Thread.new()
+	var error: Error = _ai_thread.start(AIPlayer.choose.bind(job))
+	if error != OK:
+		push_error("Could not start the AI worker: %s" % error_string(error))
+		_ai_thread = null
+		return EasyAI.choose_action(job["records"])
+	await get_tree().create_timer(AI_DELAY).timeout
+	while _ai_thread.is_alive():
+		await get_tree().process_frame
+	var selected: Dictionary = _ai_thread.wait_to_finish()
+	_ai_thread = null
+	return selected
 
 
 ## Animates the events of the action just applied over the old board, then shows the new state.

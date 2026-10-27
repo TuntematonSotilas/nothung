@@ -51,7 +51,7 @@
 
 - `scenes/screens/duel.tscn` uses portrait containers for both boards, artifacts, Leaders, Energy, deck/graveyard counts, battle log and the scrollable hand.
 - The first match uses the generated Gods and Nibelungs starter decks. Redraw, action validation, turn updates, match results and rematches are wired to `Match`.
-- `ai/easy_ai.gd` picks only from serialized legal actions on a `Thread`; the main thread alone applies the returned action.
+- The AI (`ai/ai_player.gd`, Normal by default) runs on a `Thread` from a job of copies; the duel polls the thread each frame instead of blocking, and the main thread alone applies the returned action ([AI opponent](05-ai-opponent.md#threading)).
 - A headless smoke test loads and starts the duel scene. The Android device play-through is still required before this milestone is complete.
 
 ## Animation pipeline

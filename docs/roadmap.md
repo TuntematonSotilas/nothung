@@ -81,17 +81,17 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 ## 4 — AI & balancing
 
 - [x] Improve Easy AI action selection: evaluate card value, lethal attacks and favorable trades
-- [ ] Normal and Hard difficulties; AI profiles
+- [x] Normal (greedy over simulated actions) and Hard (information-set MCTS) difficulties; AI profiles with personalities; AI never sees the opponent's hand; non-blocking AI thread in the duel ([AI opponent](technical/05-ai-opponent.md))
 - [x] AI vs AI soak tests: no crash, no illegal move ([testing](technical/09-testing.md))
 - [x] Match-length and win-rate stats per starter deck ([AI soak baseline](technical/09-testing.md#ai-soak))
 - [x] Tune Götterdämmerung start from the stats: stays at turn 10 (fires in 45–58 % of matches, 8.7–9.6 turns per player) ([AI soak](technical/09-testing.md#ai-soak))
-- [ ] Remaining cards to ~80 (4 factions + Neutral) ([cards](functional/04-cards.md))
+- [x] Remaining cards to ~80 (4 factions + Neutral) ([cards](functional/04-cards.md))
   - [x] Wälsungs: 15 cards, Leader Siegfried, starter deck
   - [x] One Legendary per faction: Wotan's Spear (Gods), Tarnhelm (Nibelungs), Nothung (Wälsungs); Invisible trait. Balance: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs
   - [x] Valkyries: 15 cards (one per sister, two unnamed heroes), Leader Brünnhilde, Legendary *Ride of the Valkyries*, starter deck. All 12 starter matchups within 40–60 % ([AI soak](technical/09-testing.md#ai-soak))
   - [x] Neutral: 20 cards (Rhinemaidens, Woodbird, Norns, Erda, Giants, Gibichungs, Hunding), Legendary *Hagen*; Fafner, Hagen and *The Giants' Wage* can take the Ring. Covered by the AI soak with a test deck (Alberich + each Neutral card once)
   - [x] Gods and Nibelungs up to 15 cards each: Froh, Fricka's Rams, The Wanderer, Rainbow Bridge; Alberich the Toad, Mime's Forge, The Anvils of Nibelheim — 80 cards in all, every starter matchup within 43–57 %
-  - [ ] Potion of forgetfulness (needs a "take control of a unit" effect)
+  - [x] *Potion of Forgetfulness* (Neutral spell, Epic, 5): take control of an enemy unit costing 4 or less — new `take_control` effect; 81 cards
 
 ## 5 — Menus & meta
 

@@ -35,7 +35,7 @@ flowchart TB
     end
     subgraph Controllers
         HumanCtl[HumanController<br/>input → Action]
-        AICtl[AIController<br/>search → Action]
+        AICtl[AIPlayer<br/>search → Action]
     end
     subgraph Core["Core rules engine (RefCounted, no Nodes)"]
         Match[Match] --> State[GameState]

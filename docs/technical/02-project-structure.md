@@ -32,7 +32,7 @@ res://
 │   ├── effects/                # Effect base class + DealDamageEffect, DrawEffect…
 │   ├── events/                 # GameEvent types
 │   └── rules/                  # RulesValidator, keyword handlers
-├── ai/                         # AIController, evaluators, difficulty profiles
+├── ai/                         # AIPlayer, Easy / Normal (greedy) / Hard (MCTS), StateEvaluator, AIProfile
 ├── data/
 │   ├── cards/                  # GENERATED from cards/*.md — one .tres per card: <faction>/<card_id>.tres
 │   ├── decks/                  # Starter & campaign decks (.tres)

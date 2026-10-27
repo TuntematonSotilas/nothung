@@ -210,6 +210,11 @@ static func _effects_value(
 					value += float(effect.card.relic_attack_bonus) * 4.0 + float(effect.card.relic_health_bonus) * 2.0
 			EffectData.Kind.CREATE_ARTIFACT:
 				value += 10.0
+			EffectData.Kind.TAKE_CONTROL:
+				# The opponent loses the unit and you gain it: worth two summons.
+				var taken: CardInstance = _find_unit(state, target_uid)
+				if taken != null and taken.owner != player_id:
+					value += _unit_value(taken.data) * 4.0
 	return value
 
 

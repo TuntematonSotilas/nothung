@@ -23,9 +23,12 @@ var _resolution_count: int = 0
 
 
 ## Creates a match, shuffles both decks with the supplied seed and deals opening hands.
-func _init(deck_a: DeckData, deck_b: DeckData, seed: int) -> void:
+## Without decks, creates an empty match for from_state().
+func _init(deck_a: DeckData = null, deck_b: DeckData = null, seed: int = 0) -> void:
 	_state = GameState.new()
 	_state.rng.seed = seed
+	if deck_a == null and deck_b == null:
+		return
 	if not _valid_deck(deck_a) or not _valid_deck(deck_b):
 		push_error("Match requires two decks with a leader and exactly 20 valid cards.")
 		_state.phase = GameState.Phase.GAME_OVER
@@ -46,6 +49,13 @@ func _init(deck_a: DeckData, deck_b: DeckData, seed: int) -> void:
 			_draw_card(player_id)
 		if player_id != _state.active_player:
 			_state.player(player_id).opening_energy = 1
+
+
+## Creates a match that continues from a copy of the given state (AI simulations).
+static func from_state(state: GameState) -> Match:
+	var simulation := Match.new()
+	simulation.restore_snapshot(state)
+	return simulation
 
 
 ## Returns the current runtime state. Callers must treat it as read-only.
@@ -728,6 +738,24 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 					var created := _new_instance(effect.card, player_id)
 					owner.artifacts.add(created)
 					_emit(&"artifact_created", player_id, created.uid)
+		EffectData.Kind.TAKE_CONTROL:
+			if selected != null and selected.owner != player_id:
+				_take_control(selected, player_id)
+
+
+## Moves an enemy unit (and its relic) to the player's board. It cannot attack this turn unless it has Charge.
+func _take_control(unit: CardInstance, player_id: int) -> void:
+	var player := _state.player(player_id)
+	if player.board.size() >= MAX_BOARD_SIZE:
+		return
+	_state.player(unit.owner).board.remove_uid(unit.uid)
+	unit.owner = player_id
+	if unit.relic != null:
+		unit.relic.owner = player_id
+	unit.exhausted = false
+	unit.can_attack = unit.has_keyword(&"charge")
+	player.board.add(unit)
+	_emit(&"control_taken", player_id, unit.uid)
 
 
 func _effect_targets(target_kind: EffectData.Target, player_id: int, source: CardInstance, selected: CardInstance) -> Array[Variant]:
@@ -912,7 +940,11 @@ func _set_ring_holder(player_id: int) -> void:
 
 
 func _controls_alberich(player_id: int) -> bool:
-	var player := _state.player(player_id)
+	return controls_alberich(_state.player(player_id))
+
+
+## Alberich as Leader or on the board: the Ring's full power (also used by the AI evaluation).
+static func controls_alberich(player: PlayerState) -> bool:
 	if player.leader.id == &"alberich":
 		return true
 	for unit: CardInstance in player.board.cards:
@@ -943,21 +975,14 @@ func _has_selected_unit_target(card: CardData) -> bool:
 func _effect_requires_selected_unit(effect: EffectData) -> bool:
 	return (
 		effect.target == EffectData.Target.SELECTED_UNIT
-		and effect.kind in [EffectData.Kind.DEAL_DAMAGE, EffectData.Kind.HEAL, EffectData.Kind.BUFF, EffectData.Kind.TRANSFORM]
+		and effect.kind in [EffectData.Kind.DEAL_DAMAGE, EffectData.Kind.HEAL, EffectData.Kind.BUFF, EffectData.Kind.TRANSFORM, EffectData.Kind.TAKE_CONTROL]
 	)
 
 
 func _is_legal_selected_target(card: CardData, player_id: int, target: CardInstance) -> bool:
 	for ability: AbilityData in card.abilities:
-		for effect: EffectData in ability.effects:
-			if not _effect_requires_selected_unit(effect):
-				continue
-			if target.owner != player_id and _is_hidden(target):
-				return false
-			if effect.kind == EffectData.Kind.DEAL_DAMAGE and target.owner == player_id:
-				return false
-			if effect.kind in [EffectData.Kind.HEAL, EffectData.Kind.BUFF] and target.owner != player_id:
-				return false
+		if not _ability_target_is_legal(ability, player_id, target):
+			return false
 	return true
 
 
@@ -974,10 +999,15 @@ func _ability_target_is_legal(ability: AbilityData, player_id: int, target: Card
 			continue
 		if target.owner != player_id and _is_hidden(target):
 			return false
-		if effect.kind == EffectData.Kind.DEAL_DAMAGE and target.owner == player_id:
+		if effect.kind in [EffectData.Kind.DEAL_DAMAGE, EffectData.Kind.TAKE_CONTROL] and target.owner == player_id:
 			return false
 		if effect.kind in [EffectData.Kind.HEAL, EffectData.Kind.BUFF] and target.owner != player_id:
 			return false
+		if effect.kind == EffectData.Kind.TAKE_CONTROL:
+			if effect.amount > 0 and target.data.cost > effect.amount:
+				return false
+			if _state.player(player_id).board.size() >= MAX_BOARD_SIZE:
+				return false
 	return true
 
 

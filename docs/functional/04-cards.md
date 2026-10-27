@@ -1,7 +1,7 @@
 # Cards
 
 > Card anatomy, types, traits, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-23
+> Status: Draft · Last updated: 2026-10-27
 
 ## Card anatomy
 
@@ -102,10 +102,10 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 | Nibelungs | 9 | 3 | 3 | 15 (done: [`cards/nibelungs.md`](../../cards/nibelungs.md)) |
 | Wälsungs & Heroes | 8 | 5 | 2 | 15 (done: [`cards/walsungs.md`](../../cards/walsungs.md)) |
 | Valkyries | 10 | 4 | 1 | 15 (done: [`cards/valkyries.md`](../../cards/valkyries.md)) |
-| Neutral | 13 | 5 | 2 | 20 (done: [`cards/neutral.md`](../../cards/neutral.md)) |
-| **Total** | | | | **~80** |
+| Neutral | 13 | 6 | 2 | 21 (done: [`cards/neutral.md`](../../cards/neutral.md)) |
+| **Total** | | | | **81** |
 
-Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card deck — enough for several distinct decks per faction. More cards can come with post-launch expansions (e.g. Giants and Gibichungs as factions).
+Each faction has 36 eligible cards (15 faction + 21 Neutral) to build a 20-card deck — enough for several distinct decks per faction. More cards can come with post-launch expansions (e.g. Giants and Gibichungs as factions).
 
 ## Example cards (to validate the format)
 

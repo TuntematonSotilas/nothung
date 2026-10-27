@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_p03lj"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_61btu"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_ljwlt"]
+
+[sub_resource type="Resource" id="Resource_hca8h"]
+script = ExtResource("2_61btu")
+kind = 13
+amount = 4
+
+[sub_resource type="Resource" id="Resource_ct5qr"]
+script = ExtResource("1_p03lj")
+effects = Array[ExtResource("2_61btu")]([SubResource("Resource_hca8h")])
+
+[resource]
+script = ExtResource("3_ljwlt")
+id = &"potion_of_forgetfulness"
+faction = &"neutral"
+type = 1
+rarity = 2
+cost = 5
+abilities = Array[ExtResource("1_p03lj")]([SubResource("Resource_ct5qr")])

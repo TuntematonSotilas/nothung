@@ -1,7 +1,7 @@
 # Lore & setting
 
 > The source material and how it maps onto game content (factions, characters, artifacts, campaign).
-> Status: Draft · Last updated: 2026-10-19
+> Status: Draft · Last updated: 2026-10-27
 
 ## Source material
 
@@ -57,7 +57,7 @@ The eight sisters have no individual story beyond the Ride: their cards can diff
 - **Tarnhelm** — invisibility / transformation; the Nibelungs' Legendary, a Relic any unit can wear (+2/+2, Invisible).
 - **Nothung** — sword, broken then reforged (two-state card): brought in pieces by Brünnhilde, drawn by Siegmund, reforged in a Siegfried deck.
 - **Wotan's spear** — contracts carved on it; enforces rules. The Gods' Legendary artifact: deals 1 damage to the enemy Leader at the start of your turn.
-- **Potion of forgetfulness** — mind control / steal. *Not made yet: it needs a "take control of a unit" effect.*
+- **Potion of forgetfulness** — mind control: the Neutral spell *Potion of Forgetfulness* (5 Energy, Epic) takes control of an enemy unit costing 4 or less, as Hagen's potion turns Siegfried against Brünnhilde. Siegfried himself is a Leader, so the potion takes his companions instead.
 - **Magic fire** — protective barrier around a unit.
 
 ## Canon notes (libretto)

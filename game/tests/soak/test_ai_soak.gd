@@ -89,7 +89,7 @@ func _soak(deck_a: StringName, deck_b: StringName) -> void:
 	])
 
 
-## A starter deck, or "neutral_test": Alberich with each of the 20 Neutral cards once.
+## A starter deck, or "neutral_test": Alberich with 20 of the 21 Neutral cards once (all but Woglinde, a plain 1/2).
 func _deck(deck_id: StringName) -> DeckData:
 	if deck_id != &"neutral_test":
 		return CardDatabase.get_deck(deck_id)
@@ -97,10 +97,55 @@ func _deck(deck_id: StringName) -> DeckData:
 	deck.id = deck_id
 	deck.leader = CardDatabase.get_leader(&"alberich")
 	for card_id: StringName in [
-		&"woglinde", &"woodbird", &"wellgunde", &"flosshilde", &"hundings_kinsmen",
+		&"potion_of_forgetfulness", &"woodbird", &"wellgunde", &"flosshilde", &"hundings_kinsmen",
 		&"gibichung_vassal", &"hunding", &"gutrune", &"gunther", &"erda",
 		&"hagen", &"fasolt", &"fafner", &"rhinegold_lament", &"giants_wage",
 		&"the_norns", &"hagens_call", &"valhalla_in_flames", &"the_rhinegold", &"hagens_spear",
 	]:
 		deck.cards.append(CardDatabase.get_card(card_id))
 	return deck
+
+
+## Each difficulty must beat the one below it, with legal moves only.
+func test_difficulty_ladder() -> void:
+	var normal: AIProfile = AIProfile.preset(AIProfile.Difficulty.NORMAL)
+	var hard: AIProfile = AIProfile.preset(AIProfile.Difficulty.HARD)
+	# A fixed iteration count keeps the soak reproducible and quick (a phone gets ~100 in its time budget).
+	hard.max_iterations = 60
+	hard.time_budget_msec = 0
+	var normal_wins: float = _ladder(normal, AIProfile.preset(AIProfile.Difficulty.EASY), 40)
+	var hard_wins: float = _ladder(hard, normal, 10)
+	assert_float(normal_wins).is_greater(0.6)
+	assert_float(hard_wins).is_greater(0.5)
+
+
+## Share of matches the stronger profile wins, alternating decks (Gods / Nibelungs) and who goes first.
+func _ladder(stronger: AIProfile, weaker: AIProfile, matches: int) -> float:
+	var wins: int = 0
+	for match_index: int in matches:
+		var swap: bool = match_index % 2 == 1
+		var engine := Match.new(
+			_deck(&"nibelungs_starter" if swap else &"gods_starter"),
+			_deck(&"gods_starter" if swap else &"nibelungs_starter"),
+			20261100 + match_index
+		)
+		# Player 0 is the stronger profile unless swapped.
+		var stronger_id: int = 1 if swap else 0
+		var action_count: int = 0
+		while engine.get_state().phase != GameState.Phase.GAME_OVER and action_count < ACTION_LIMIT:
+			var state: GameState = engine.get_state()
+			var player_id: int = state.redraw_player if state.phase == GameState.Phase.REDRAW else state.active_player
+			var profile: AIProfile = stronger if player_id == stronger_id else weaker
+			var selected: Action = Action.from_record(AIPlayer.choose(AIPlayer.prepare(engine, player_id, profile, match_index * 1000 + action_count)))
+			assert_bool(engine.apply(selected)).override_failure_message(
+				"%s AI played an illegal action in ladder match %d: %s" % [
+					AIProfile.Difficulty.keys()[profile.difficulty], match_index, selected.to_record() if selected != null else {},
+				]
+			).is_true()
+			action_count += 1
+		if engine.get_state().winner == stronger_id:
+			wins += 1
+	print("AI ladder %s vs %s: %d / %d wins." % [
+		AIProfile.Difficulty.keys()[stronger.difficulty], AIProfile.Difficulty.keys()[weaker.difficulty], wins, matches,
+	])
+	return float(wins) / matches
