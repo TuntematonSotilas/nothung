@@ -78,7 +78,7 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 > **Decision (2026-10-19):** Rarity of **named characters** depends on their weight in the story, not on having a name.
 > - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm… (Wotan, Alberich and Siegfried are Leaders, not cards)
 >
-> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its forged form count as one sword), Valkyries — *Ride of the Valkyries* (Brünnhilde is the Leader). Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
+> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its forged form count as one sword), Valkyries — *Ride of the Valkyries* (Brünnhilde is the Leader), Neutral — *Hagen*. Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
 > - **Common / Rare / Epic** (by power): the secondary named characters — Fricka, Freia, Donner, Froh, Loge, the eight sister Valkyries, Mime, Sieglinde, the Rhinemaidens…
 >
 > A card named after a character must come from the libretto: no figure from Norse mythology that Wagner does not use ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).
@@ -98,11 +98,11 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 
 | Faction | Units | Spells | Artifacts | Total |
 |---------|-------|--------|-----------|-------|
-| Gods | 10 | 4 | 1 | 15 |
-| Nibelungs | 9 | 3 | 3 | 15 |
+| Gods | 10 | 4 | 1 | 15 (done: [`cards/gods.md`](../../cards/gods.md)) |
+| Nibelungs | 9 | 3 | 3 | 15 (done: [`cards/nibelungs.md`](../../cards/nibelungs.md)) |
 | Wälsungs & Heroes | 8 | 5 | 2 | 15 (done: [`cards/walsungs.md`](../../cards/walsungs.md)) |
 | Valkyries | 10 | 4 | 1 | 15 (done: [`cards/valkyries.md`](../../cards/valkyries.md)) |
-| Neutral | 13 | 5 | 2 | 20 |
+| Neutral | 13 | 5 | 2 | 20 (done: [`cards/neutral.md`](../../cards/neutral.md)) |
 | **Total** | | | | **~80** |
 
 Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card deck — enough for several distinct decks per faction. More cards can come with post-launch expansions (e.g. Giants and Gibichungs as factions).

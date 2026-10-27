@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_ynb8g"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_lhkby"]
+
+[resource]
+script = ExtResource("2_lhkby")
+id = &"fasolt"
+faction = &"neutral"
+subtypes = Array[StringName]([&"giant"])
+rarity = 2
+cost = 6
+attack = 6
+health = 6
+keywords = Array[StringName]([&"guard"])
+leitmotifs = Array[StringName]([&"valhalla"])

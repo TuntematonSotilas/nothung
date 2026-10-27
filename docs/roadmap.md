@@ -89,7 +89,9 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
   - [x] Wälsungs: 15 cards, Leader Siegfried, starter deck
   - [x] One Legendary per faction: Wotan's Spear (Gods), Tarnhelm (Nibelungs), Nothung (Wälsungs); Invisible trait. Balance: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs
   - [x] Valkyries: 15 cards (one per sister, two unnamed heroes), Leader Brünnhilde, Legendary *Ride of the Valkyries*, starter deck. All 12 starter matchups within 40–60 % ([AI soak](technical/09-testing.md#ai-soak))
-  - [ ] Neutral
+  - [x] Neutral: 20 cards (Rhinemaidens, Woodbird, Norns, Erda, Giants, Gibichungs, Hunding), Legendary *Hagen*; Fafner, Hagen and *The Giants' Wage* can take the Ring. Covered by the AI soak with a test deck (Alberich + each Neutral card once)
+  - [x] Gods and Nibelungs up to 15 cards each: Froh, Fricka's Rams, The Wanderer, Rainbow Bridge; Alberich the Toad, Mime's Forge, The Anvils of Nibelheim — 80 cards in all, every starter matchup within 43–57 %
+  - [ ] Potion of forgetfulness (needs a "take control of a unit" effect)
 
 ## 5 — Menus & meta
 

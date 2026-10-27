@@ -52,6 +52,8 @@ const DECK_HEADER: PackedStringArray = ["id", "leader", "cards"]
 const ART_DIRECTORY: String = "res://assets/art/cards"
 ## Display names of subtypes used in generated rules text (e.g. "Bearer: Wälsung.").
 const SUBTYPE_NAMES: Dictionary = {"walsung": "Wälsung"}
+## Display names of factions in generated rules text (e.g. "double against Wälsungs").
+const FACTION_NAMES: Dictionary = {"gods": "Gods", "nibelungs": "Nibelungs", "walsungs": "Wälsungs", "valkyries": "Valkyries"}
 
 var _repo_root: String
 var _errors: Array[String] = []
@@ -698,7 +700,23 @@ func _rules_text(card: CardData) -> String:
 			# Lower-case only the leading "If": card names keep their capitals.
 			trigger += ", %s" % _condition_text(ability.condition).replace("If ", "if ")
 		lines.append("%s: %s" % [trigger, _effect_text(ability.effects[0])])
-	return "\n".join(lines)
+	return "\n".join(_merge_repeated_lines(lines))
+
+
+## Identical consecutive lines become one line with "(×N)", e.g. two resurrect clauses.
+func _merge_repeated_lines(lines: Array[String]) -> Array[String]:
+	var merged: Array[String] = []
+	var counts: Array[int] = []
+	for line: String in lines:
+		if not merged.is_empty() and merged[-1] == line:
+			counts[-1] += 1
+		else:
+			merged.append(line)
+			counts.append(1)
+	for index: int in merged.size():
+		if counts[index] > 1:
+			merged[index] = "%s (×%d)" % [merged[index].trim_suffix("."), counts[index]]
+	return merged
 
 
 func _trigger_text(trigger: StringName) -> String:
@@ -737,7 +755,7 @@ func _effect_text(effect: EffectData) -> String:
 	match effect.kind:
 		EffectData.Kind.DEAL_DAMAGE:
 			if effect.bonus_faction != &"":
-				return "Deal %d damage to %s (double against %s)." % [effect.amount, target, String(effect.bonus_faction).capitalize()]
+				return "Deal %d damage to %s (double against %s)." % [effect.amount, target, FACTION_NAMES.get(String(effect.bonus_faction), String(effect.bonus_faction).capitalize())]
 			return "Deal %d damage to %s." % [effect.amount, target]
 		EffectData.Kind.CREATE_ARTIFACT:
 			return "Put %s into your artifacts." % _referenced_card_name(effect.card)

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_0sojl"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_5qwvh"]
+
+[resource]
+script = ExtResource("2_5qwvh")
+id = &"wellgunde"
+faction = &"neutral"
+subtypes = Array[StringName]([&"rhinemaiden"])
+cost = 2
+attack = 2
+health = 2
+leitmotifs = Array[StringName]([&"rhinegold"])

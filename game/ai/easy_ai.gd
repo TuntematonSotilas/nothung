@@ -184,8 +184,11 @@ static func _effects_value(
 							buff_value += float(target.attack + effect.amount) * 3.0
 					# Buffing an enemy unit helps the opponent.
 					value += buff_value if target.owner == player_id else -buff_value
-			EffectData.Kind.CREATE_RING, EffectData.Kind.STEAL_RING:
-				if state.ring_holder != player_id:
+			EffectData.Kind.CREATE_RING:
+				if state.ring_holder == -1:
+					value += 35.0
+			EffectData.Kind.STEAL_RING:
+				if state.ring_holder == 1 - player_id:
 					value += 35.0
 			EffectData.Kind.RESURRECT:
 				# Worth something only if a Valhalla unit waits in the graveyard and there is room on the board.

@@ -103,7 +103,7 @@ The Ring is a special neutral legendary artifact that enters play only through s
   - **Reduced power** otherwise: +1 Energy.
 - **Curse (every holder, Alberich included):** at the end of each of their turns, the holder loses Life equal to the number of turns they have held it, **capped at 3 per turn**. The count restarts when the Ring changes hands.
 - **Creating the Ring:** only Nibelung cards bring the Ring into play (renunciation of love).
-- **Stealing:** certain effects take the Ring from its holder (Wotan seizing it, Fafner claiming his payment, Hagen's treachery…). Returning it to the Rhine (a specific card) removes it from the game.
+- **Stealing:** certain effects take the Ring from its holder (Wotan seizing it, Fafner claiming his payment, Hagen's treachery…): today *Fafner*, *Hagen* and *The Giants' Wage* (Neutral). Taking only works when the opponent holds the Ring; it never creates it. Returning it to the Rhine (a specific card) removes it from the game.
 
 > **Decision (2026-10-09):** The Ring is not present by default; it enters play only through specific cards in a deck.
 

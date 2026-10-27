@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_8foid"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_qbe5w"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_miner.tres" id="3_ps3h1"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="4_43mkb"]
+
+[sub_resource type="Resource" id="Resource_ucni3"]
+script = ExtResource("2_qbe5w")
+kind = 3
+card = ExtResource("3_ps3h1")
+
+[sub_resource type="Resource" id="Resource_cr3p3"]
+script = ExtResource("1_8foid")
+trigger = &"start_of_turn"
+effects = Array[ExtResource("2_qbe5w")]([SubResource("Resource_ucni3")])
+
+[resource]
+script = ExtResource("4_43mkb")
+id = &"anvils_of_nibelheim"
+faction = &"nibelungs"
+type = 2
+rarity = 1
+cost = 3
+abilities = Array[ExtResource("1_8foid")]([SubResource("Resource_cr3p3")])

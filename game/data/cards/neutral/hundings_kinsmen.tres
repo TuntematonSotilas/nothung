@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_5rneh"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_tok12"]
+
+[resource]
+script = ExtResource("2_tok12")
+id = &"hundings_kinsmen"
+faction = &"neutral"
+subtypes = Array[StringName]([&"human"])
+cost = 2
+attack = 2
+health = 2
+keywords = Array[StringName]([&"charge"])

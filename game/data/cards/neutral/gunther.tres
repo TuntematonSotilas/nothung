@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_0g7ui"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_hxvb1"]
+
+[resource]
+script = ExtResource("2_hxvb1")
+id = &"gunther"
+faction = &"neutral"
+subtypes = Array[StringName]([&"gibichung"])
+rarity = 1
+cost = 4
+attack = 3
+health = 5
+keywords = Array[StringName]([&"guard"])

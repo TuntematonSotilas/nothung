@@ -213,6 +213,25 @@ Retained matrix (row deck's win rate, 400 matches each; average length 8.0–9.5
 | Wälsungs | 53 % | 45 % | — | 53 % |
 | Valkyries | 60 % | 47 % | 47 % | — |
 
+**Neutral cards (2026-10-27).** No starter deck contains Neutral cards, so the soak test adds a **Neutral test deck**: Alberich with each of the 20 Neutral cards once, against the Gods and Nibelungs starters. It checks that the AI only plays legal Neutral actions (Ring theft, relic, double summons, damage to all units). As a pure-Neutral deck it wins about a third of its matches (32.5 % vs Gods, 35 % vs Nibelungs, 40 matches each), which is expected: Neutral cards complete a faction deck. Their real balance comes with built decks (milestone 5).
+
+**Gods and Nibelungs at 15 cards (2026-10-27).** New cards in the starter decks: Gods — *The Wanderer* (replacing a *Fricka*) and *Rainbow Bridge* (replacing the last *Blessing of Valhalla*); Nibelungs — *Alberich, the Toad* (replacing a *Nibelung Miner*) and *The Anvils of Nibelheim* (replacing an *Alberich's Whip*). *Froh*, *Fricka's Rams* and *Mime's Forge* stay in the card pool. Variants (400 matches per pairing):
+
+| Variant | Gods vs Nibelungs | Gods vs Wälsungs | Gods vs Valkyries |
+|---------|-------------------|------------------|-------------------|
+| Wanderer 4/5 draws 2, Rainbow Bridge +0/+2, Toad 2/2, Anvils cost 4 | 68 % | 58 % | 59 % |
+| Wanderer 4/4 draws 1, Rainbow Bridge +0/+1 | 64 % | 53 % | 50 % |
+| **+ Toad 2/3, Anvils cost 3 — retained** | **57 %** | **53 %** | **50 %** |
+
+Retained matrix (row deck's win rate, 400 matches each; 8.0–9.5 turns per player):
+
+| | vs Gods | vs Nibelungs | vs Wälsungs | vs Valkyries |
+|---|---|---|---|---|
+| Gods | — | 57 % | 53 % | 50 % |
+| Nibelungs | 43 % | — | 56 % | 55 % |
+| Wälsungs | 47 % | 44 % | — | 53 % |
+| Valkyries | 50 % | 45 % | 47 % | — |
+
 ## Manual test checklist (release)
 
 - [ ] Install on reference device + one low-end device + one tall-aspect (20:9+) device

@@ -712,7 +712,9 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 			if source != null and source.data.faction == &"nibelungs" and _state.ring_holder == -1:
 				_set_ring_holder(player_id)
 		EffectData.Kind.STEAL_RING:
-			_set_ring_holder(player_id)
+			# Only takes an existing Ring from the other player: stealing never creates it.
+			if _state.ring_holder == 1 - player_id:
+				_set_ring_holder(player_id)
 		EffectData.Kind.RETURN_RING:
 			_set_ring_holder(-1)
 		EffectData.Kind.RESURRECT:

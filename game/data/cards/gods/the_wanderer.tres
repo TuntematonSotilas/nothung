@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_5w266"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_mqy0m"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_3y4rl"]
+
+[sub_resource type="Resource" id="Resource_f6w2s"]
+script = ExtResource("2_mqy0m")
+kind = 1
+amount = 1
+
+[sub_resource type="Resource" id="Resource_j4jho"]
+script = ExtResource("1_5w266")
+effects = Array[ExtResource("2_mqy0m")]([SubResource("Resource_f6w2s")])
+
+[resource]
+script = ExtResource("3_3y4rl")
+id = &"the_wanderer"
+faction = &"gods"
+subtypes = Array[StringName]([&"god"])
+rarity = 2
+cost = 5
+attack = 4
+health = 4
+abilities = Array[ExtResource("1_5w266")]([SubResource("Resource_j4jho")])
+leitmotifs = Array[StringName]([&"wisdom"])

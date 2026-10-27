@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_klrfk"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_n1x80"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_fp4hl"]
+
+[sub_resource type="Resource" id="Resource_tkr8p"]
+script = ExtResource("2_n1x80")
+kind = 8
+
+[sub_resource type="Resource" id="Resource_43wie"]
+script = ExtResource("1_klrfk")
+effects = Array[ExtResource("2_n1x80")]([SubResource("Resource_tkr8p")])
+
+[resource]
+script = ExtResource("3_fp4hl")
+id = &"fafner"
+faction = &"neutral"
+subtypes = Array[StringName]([&"giant"])
+rarity = 2
+cost = 7
+attack = 7
+health = 7
+abilities = Array[ExtResource("1_klrfk")]([SubResource("Resource_43wie")])
+leitmotifs = Array[StringName]([&"curse"])

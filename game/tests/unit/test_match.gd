@@ -22,7 +22,7 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 
 
 func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
-	assert_int(CardDatabase.card_count()).is_equal(53)
+	assert_int(CardDatabase.card_count()).is_equal(80)
 	var gods_deck: DeckData = CardDatabase.get_deck(&"gods_starter")
 	var nibelungs_deck: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
 	for deck_id: StringName in [&"gods_starter", &"nibelungs_starter", &"walsungs_starter", &"valkyries_starter"]:
@@ -371,6 +371,25 @@ func test_ring_bonus_and_stealing_reset_its_curse_counter() -> void:
 
 	assert_bool(engine.apply(PlayCardAction.new(1, spell.uid))).is_true()
 	assert_int(state.ring_holder).is_equal(1)
+	assert_int(state.ring_turns_held).is_equal(0)
+
+
+func test_hagen_takes_the_ring_only_from_the_opponent_and_never_creates_it() -> void:
+	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 175)
+	_prepare_main_phase(engine)
+	var state := engine.get_state()
+	var hagen := CardInstance.new(CardDatabase.get_card(&"hagen"), 0, 176)
+	var wage := CardInstance.new(CardDatabase.get_card(&"giants_wage"), 0, 177)
+	state.player(0).hand.add(hagen)
+	state.player(0).hand.add(wage)
+	# Nobody holds the Ring: taking it does nothing.
+	assert_bool(engine.apply(PlayCardAction.new(0, wage.uid))).is_true()
+	assert_int(state.ring_holder).is_equal(-1)
+	# The opponent holds it: Hagen takes it.
+	state.ring_holder = 1
+	state.ring_turns_held = 3
+	assert_bool(engine.apply(PlayCardAction.new(0, hagen.uid))).is_true()
+	assert_int(state.ring_holder).is_equal(0)
 	assert_int(state.ring_turns_held).is_equal(0)
 
 

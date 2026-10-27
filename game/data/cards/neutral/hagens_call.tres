@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_nh151"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_n2gmw"]
+[ext_resource type="Resource" path="res://data/cards/neutral/gibichung_vassal.tres" id="3_0k5cv"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="4_clm8h"]
+
+[sub_resource type="Resource" id="Resource_ypp1g"]
+script = ExtResource("2_n2gmw")
+kind = 3
+card = ExtResource("3_0k5cv")
+
+[sub_resource type="Resource" id="Resource_8vsvk"]
+script = ExtResource("1_nh151")
+effects = Array[ExtResource("2_n2gmw")]([SubResource("Resource_ypp1g")])
+
+[sub_resource type="Resource" id="Resource_2atre"]
+script = ExtResource("2_n2gmw")
+kind = 3
+card = ExtResource("3_0k5cv")
+
+[sub_resource type="Resource" id="Resource_05sva"]
+script = ExtResource("1_nh151")
+effects = Array[ExtResource("2_n2gmw")]([SubResource("Resource_2atre")])
+
+[resource]
+script = ExtResource("4_clm8h")
+id = &"hagens_call"
+faction = &"neutral"
+type = 1
+cost = 4
+abilities = Array[ExtResource("1_nh151")]([SubResource("Resource_8vsvk"), SubResource("Resource_05sva")])

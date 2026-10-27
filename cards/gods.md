@@ -13,3 +13,7 @@
 | donners_hammer | Donner's Hammer | spell | | rare | 4 | | | | | on_play: damage(selected_unit, 3) | thunder | "Heda! Heda! Hedo!" — Donner, Das Rheingold |
 | donner | Donner | unit | god | rare | 4 | 4 | 4 | | | on_play: damage(enemy_leader, 2) | thunder | "Sultry vapours hang in the air." — Donner, Das Rheingold |
 | wotans_spear | Wotan's Spear | artifact | weapon | legendary | 5 | | | | | start_of_turn: damage(enemy_leader, 1) | valhalla | "What you are, you are only through treaties." — Fasolt, Das Rheingold |
+| frickas_rams | Fricka's Rams | unit | beast | common | 2 | 3 | 1 | charge | | | | |
+| froh | Froh | unit | god | common | 3 | 2 | 4 | | | on_play: heal(friendly_leader, 2) | valhalla | |
+| the_wanderer | The Wanderer | unit | god | epic | 5 | 4 | 4 | | | on_play: draw(1) | wisdom | "The world calls me Wanderer." — The Wanderer, Siegfried |
+| rainbow_bridge | Rainbow Bridge | spell | | rare | 3 | | | | | on_play: buff(all_friendly_units, 0, 1) | valhalla | "The bridge leads to the castle, light but firm beneath your feet." — Froh, Das Rheingold |

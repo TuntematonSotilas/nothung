@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_7nrge"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_ubwgc"]
+
+[resource]
+script = ExtResource("2_ubwgc")
+id = &"gibichung_vassal"
+faction = &"neutral"
+subtypes = Array[StringName]([&"gibichung"])
+cost = 2
+attack = 2
+health = 3

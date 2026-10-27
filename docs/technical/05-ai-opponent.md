@@ -24,7 +24,7 @@ func choose_action(state: GameState, legal: Array[Action]) -> Action
 
 ## Approach (incremental)
 
-1. **v0 — Easy heuristic (implemented)**: score legal actions using own-card value, board trades, lethal attacks, play effects and Ring value; select the highest score. Effects are scored only when their condition will be met, buffs on enemy units and damage to own units count as losses, Charge on a unit that could not attack is valued as an attack, and faction damage bonuses (Spear-breaker) are counted. *Resurrect* is worth something only when a Valhalla unit waits in the graveyard and the board has room; *return the Ring* only when the opponent holds it.
+1. **v0 — Easy heuristic (implemented)**: score legal actions using own-card value, board trades, lethal attacks, play effects and Ring value; select the highest score. Effects are scored only when their condition will be met, buffs on enemy units and damage to own units count as losses, Charge on a unit that could not attack is valued as an attack, and faction damage bonuses (Spear-breaker) are counted. *Resurrect* is worth something only when a Valhalla unit waits in the graveyard and the board has room; *return the Ring* and *take the Ring* only when the opponent holds it (taking never creates it).
 2. **v1 — Greedy heuristic**: for each legal action, simulate on a copy of the state, score with an evaluation function, pick the best. Repeat until `EndTurn` is best.
 3. **v2 — Turn planning**: search sequences of actions within the turn (beam search / limited depth), still with a heuristic evaluation.
 4. *(Optional)* **v3 — Determinised MCTS** for Hard difficulty.

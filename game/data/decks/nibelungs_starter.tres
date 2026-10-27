@@ -1,22 +1,24 @@
 [gd_resource type="Resource" script_class="DeckData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_i4ltl"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_miner.tres" id="2_ewfd0"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/mime.tres" id="3_wmbsc"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/hoard_bearers.tres" id="4_2atle"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/smiths_of_nibelheim.tres" id="5_g7khu"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_host.tres" id="6_fdpia"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_hoard.tres" id="7_tp8wh"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/alberichs_whip.tres" id="8_2la6w"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/alberichs_curse.tres" id="9_dbgbo"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/mimes_brew.tres" id="10_ve8ds"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/giant_serpent.tres" id="11_eviku"]
-[ext_resource type="Resource" path="res://data/cards/nibelungs/tarnhelm.tres" id="12_e8kgu"]
-[ext_resource type="Resource" path="res://data/leaders/alberich.tres" id="13_5xks2"]
-[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="14_i4jdg"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_wmbsc"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_miner.tres" id="2_2atle"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/mime.tres" id="3_g7khu"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/hoard_bearers.tres" id="4_fdpia"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/smiths_of_nibelheim.tres" id="5_tp8wh"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_host.tres" id="6_2la6w"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_hoard.tres" id="7_dbgbo"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/alberichs_whip.tres" id="8_ve8ds"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/alberichs_curse.tres" id="9_eviku"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/mimes_brew.tres" id="10_e8kgu"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/giant_serpent.tres" id="11_5xks2"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/alberich_toad.tres" id="12_i4jdg"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/tarnhelm.tres" id="13_y8oic"]
+[ext_resource type="Resource" path="res://data/cards/nibelungs/anvils_of_nibelheim.tres" id="14_bu7ms"]
+[ext_resource type="Resource" path="res://data/leaders/alberich.tres" id="15_yrnxm"]
+[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="16_rs5md"]
 
 [resource]
-script = ExtResource("14_i4jdg")
+script = ExtResource("16_rs5md")
 id = &"nibelungs_starter"
-leader = ExtResource("13_5xks2")
-cards = Array[ExtResource("1_i4ltl")]([ExtResource("2_ewfd0"), ExtResource("3_wmbsc"), ExtResource("4_2atle"), ExtResource("5_g7khu"), ExtResource("6_fdpia"), ExtResource("7_tp8wh"), ExtResource("8_2la6w"), ExtResource("9_dbgbo"), ExtResource("10_ve8ds"), ExtResource("11_eviku"), ExtResource("2_ewfd0"), ExtResource("3_wmbsc"), ExtResource("4_2atle"), ExtResource("5_g7khu"), ExtResource("6_fdpia"), ExtResource("12_e8kgu"), ExtResource("8_2la6w"), ExtResource("9_dbgbo"), ExtResource("10_ve8ds"), ExtResource("11_eviku")])
+leader = ExtResource("15_yrnxm")
+cards = Array[ExtResource("1_wmbsc")]([ExtResource("2_2atle"), ExtResource("3_g7khu"), ExtResource("4_fdpia"), ExtResource("5_tp8wh"), ExtResource("6_2la6w"), ExtResource("7_dbgbo"), ExtResource("8_ve8ds"), ExtResource("9_eviku"), ExtResource("10_e8kgu"), ExtResource("11_5xks2"), ExtResource("12_i4jdg"), ExtResource("3_g7khu"), ExtResource("4_fdpia"), ExtResource("5_tp8wh"), ExtResource("6_2la6w"), ExtResource("13_y8oic"), ExtResource("14_bu7ms"), ExtResource("9_eviku"), ExtResource("10_e8kgu"), ExtResource("11_5xks2")])

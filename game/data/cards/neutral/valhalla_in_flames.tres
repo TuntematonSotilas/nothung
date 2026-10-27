@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_h15sy"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_8fkl4"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_6md1f"]
+
+[sub_resource type="Resource" id="Resource_jryvr"]
+script = ExtResource("2_8fkl4")
+target = 6
+amount = 2
+
+[sub_resource type="Resource" id="Resource_hikjl"]
+script = ExtResource("1_h15sy")
+effects = Array[ExtResource("2_8fkl4")]([SubResource("Resource_jryvr")])
+
+[resource]
+script = ExtResource("3_6md1f")
+id = &"valhalla_in_flames"
+faction = &"neutral"
+type = 1
+rarity = 2
+cost = 6
+abilities = Array[ExtResource("1_h15sy")]([SubResource("Resource_hikjl")])
+leitmotifs = Array[StringName]([&"valhalla"])

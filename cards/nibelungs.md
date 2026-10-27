@@ -14,3 +14,6 @@
 | mimes_brew | Mime's Brew | spell | | rare | 3 | | | | | on_play: damage(selected_unit, 3) | | |
 | giant_serpent | The Giant Serpent | unit | beast | rare | 5 | 5 | 5 | | | | tarnhelm | |
 | tarnhelm | Tarnhelm | artifact | relic | legendary | 2 | 2 | 2 | invisible | | | ring | "Night and mist, like no one!" — Alberich, Das Rheingold |
+| alberich_toad | Alberich, the Toad | unit | dwarf | epic | 2 | 2 | 3 | invisible | | | ring | "There, the toad — seize it quickly!" — Loge, Das Rheingold |
+| mimes_forge | Mime's Forge | artifact | | common | 2 | | | | | start_of_turn: heal(friendly_leader, 1) | | |
+| anvils_of_nibelheim | The Anvils of Nibelheim | artifact | | rare | 3 | | | | | start_of_turn: summon(nibelung_miner) | | |

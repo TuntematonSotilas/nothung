@@ -10,6 +10,9 @@ const PAIRINGS: Array = [
 	[&"valkyries_starter", &"gods_starter"],
 	[&"valkyries_starter", &"nibelungs_starter"],
 	[&"valkyries_starter", &"walsungs_starter"],
+	# Neutral cards are in no starter deck: a test deck plays each of them once.
+	[&"neutral_test", &"gods_starter"],
+	[&"neutral_test", &"nibelungs_starter"],
 ]
 
 
@@ -30,8 +33,8 @@ func _soak(deck_a: StringName, deck_b: StringName) -> void:
 		var first_deck_id: StringName = deck_a if a_first else deck_b
 		var second_deck_id: StringName = deck_b if a_first else deck_a
 		var engine := Match.new(
-			CardDatabase.get_deck(first_deck_id),
-			CardDatabase.get_deck(second_deck_id),
+			_deck(first_deck_id),
+			_deck(second_deck_id),
 			20261000 + match_index
 		)
 		var action_count: int = 0
@@ -84,3 +87,20 @@ func _soak(deck_a: StringName, deck_b: StringName) -> void:
 		float(deck_wins[deck_a]) * 100.0 / MATCH_COUNT,
 		float(deck_wins[deck_b]) * 100.0 / MATCH_COUNT,
 	])
+
+
+## A starter deck, or "neutral_test": Alberich with each of the 20 Neutral cards once.
+func _deck(deck_id: StringName) -> DeckData:
+	if deck_id != &"neutral_test":
+		return CardDatabase.get_deck(deck_id)
+	var deck := DeckData.new()
+	deck.id = deck_id
+	deck.leader = CardDatabase.get_leader(&"alberich")
+	for card_id: StringName in [
+		&"woglinde", &"woodbird", &"wellgunde", &"flosshilde", &"hundings_kinsmen",
+		&"gibichung_vassal", &"hunding", &"gutrune", &"gunther", &"erda",
+		&"hagen", &"fasolt", &"fafner", &"rhinegold_lament", &"giants_wage",
+		&"the_norns", &"hagens_call", &"valhalla_in_flames", &"the_rhinegold", &"hagens_spear",
+	]:
+		deck.cards.append(CardDatabase.get_card(card_id))
+	return deck
