@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="LeaderData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_aamyt"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/fallen_hero.tres" id="2_hm683"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="3_l81jn"]
+[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="4_oim4q"]
+
+[sub_resource type="Resource" id="Resource_w26i2"]
+script = ExtResource("1_aamyt")
+kind = 3
+card = ExtResource("2_hm683")
+
+[sub_resource type="Resource" id="Resource_87gu5"]
+script = ExtResource("3_l81jn")
+cost = 3
+effects = Array[ExtResource("1_aamyt")]([SubResource("Resource_w26i2")])
+
+[resource]
+script = ExtResource("4_oim4q")
+id = &"brunnhilde"
+faction = &"valkyries"
+ability = SubResource("Resource_87gu5")

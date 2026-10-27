@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_q8vp6"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_rihae"]
+
+[resource]
+script = ExtResource("2_rihae")
+id = &"helmwige"
+faction = &"valkyries"
+subtypes = Array[StringName]([&"valkyrie"])
+rarity = 1
+cost = 4
+attack = 4
+health = 4
+keywords = Array[StringName]([&"flying"])
+leitmotifs = Array[StringName]([&"ride"])

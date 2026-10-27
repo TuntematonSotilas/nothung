@@ -78,7 +78,7 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 > **Decision (2026-10-19):** Rarity of **named characters** depends on their weight in the story, not on having a name.
 > - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm… (Wotan, Alberich and Siegfried are Leaders, not cards)
 >
-> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its forged form count as one sword). Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
+> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its forged form count as one sword), Valkyries — *Ride of the Valkyries* (Brünnhilde is the Leader). Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
 > - **Common / Rare / Epic** (by power): the secondary named characters — Fricka, Freia, Donner, Froh, Loge, the eight sister Valkyries, Mime, Sieglinde, the Rhinemaidens…
 >
 > A card named after a character must come from the libretto: no figure from Norse mythology that Wagner does not use ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).
@@ -101,7 +101,7 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 | Gods | 10 | 4 | 1 | 15 |
 | Nibelungs | 9 | 3 | 3 | 15 |
 | Wälsungs & Heroes | 8 | 5 | 2 | 15 (done: [`cards/walsungs.md`](../../cards/walsungs.md)) |
-| Valkyries | 10 | 4 | 1 | 15 |
+| Valkyries | 10 | 4 | 1 | 15 (done: [`cards/valkyries.md`](../../cards/valkyries.md)) |
 | Neutral | 13 | 5 | 2 | 20 |
 | **Total** | | | | **~80** |
 
@@ -113,7 +113,7 @@ Each faction has 35 eligible cards (15 faction + 20 Neutral) to build a 20-card 
 |------|------|------|---------|-------|------|
 | Alberich, Lord of the Nibelungs | 4 | Unit — Dwarf | Nibelungs | 3/4 | On play: gain 2 Energy. If you hold the Ring, draw a card. |
 | Fafner | 8 | Unit — Giant | Neutral | 8/8 | Guard. Cannot attack the turn after it attacks. |
-| Ride of the Valkyries | 5 | Spell | Valkyries | – | Return up to 2 Valhalla units from your graveyard to the board. |
+| Ride of the Valkyries | 5 | Spell — Legendary | Valkyries | – | Return up to 2 Valhalla units from your graveyard to the board. |
 | Loge | 4 | Unit — God | Gods | 2/3 | On play: deal 2 damage to all enemy units. |
 
 ## Signature cards (libretto rules)

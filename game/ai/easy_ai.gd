@@ -188,7 +188,19 @@ static func _effects_value(
 				if state.ring_holder != player_id:
 					value += 35.0
 			EffectData.Kind.RESURRECT:
-				value += 20.0
+				# Worth something only if a Valhalla unit waits in the graveyard and there is room on the board.
+				var own: PlayerState = state.player(player_id)
+				if own.board.size() < Match.MAX_BOARD_SIZE:
+					for card: CardInstance in own.graveyard.cards:
+						if card.data.is_unit() and card.data.keywords.has(&"valhalla"):
+							value += 10.0 + _unit_value(card.data) * 2.0
+							break
+			EffectData.Kind.RETURN_RING:
+				# Taking the Ring away from the opponent is good; giving up your own is not.
+				if state.ring_holder == 1 - player_id:
+					value += 30.0
+				elif state.ring_holder == player_id:
+					value -= 30.0
 			EffectData.Kind.FORGE_CARD:
 				value += 15.0
 				if effect.card != null:

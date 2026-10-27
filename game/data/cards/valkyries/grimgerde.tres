@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_3nx2w"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_5no56"]
+
+[resource]
+script = ExtResource("2_5no56")
+id = &"grimgerde"
+faction = &"valkyries"
+subtypes = Array[StringName]([&"valkyrie"])
+cost = 4
+attack = 3
+health = 5
+keywords = Array[StringName]([&"guard"])
+leitmotifs = Array[StringName]([&"ride"])

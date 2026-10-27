@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-10-26
+> Status: Draft · Last updated: 2026-10-27
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -17,17 +17,18 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | In progress |
 | 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | To do |
-| 6 | [Campaign](#6--campaign) | Prologue + chapter 1 playable | To do |
-| 7 | [Release](#7--release) | Internal build on Google Play | To do |
+| 6 | [Test matches](#6--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
+| 7 | [Campaign](#7--campaign) | Prologue + chapter 1 playable | To do |
+| 8 | [Release](#8--release) | Internal build on Google Play | To do |
 | – | [Art & audio track](#art--audio-track-in-parallel) | Runs in parallel, no code dependency | In progress |
 
 ```mermaid
 flowchart LR
     M0[0 Foundations] --> M1[1 Rules engine] --> M3[3 Playable match]
     M0 --> M2[2 Card pipeline] --> M3
-    M3 --> M4[4 AI & balancing] --> M5[5 Menus & meta] --> M6[6 Campaign] --> M7[7 Release]
+    M3 --> M4[4 AI & balancing] --> M5[5 Menus & meta] --> M6[6 Test matches] --> M7[7 Campaign] --> M8[8 Release]
     ART[Art & audio track] -.-> M3
-    ART -.-> M7
+    ART -.-> M8
 ```
 
 ## 0 — Foundations
@@ -84,11 +85,10 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] AI vs AI soak tests: no crash, no illegal move ([testing](technical/09-testing.md))
 - [x] Match-length and win-rate stats per starter deck ([AI soak baseline](technical/09-testing.md#ai-soak))
 - [x] Tune Götterdämmerung start from the stats: stays at turn 10 (fires in 45–58 % of matches, 8.7–9.6 turns per player) ([AI soak](technical/09-testing.md#ai-soak))
-- [ ] Tune the Ring curse once a starter deck creates the Ring
 - [ ] Remaining cards to ~80 (4 factions + Neutral) ([cards](functional/04-cards.md))
   - [x] Wälsungs: 15 cards, Leader Siegfried, starter deck
   - [x] One Legendary per faction: Wotan's Spear (Gods), Tarnhelm (Nibelungs), Nothung (Wälsungs); Invisible trait. Balance: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs
-  - [ ] Valkyries
+  - [x] Valkyries: 15 cards (one per sister, two unnamed heroes), Leader Brünnhilde, Legendary *Ride of the Valkyries*, starter deck. All 12 starter matchups within 40–60 % ([AI soak](technical/09-testing.md#ai-soak))
   - [ ] Neutral
 
 ## 5 — Menus & meta
@@ -101,7 +101,14 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [ ] Settings: audio, language, animation speed, text size
 - [ ] Achievements
 
-## 6 — Campaign
+## 6 — Test matches
+
+Real matches on the phone, once the deck choice of milestone 5 exists.
+
+- [ ] Test a match with artifacts: play *Wotan's Spear* and *The Valkyrie Rock*, attach the *Tarnhelm* (Invisible) and *Nothung*, check that Nothung shatters and is reforged (Siegmund, *Notung! Notung!*)
+- [ ] Test a match with the Ring: forge it with *Renunciation of Love* (Nibelungs), check the holder's bonus (+2 Energy and 1 card with Alberich, +1 Energy otherwise), the curse at the end of each of the holder's turns (1, 2, 3, then 3 Life) and *Waltraute* sending it back to the Rhine; then tune the curse from these matches and the AI soak
+
+## 7 — Campaign
 
 - [ ] Chapter map, story panels
 - [ ] Campaign duels with fixed opponents and special rules; AI personalities
@@ -109,7 +116,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [ ] Tutorial in the *Rheingold* prologue
 - [ ] Prologue + chapter 1 (*Die Walküre*), then chapters 2–3 and the epilogue
 
-## 7 — Release
+## 8 — Release
 
 - [ ] Final art for every card (no placeholder left) ([artwork policy](tools/art-tools.md#artwork-policy))
 - [ ] Store listing: 512 × 512 icon, feature graphic, screenshots, descriptions in EN / DE / ES / FR

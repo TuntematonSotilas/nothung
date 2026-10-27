@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_wirj5"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="2_l1nsu"]
+
+[resource]
+script = ExtResource("2_l1nsu")
+id = &"slain_warrior"
+faction = &"valkyries"
+subtypes = Array[StringName]([&"hero"])
+cost = 3
+attack = 3
+health = 3
+keywords = Array[StringName]([&"valhalla"])
+leitmotifs = Array[StringName]([&"valhalla"])

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_8q8kb"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_oq442"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_6f1dy"]
+
+[sub_resource type="Resource" id="Resource_2axp1"]
+script = ExtResource("2_oq442")
+kind = 5
+target = 4
+amount = 1
+
+[sub_resource type="Resource" id="Resource_kh0bx"]
+script = ExtResource("1_8q8kb")
+effects = Array[ExtResource("2_oq442")]([SubResource("Resource_2axp1")])
+
+[resource]
+script = ExtResource("3_6f1dy")
+id = &"hojotoho"
+faction = &"valkyries"
+type = 1
+cost = 2
+abilities = Array[ExtResource("1_8q8kb")]([SubResource("Resource_kh0bx")])
+leitmotifs = Array[StringName]([&"ride"])

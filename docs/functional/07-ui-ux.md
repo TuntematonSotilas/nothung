@@ -78,7 +78,7 @@ flowchart TD
 ```
 
 - **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
-- Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*, Siegfried — *Spear-breaker*.
+- Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*, Siegfried — *Spear-breaker*, Brünnhilde — *Chooser of the Slain*.
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
 - **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.
 - **Play areas wrap**: when units do not fit on one line (up to 6 per side), they continue on a second line instead of widening the screen.

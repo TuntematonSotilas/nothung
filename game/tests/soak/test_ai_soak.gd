@@ -7,6 +7,9 @@ const PAIRINGS: Array = [
 	[&"gods_starter", &"nibelungs_starter"],
 	[&"walsungs_starter", &"gods_starter"],
 	[&"walsungs_starter", &"nibelungs_starter"],
+	[&"valkyries_starter", &"gods_starter"],
+	[&"valkyries_starter", &"nibelungs_starter"],
+	[&"valkyries_starter", &"walsungs_starter"],
 ]
 
 

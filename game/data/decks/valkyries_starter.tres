@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="DeckData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="1_4f377"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/gerhilde.tres" id="2_aqn20"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/rossweisse.tres" id="3_df4hl"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/ortlinde.tres" id="4_sgllj"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/grimgerde.tres" id="5_5jfu5"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/fallen_hero.tres" id="6_gswww"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/schwertleite.tres" id="7_nwisk"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/slain_warrior.tres" id="8_mp5se"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/siegrune.tres" id="9_tejhj"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/helmwige.tres" id="10_xybhm"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/waltraute.tres" id="11_rbign"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/hojotoho.tres" id="12_pa0hd"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/magic_fire.tres" id="13_tu8ma"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/annunciation_of_death.tres" id="14_e0hin"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/ride_of_the_valkyries.tres" id="15_kg8wj"]
+[ext_resource type="Resource" path="res://data/leaders/brunnhilde.tres" id="16_lbsuv"]
+[ext_resource type="Script" path="res://data/decks/deck_data.gd" id="17_b8s27"]
+
+[resource]
+script = ExtResource("17_b8s27")
+id = &"valkyries_starter"
+leader = ExtResource("16_lbsuv")
+cards = Array[ExtResource("1_4f377")]([ExtResource("2_aqn20"), ExtResource("2_aqn20"), ExtResource("3_df4hl"), ExtResource("3_df4hl"), ExtResource("4_sgllj"), ExtResource("5_5jfu5"), ExtResource("6_gswww"), ExtResource("6_gswww"), ExtResource("7_nwisk"), ExtResource("7_nwisk"), ExtResource("8_mp5se"), ExtResource("8_mp5se"), ExtResource("9_tejhj"), ExtResource("9_tejhj"), ExtResource("10_xybhm"), ExtResource("11_rbign"), ExtResource("12_pa0hd"), ExtResource("13_tu8ma"), ExtResource("14_e0hin"), ExtResource("15_kg8wj")])

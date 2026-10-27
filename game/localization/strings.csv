@@ -195,3 +195,58 @@ When its bearer dies, it shatters into Nothung (broken)."
 "CARD_TARNHELM_FLAVOUR","""Night and mist, like no one!"" — Alberich, Das Rheingold","""Night and mist, like no one!"" — Alberich, Das Rheingold","""Night and mist, like no one!"" — Alberich, Das Rheingold","""Night and mist, like no one!"" — Alberich, Das Rheingold"
 "CARD_WOTANS_SPEAR_RULES","At the start of your turn: Deal 1 damage to the enemy Leader.","At the start of your turn: Deal 1 damage to the enemy Leader.","At the start of your turn: Deal 1 damage to the enemy Leader.","At the start of your turn: Deal 1 damage to the enemy Leader."
 "CARD_TARNHELM_RULES","Bearer gets +2/+2 and Invisible.","Bearer gets +2/+2 and Invisible.","Bearer gets +2/+2 and Invisible.","Bearer gets +2/+2 and Invisible."
+"CARD_GERHILDE_NAME","Gerhilde","Gerhilde","Gerhilde","Gerhilde"
+"CARD_GERHILDE_FLAVOUR","""Hojotoho! Heiaha!"" — Gerhilde, Die Walküre","""Hojotoho! Heiaha!"" — Gerhilde, Die Walküre","""Hojotoho! Heiaha!"" — Gerhilde, Die Walküre","""Hojotoho! Heiaha!"" — Gerhilde, Die Walküre"
+"CARD_ROSSWEISSE_NAME","Rossweisse","Rossweisse","Rossweisse","Rossweisse"
+"CARD_ORTLINDE_NAME","Ortlinde","Ortlinde","Ortlinde","Ortlinde"
+"CARD_FALLEN_HERO_NAME","Fallen Hero","Fallen Hero","Fallen Hero","Fallen Hero"
+"CARD_SCHWERTLEITE_NAME","Schwertleite","Schwertleite","Schwertleite","Schwertleite"
+"CARD_SLAIN_WARRIOR_NAME","Slain Warrior","Slain Warrior","Slain Warrior","Slain Warrior"
+"CARD_SIEGRUNE_NAME","Siegrune","Siegrune","Siegrune","Siegrune"
+"CARD_GRIMGERDE_NAME","Grimgerde","Grimgerde","Grimgerde","Grimgerde"
+"CARD_HELMWIGE_NAME","Helmwige","Helmwige","Helmwige","Helmwige"
+"CARD_WALTRAUTE_NAME","Waltraute","Waltraute","Waltraute","Waltraute"
+"CARD_HOJOTOHO_NAME","Hojotoho!","Hojotoho!","Hojotoho!","Hojotoho!"
+"CARD_HOJOTOHO_FLAVOUR","""Hojotoho! Hojotoho! Heiaha!"" — Brünnhilde, Die Walküre","""Hojotoho! Hojotoho! Heiaha!"" — Brünnhilde, Die Walküre","""Hojotoho! Hojotoho! Heiaha!"" — Brünnhilde, Die Walküre","""Hojotoho! Hojotoho! Heiaha!"" — Brünnhilde, Die Walküre"
+"CARD_MAGIC_FIRE_NAME","Magic Fire","Magic Fire","Magic Fire","Magic Fire"
+"CARD_MAGIC_FIRE_FLAVOUR","""Whoever fears the tip of my spear shall never pass through the fire!"" — Wotan, Die Walküre","""Whoever fears the tip of my spear shall never pass through the fire!"" — Wotan, Die Walküre","""Whoever fears the tip of my spear shall never pass through the fire!"" — Wotan, Die Walküre","""Whoever fears the tip of my spear shall never pass through the fire!"" — Wotan, Die Walküre"
+"CARD_ANNUNCIATION_OF_DEATH_NAME","Annunciation of Death","Annunciation of Death","Annunciation of Death","Annunciation of Death"
+"CARD_ANNUNCIATION_OF_DEATH_FLAVOUR","""Siegmund! Look at me!"" — Brünnhilde, Die Walküre","""Siegmund! Look at me!"" — Brünnhilde, Die Walküre","""Siegmund! Look at me!"" — Brünnhilde, Die Walküre","""Siegmund! Look at me!"" — Brünnhilde, Die Walküre"
+"CARD_RIDE_OF_THE_VALKYRIES_NAME","Ride of the Valkyries","Ride of the Valkyries","Ride of the Valkyries","Ride of the Valkyries"
+"CARD_VALKYRIE_ROCK_NAME","The Valkyrie Rock","The Valkyrie Rock","The Valkyrie Rock","The Valkyrie Rock"
+"LEADER_BRUNNHILDE_NAME","Brünnhilde","Brünnhilde","Brünnhilde","Brünnhilde"
+"LEADER_BRUNNHILDE_FLAVOUR","""Was it so shameful, what I did?"" — Brünnhilde, Die Walküre","""Was it so shameful, what I did?"" — Brünnhilde, Die Walküre","""Was it so shameful, what I did?"" — Brünnhilde, Die Walküre","""Was it so shameful, what I did?"" — Brünnhilde, Die Walküre"
+"LEADER_BRUNNHILDE_ABILITY_NAME","Chooser of the Slain","Chooser of the Slain","Chooser of the Slain","Chooser of the Slain"
+"CARD_GERHILDE_RULES","Flying.
+Charge.","Flying.
+Charge.","Flying.
+Charge.","Flying.
+Charge."
+"CARD_ROSSWEISSE_RULES","Flying.","Flying.","Flying.","Flying."
+"CARD_ORTLINDE_RULES","Guard.","Guard.","Guard.","Guard."
+"CARD_FALLEN_HERO_RULES","Valhalla.","Valhalla.","Valhalla.","Valhalla."
+"CARD_SCHWERTLEITE_RULES","Flying.","Flying.","Flying.","Flying."
+"CARD_SLAIN_WARRIOR_RULES","Valhalla.","Valhalla.","Valhalla.","Valhalla."
+"CARD_SIEGRUNE_RULES","Flying.
+On play: Resurrect a Valhalla unit.","Flying.
+On play: Resurrect a Valhalla unit.","Flying.
+On play: Resurrect a Valhalla unit.","Flying.
+On play: Resurrect a Valhalla unit."
+"CARD_GRIMGERDE_RULES","Guard.","Guard.","Guard.","Guard."
+"CARD_HELMWIGE_RULES","Flying.","Flying.","Flying.","Flying."
+"CARD_WALTRAUTE_RULES","Flying.
+On play: Return the Ring.","Flying.
+On play: Return the Ring.","Flying.
+On play: Return the Ring.","Flying.
+On play: Return the Ring."
+"CARD_HOJOTOHO_RULES","On play: Give all your units +1/+0.","On play: Give all your units +1/+0.","On play: Give all your units +1/+0.","On play: Give all your units +1/+0."
+"CARD_MAGIC_FIRE_RULES","On play: Give a unit +0/+3 and Guard.","On play: Give a unit +0/+3 and Guard.","On play: Give a unit +0/+3 and Guard.","On play: Give a unit +0/+3 and Guard."
+"CARD_ANNUNCIATION_OF_DEATH_RULES","On play: Deal 4 damage to a unit.","On play: Deal 4 damage to a unit.","On play: Deal 4 damage to a unit.","On play: Deal 4 damage to a unit."
+"CARD_RIDE_OF_THE_VALKYRIES_RULES","On play: Resurrect a Valhalla unit.
+On play: Resurrect a Valhalla unit.","On play: Resurrect a Valhalla unit.
+On play: Resurrect a Valhalla unit.","On play: Resurrect a Valhalla unit.
+On play: Resurrect a Valhalla unit.","On play: Resurrect a Valhalla unit.
+On play: Resurrect a Valhalla unit."
+"CARD_VALKYRIE_ROCK_RULES","At the start of your turn: Restore 2 to your Leader.","At the start of your turn: Restore 2 to your Leader.","At the start of your turn: Restore 2 to your Leader.","At the start of your turn: Restore 2 to your Leader."
+"LEADER_BRUNNHILDE_RULES","Ability (3 Energy): Summon Fallen Hero.","Ability (3 Energy): Summon Fallen Hero.","Ability (3 Energy): Summon Fallen Hero.","Ability (3 Energy): Summon Fallen Hero."
+"LEADER_BRUNNHILDE_ABILITY_TEXT","Summon Fallen Hero.","Summon Fallen Hero.","Summon Fallen Hero.","Summon Fallen Hero."

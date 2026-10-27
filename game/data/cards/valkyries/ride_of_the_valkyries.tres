@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_ln7b4"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_87jac"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_co8la"]
+
+[sub_resource type="Resource" id="Resource_iyc8a"]
+script = ExtResource("2_87jac")
+kind = 10
+
+[sub_resource type="Resource" id="Resource_q7inm"]
+script = ExtResource("1_ln7b4")
+effects = Array[ExtResource("2_87jac")]([SubResource("Resource_iyc8a")])
+
+[sub_resource type="Resource" id="Resource_558mu"]
+script = ExtResource("2_87jac")
+kind = 10
+
+[sub_resource type="Resource" id="Resource_a6upk"]
+script = ExtResource("1_ln7b4")
+effects = Array[ExtResource("2_87jac")]([SubResource("Resource_558mu")])
+
+[resource]
+script = ExtResource("3_co8la")
+id = &"ride_of_the_valkyries"
+faction = &"valkyries"
+type = 1
+rarity = 3
+cost = 5
+abilities = Array[ExtResource("1_ln7b4")]([SubResource("Resource_q7inm"), SubResource("Resource_a6upk")])
+leitmotifs = Array[StringName]([&"ride"])

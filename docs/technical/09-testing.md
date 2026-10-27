@@ -194,6 +194,25 @@ Average length 8.7–9.6 turns per player; the Götterdämmerung fires in 45–5
 
 Both cards shift the Gods vs Nibelungs matchup by 4–5 points each, so both were tuned. Retained triangle: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs.
 
+**The Valkyries (2026-10-26).** Fourth starter deck, led by Brünnhilde. The Easy AI now values *resurrect* only when a Valhalla unit waits in the graveyard, and *return the Ring* only when it takes the Ring from the opponent. Variants (400 matches per pairing, Valkyries win rate):
+
+| Variant | vs Gods | vs Nibelungs | vs Wälsungs |
+|---------|---------|--------------|-------------|
+| Draft; Leader ability: resurrect a Valhalla unit (3 Energy) | 31 % | 32 % | 41 % |
+| Sturdier sisters (Gerhilde 2/2, Rossweisse 2/3, Schwertleite 3/3, Siegrune 3/3, Helmwige 4/4); resurrect for 2 Energy | 35 % | 34 % | 36 % |
+| **Same sisters; Leader ability: summon a *Fallen Hero* (3 Energy) — retained** | **60 %** | **47 %** | **47 %** |
+
+A Leader ability that only works once a hero has died was the main weakness: the other Leaders act from the first turn.
+
+Retained matrix (row deck's win rate, 400 matches each; average length 8.0–9.5 turns per player):
+
+| | vs Gods | vs Nibelungs | vs Wälsungs | vs Valkyries |
+|---|---|---|---|---|
+| Gods | — | 59 % | 48 % | 40 % |
+| Nibelungs | 41 % | — | 55 % | 53 % |
+| Wälsungs | 53 % | 45 % | — | 53 % |
+| Valkyries | 60 % | 47 % | 47 % | — |
+
 ## Manual test checklist (release)
 
 - [ ] Install on reference device + one low-end device + one tall-aspect (20:9+) device

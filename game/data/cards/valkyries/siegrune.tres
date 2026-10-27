@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_8croh"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_gpsc0"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_fvkwt"]
+
+[sub_resource type="Resource" id="Resource_d4g2s"]
+script = ExtResource("2_gpsc0")
+kind = 10
+
+[sub_resource type="Resource" id="Resource_hf3n6"]
+script = ExtResource("1_8croh")
+effects = Array[ExtResource("2_gpsc0")]([SubResource("Resource_d4g2s")])
+
+[resource]
+script = ExtResource("3_fvkwt")
+id = &"siegrune"
+faction = &"valkyries"
+subtypes = Array[StringName]([&"valkyrie"])
+rarity = 1
+cost = 3
+attack = 3
+health = 3
+keywords = Array[StringName]([&"flying"])
+abilities = Array[ExtResource("1_8croh")]([SubResource("Resource_hf3n6")])
+leitmotifs = Array[StringName]([&"ride"])

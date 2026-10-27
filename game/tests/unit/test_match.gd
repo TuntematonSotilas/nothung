@@ -22,10 +22,10 @@ func test_match_initializes_seeded_decks_and_completes_redraw() -> void:
 
 
 func test_generated_card_catalogue_provides_valid_starter_decks() -> void:
-	assert_int(CardDatabase.card_count()).is_equal(38)
+	assert_int(CardDatabase.card_count()).is_equal(53)
 	var gods_deck: DeckData = CardDatabase.get_deck(&"gods_starter")
 	var nibelungs_deck: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
-	for deck_id: StringName in [&"gods_starter", &"nibelungs_starter", &"walsungs_starter"]:
+	for deck_id: StringName in [&"gods_starter", &"nibelungs_starter", &"walsungs_starter", &"valkyries_starter"]:
 		var deck: DeckData = CardDatabase.get_deck(deck_id)
 		assert_object(deck).is_not_null()
 		assert_int(deck.cards.size()).is_equal(20)
