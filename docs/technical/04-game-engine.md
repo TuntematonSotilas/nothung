@@ -1,7 +1,7 @@
 # Game engine
 
 > The rules engine: state, turn flow, actions, effect resolution. Implements [functional/03-game-rules.md](../functional/03-game-rules.md).
-> Status: Implemented · Last updated: 2026-10-16
+> Status: Implemented · Last updated: 2026-10-28
 
 ## Responsibilities
 
@@ -70,7 +70,7 @@ Each action is a small `RefCounted` value object. Its JSON-compatible record ena
 ### Validation rules worth noting
 
 - **Relics** ([rules](../functional/03-game-rules.md#relics-equipment)): the target must be a unit controlled by the player, without a Relic, matching `CardData.bearer` (subtype or card id). `get_legal_actions()` only offers valid bearers, so the UI highlights them and the AI never tries an illegal one.
-- **Conditional forging** (e.g. Siegmund reforges Nothung only if *Nothung (broken)* is among your artifacts): expressed as an ability condition (`[controls(nothung_broken)]`; `controls` checks your units, artifacts and Leader), checked like any other condition.
+- **Conditional reforging** (e.g. Siegmund reforges Nothung only if *Nothung (broken)* is among your artifacts): expressed as an ability condition (`[controls(nothung_broken)]`; `controls` checks your units, artifacts and Leader), checked like any other condition.
 - **Ring bonus**: full vs reduced bonus is a condition on the holder (`[controls(alberich)]`), evaluated at the start of the holder's turn.
 
 ## Effect resolution
@@ -82,9 +82,9 @@ Each action is a small `RefCounted` value object. Its JSON-compatible record ena
 5. After each step, **state-based checks**: destroy units at ≤ 0 health, check victory.
 6. A safety limit of 500 resolved abilities per action prevents infinite loops; exceeding it reports an error and ends the match as a draw.
 
-`EffectData.Kind` currently implements damage (optionally doubled against a `bonus_faction`), draw, energy, summon, heal, buff (granting Charge lets the unit attack this turn), transform, resurrect, Ring creation/stealing/return, conditional forging and artifact creation. **Invisible** units (trait or relic) cannot be attacked or selected by the opponent until they attack (they then get the `revealed` status); a hidden Guard does not restrict attacks. A forge effect's `amount` is the additional Energy cost and it only charges when its condition is met and a valid relic bearer exists. Target selectors include a selected unit, either leader, all units on one/both boards, both leaders, the source card, and an equipped relic's bearer. `ConditionData` currently supports holding the Ring and controlling a named card. New cards compose these data objects rather than adding card-specific engine code.
+`EffectData.Kind` currently implements damage (optionally doubled against a `bonus_faction`), draw, energy, summon, heal, buff (granting Charge lets the unit attack this turn), transform, resurrect, Ring creation/stealing/return, conditional reforging, artifact creation and taking control of an enemy unit. **Invisible** units (trait or relic) cannot be attacked or selected by the opponent until they attack (they then get the `revealed` status); a hidden Guard does not restrict attacks. A forge effect's `amount` is the additional Energy cost and it only charges when its condition is met and a valid relic bearer exists. Target selectors include a selected unit, either leader, all units on one/both boards, both leaders, the source card, and an equipped relic's bearer. `ConditionData` currently supports holding the Ring and controlling a named card. New cards compose these data objects rather than adding card-specific engine code.
 
-Relics use `CardData.bearer` subtype/card IDs and `attachable`; they add their configured stats/keywords to a matching unit. A dead bearer moves its relic to the graveyard, or creates `shatters_into` in the owner's artifact zone. Conditional forge effects replace an artifact with a relic and attach it to a valid bearer: the forging unit itself when it can carry it, else the first valid one. A forge triggered by a spell or a unit uses, as material, the relic's `shatters_into` artifact among your artifacts (reforging). Only a Nibelung-faction card can create the Ring, and it cannot be created again while already held. The Ring is represented by `GameState.ring_holder`, not an artifact in a player's zone. Götterdämmerung damage starts on each player's tenth turn and increases by one on each of their later turns.
+Relics use `CardData.bearer` subtype/card IDs and `attachable`; they add their configured stats/keywords to a matching unit. A dead bearer moves its relic to the graveyard, or creates `shatters_into` in the owner's artifact zone. Conditional `reforge` effects replace an artifact with a relic and attach it to a valid bearer: the reforging unit itself when it can carry it, else the first valid one. A reforge triggered by a spell or a unit uses, as material, the relic's `shatters_into` artifact among your artifacts. Reforging costs no extra Energy. Only a Nibelung-faction card can create the Ring, and it cannot be created again while already held. The Ring is represented by `GameState.ring_holder`, not an artifact in a player's zone. Götterdämmerung damage starts on each player's tenth turn and increases by one on each of their later turns.
 
 `GameEvent` records the authoritative engine event with owner and instance IDs. The engine does not know which client is viewing it; any network or presentation adapter must filter private card details before forwarding events to the opponent.
 

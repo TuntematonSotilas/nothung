@@ -204,7 +204,7 @@ static func _effects_value(
 					value += 30.0
 				elif state.ring_holder == player_id:
 					value -= 30.0
-			EffectData.Kind.FORGE_CARD:
+			EffectData.Kind.REFORGE:
 				value += 15.0
 				if effect.card != null:
 					value += float(effect.card.relic_attack_bonus) * 4.0 + float(effect.card.relic_health_bonus) * 2.0

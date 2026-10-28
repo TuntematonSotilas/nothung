@@ -1,7 +1,7 @@
 # Lore & setting
 
 > The source material and how it maps onto game content (factions, characters, artifacts, campaign).
-> Status: Draft · Last updated: 2026-10-27
+> Status: Draft · Last updated: 2026-10-28
 
 ## Source material
 
@@ -23,7 +23,7 @@
 | Faction | Members | Play style (draft) |
 |---------|---------|--------------------|
 | **Gods** | Wotan (Leader; *The Wanderer* as a card), Fricka and her rams, Donner, Froh, Freia, Loge, the Valkyries Wotan sends, the heroes of Valhalla | Control, contracts/pacts, powerful but bound by law |
-| **Nibelungs** | Alberich (Leader; *Alberich, the Toad* as a card), Mime, the Nibelung dwarves, the giant serpent, the anvils of Nibelheim | Energy economy, forging artifacts, swarm |
+| **Nibelungs** | Alberich (Leader; *Alberich, the Toad* as a card), Mime, the Nibelung dwarves, the giant serpent, the anvils of Nibelheim | Energy economy, artifacts, swarm |
 | **Wälsungs & Heroes** | Siegfried (Leader), Siegmund, Sieglinde, Wälse (Wotan in a wolf's pelt), the wolf tribe, Brünnhilde as protector of the Wälsungs, Grane, Siegfried's bear | Aggression, Charge, buffs, the sword Nothung |
 | **Valkyries** | Brünnhilde (Leader) and her 8 sisters — [one card each](#the-valkyries) — with the heroes they carry to Valhalla | Flying, bringing fallen heroes back (Valhalla) |
 | *Neutral* | Rhinemaidens (Woglinde, Wellgunde, Flosshilde), Norns, Erda, Woodbird · Giants (Fasolt, Fafner) · Gibichungs (Gunther, Gutrune, Hagen, the vassals) · Hunding and his kinsmen ([`cards/neutral.md`](../../cards/neutral.md)) | Utility, fate / foresight, big Giant units, Gibichung deception |

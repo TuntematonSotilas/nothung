@@ -23,4 +23,4 @@ cost = 1
 attack = 1
 health = 2
 abilities = Array[ExtResource("1_hbmcs")]([SubResource("Resource_nl7lw")])
-leitmotifs = Array[StringName]([&"forge"])
+leitmotifs = Array[StringName]([&"smithing"])

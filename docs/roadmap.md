@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-10-27
+> Status: Draft · Last updated: 2026-10-28
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -52,7 +52,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] `Match` API: setup, opening hand + Redraw, turn phases, legal actions
 - [x] Actions: play card, attack, Leader ability, end turn
 - [x] Energy, combat, traits (Guard, Charge, Flying, Valhalla), triggers and data-driven effects
-- [x] Relic bearer restrictions, conditional forging and shattering when a bearer dies
+- [x] Relic bearer restrictions, conditional reforging and shattering when a bearer dies
 - [x] The Ring (bonus, curse, stealing) and Götterdämmerung
 - [x] Victory / defeat / draw
 - [x] Integration test: full scripted match + recorded-action replay with state hash ([determinism helpers](technical/09-testing.md#determinism-helpers))
@@ -90,14 +90,14 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
   - [x] One Legendary per faction: Wotan's Spear (Gods), Tarnhelm (Nibelungs), Nothung (Wälsungs); Invisible trait. Balance: Gods 59 % vs Nibelungs, Wälsungs 53 % vs Gods, Nibelungs 55 % vs Wälsungs
   - [x] Valkyries: 15 cards (one per sister, two unnamed heroes), Leader Brünnhilde, Legendary *Ride of the Valkyries*, starter deck. All 12 starter matchups within 40–60 % ([AI soak](technical/09-testing.md#ai-soak))
   - [x] Neutral: 20 cards (Rhinemaidens, Woodbird, Norns, Erda, Giants, Gibichungs, Hunding), Legendary *Hagen*; Fafner, Hagen and *The Giants' Wage* can take the Ring. Covered by the AI soak with a test deck (Alberich + each Neutral card once)
-  - [x] Gods and Nibelungs up to 15 cards each: Froh, Fricka's Rams, The Wanderer, Rainbow Bridge; Alberich the Toad, Mime's Forge, The Anvils of Nibelheim — 80 cards in all, every starter matchup within 43–57 %
+  - [x] Gods and Nibelungs up to 15 cards each: Froh, Fricka's Rams, The Wanderer, Rainbow Bridge; Alberich the Toad, Mime's Cave, The Anvils of Nibelheim — 80 cards in all, every starter matchup within 43–57 %
   - [x] *Potion of Forgetfulness* (Neutral spell, Epic, 5): take control of an enemy unit costing 4 or less — new `take_control` effect; 81 cards
 
 ## 5 — Menus & meta
 
 - [ ] Title and main menu
 - [ ] Quick match (deck / opponent / difficulty)
-- [ ] Collection, deck builder, Forge ([game modes](functional/05-game-modes.md), [progression](functional/06-progression.md))
+- [ ] Collection, deck builder, Nibelheim (card crafting) ([game modes](functional/05-game-modes.md), [progression](functional/06-progression.md))
 - [ ] Profile save (atomic JSON, migrations) ([persistence](technical/07-persistence.md))
 - [ ] Resume an interrupted match
 - [ ] Settings: audio, language, animation speed, text size

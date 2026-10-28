@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-27
+> Status: Draft · Last updated: 2026-10-28
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -86,7 +86,7 @@ A **Relic** is an artifact that is attached to a unit instead of going to the ar
 - A unit can carry **at most 1 Relic**. Attached Relics do not count toward the 3-artifact limit.
 - The Relic's bonus applies to its bearer only.
 - When the bearer leaves the board, the Relic goes to the graveyard, unless its text says otherwise (e.g. *Nothung* shatters back into *Nothung (broken)*).
-- **Forging**: some effects turn an artifact into another (e.g. *Siegmund* or *Notung! Notung!* reforge *Nothung (broken)* in your artifacts into *Nothung*, attached to a unit that meets its Bearer requirement — Siegmund carries it himself when he forges it). Nothing happens without that artifact or without a valid bearer.
+- **Reforging**: some effects turn an artifact into another (e.g. *Siegmund* or *Notung! Notung!* reforge *Nothung (broken)* in your artifacts into *Nothung*, attached to a unit that meets its Bearer requirement — Siegmund carries it himself when he reforges it). Nothing happens without that artifact or without a valid bearer.
 
 ## Leader
 

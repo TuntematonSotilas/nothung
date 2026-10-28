@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-22
+> Status: Draft · Last updated: 2026-10-28
 
 ## Platform constraints
 
@@ -31,7 +31,7 @@ flowchart TD
     Duel --> Results
     Results --> MainMenu
     Collection --> DeckBuilder
-    Collection --> Forge
+    Collection --> Nibelheim
 ```
 
 ## Screens

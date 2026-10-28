@@ -95,7 +95,7 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 
 	var current := _state.player(player_id)
 	for card: CardInstance in current.hand.cards:
-		if _play_cost(card.data, player_id) > current.energy:
+		if card.data.cost > current.energy:
 			continue
 		if card.data.is_ring:
 			continue
@@ -158,7 +158,7 @@ func play_block_reason(player_id: int, card_uid: int) -> StringName:
 	var card := player.hand.find(card_uid)
 	if card == null or card.data.is_ring:
 		return &"unplayable"
-	if _play_cost(card.data, player_id) > player.energy:
+	if card.data.cost > player.energy:
 		return &"energy"
 	if card.data.type == CardData.Type.UNIT and player.board.size() >= MAX_BOARD_SIZE:
 		return &"board_full"
@@ -396,7 +396,7 @@ func _apply_redraw(action: RedrawAction) -> void:
 func _is_legal_play(action: PlayCardAction) -> bool:
 	var player := _state.player(action.player)
 	var card := player.hand.find(action.card_uid)
-	if card == null or _play_cost(card.data, action.player) > player.energy:
+	if card == null or card.data.cost > player.energy:
 		return false
 	if card.data.type == CardData.Type.UNIT and player.board.size() >= MAX_BOARD_SIZE:
 		return false
@@ -417,7 +417,7 @@ func _is_legal_play(action: PlayCardAction) -> bool:
 func _play_card(action: PlayCardAction) -> void:
 	var player := _state.player(action.player)
 	var card := player.hand.remove_uid(action.card_uid)
-	var cost: int = _play_cost(card.data, action.player)
+	var cost: int = card.data.cost
 	player.energy -= cost
 	_emit(&"energy_changed", action.player, card.uid, -cost)
 	_emit(&"card_played", action.player, card.uid)
@@ -729,8 +729,8 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 			_set_ring_holder(-1)
 		EffectData.Kind.RESURRECT:
 			_resurrect(player_id, effect.card)
-		EffectData.Kind.FORGE_CARD:
-			_forge_card(source, player_id, effect.card)
+		EffectData.Kind.REFORGE:
+			_reforge(source, player_id, effect.card)
 		EffectData.Kind.CREATE_ARTIFACT:
 			if effect.card != null and effect.card.type == CardData.Type.ARTIFACT:
 				var owner := _state.player(player_id)
@@ -833,7 +833,7 @@ func _resurrect(player_id: int, requested_card: CardData) -> void:
 				return
 
 
-func _forge_card(source: CardInstance, player_id: int, forged_data: CardData) -> void:
+func _reforge(source: CardInstance, player_id: int, forged_data: CardData) -> void:
 	if source == null or forged_data == null:
 		return
 	var player := _state.player(player_id)
@@ -850,7 +850,7 @@ func _forge_card(source: CardInstance, player_id: int, forged_data: CardData) ->
 			return
 	if forged_data.is_relic():
 		var bearer: CardInstance
-		# A unit that forges the relic carries it when it can (Siegmund draws Nothung himself).
+		# A unit that reforges the relic carries it when it can (Siegmund draws Nothung himself).
 		if unit_source != null and _can_bear(unit_source, forged_data):
 			bearer = unit_source
 		for unit: CardInstance in player.board.cards:
@@ -868,7 +868,7 @@ func _forge_card(source: CardInstance, player_id: int, forged_data: CardData) ->
 	else:
 		player.artifacts.remove_uid(source.uid)
 		player.artifacts.add(_new_instance(forged_data, player_id))
-	_emit(&"card_forged", player_id, source.uid)
+	_emit(&"card_reforged", player_id, source.uid)
 
 
 func _condition_is_met(condition: ConditionData, player_id: int) -> bool:
@@ -886,26 +886,6 @@ func _condition_is_met(condition: ConditionData, player_id: int) -> bool:
 		for artifact: CardInstance in player.artifacts.cards:
 			if artifact.data.id == condition.card_id:
 				return true
-	return false
-
-
-func _play_cost(card: CardData, player_id: int) -> int:
-	var cost: int = card.cost
-	for ability: AbilityData in card.abilities:
-		if ability.trigger != &"on_play" or not _condition_is_met(ability.condition, player_id):
-			continue
-		for effect: EffectData in ability.effects:
-			if effect.kind == EffectData.Kind.FORGE_CARD and _forge_has_bearer(player_id, effect.card):
-				cost += maxi(effect.amount, 0)
-	return cost
-
-
-func _forge_has_bearer(player_id: int, card: CardData) -> bool:
-	if card == null or not card.is_relic():
-		return true
-	for unit: CardInstance in _state.player(player_id).board.cards:
-		if _can_bear(unit, card):
-			return true
 	return false
 
 

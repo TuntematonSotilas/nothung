@@ -7,7 +7,7 @@
 
 > **Decision (2026-10-13):** The game is called **Nothung: The Ring Card Game**.
 
-- **Nothung** is the sword of the Wälsungs: shattered by Wotan's spear, reforged by Siegfried. A broken-then-reforged sword echoes the game itself: decks are built and improved, and *Nothung* is also a card that must be forged ([04-cards](04-cards.md#example-cards-to-validate-the-format)).
+- **Nothung** is the sword of the Wälsungs: shattered by Wotan's spear, reforged by Siegfried. A broken-then-reforged sword echoes the game itself: decks are built and improved, and *Nothung* is also a card that must be reforged ([04-cards](04-cards.md#example-cards-to-validate-the-format)).
 - Pronunciation: German *NOH-toong* (from *Not*, "need / distress"). Not "not-hung".
 - **Always use the full name with the subtitle** (store listing, title screen, icon text where possible): the subtitle makes the game findable and avoids confusion with the word "nothing" (autocorrect) and the *Nothing* phone brand.
 - The name stays untranslated in every language; only the subtitle may be localised in store listings (e.g. FR *Nothung : le jeu de cartes de l'Anneau*).

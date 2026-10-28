@@ -1,7 +1,7 @@
 # Testing
 
 > Test strategy and tooling.
-> Status: Draft · Last updated: 2026-10-27
+> Status: Draft · Last updated: 2026-10-28
 
 ## Framework
 
@@ -215,7 +215,7 @@ Retained matrix (row deck's win rate, 400 matches each; average length 8.0–9.5
 
 **Neutral cards (2026-10-27).** No starter deck contains Neutral cards, so the soak test adds a **Neutral test deck**: Alberich with 20 of the Neutral cards once (all but *Woglinde*; *Potion of Forgetfulness* replaced her on 2026-10-27, same win rates), against the Gods and Nibelungs starters. It checks that the AI only plays legal Neutral actions (Ring theft, relic, double summons, damage to all units). As a pure-Neutral deck it wins about a third of its matches (32.5 % vs Gods, 35 % vs Nibelungs, 40 matches each), which is expected: Neutral cards complete a faction deck. Their real balance comes with built decks (milestone 5).
 
-**Gods and Nibelungs at 15 cards (2026-10-27).** New cards in the starter decks: Gods — *The Wanderer* (replacing a *Fricka*) and *Rainbow Bridge* (replacing the last *Blessing of Valhalla*); Nibelungs — *Alberich, the Toad* (replacing a *Nibelung Miner*) and *The Anvils of Nibelheim* (replacing an *Alberich's Whip*). *Froh*, *Fricka's Rams* and *Mime's Forge* stay in the card pool. Variants (400 matches per pairing):
+**Gods and Nibelungs at 15 cards (2026-10-27).** New cards in the starter decks: Gods — *The Wanderer* (replacing a *Fricka*) and *Rainbow Bridge* (replacing the last *Blessing of Valhalla*); Nibelungs — *Alberich, the Toad* (replacing a *Nibelung Miner*) and *The Anvils of Nibelheim* (replacing an *Alberich's Whip*). *Froh*, *Fricka's Rams* and *Mime's Forge* (now *Mime's Cave*) stay in the card pool. Variants (400 matches per pairing):
 
 | Variant | Gods vs Nibelungs | Gods vs Wälsungs | Gods vs Valkyries |
 |---------|-------------------|------------------|-------------------|

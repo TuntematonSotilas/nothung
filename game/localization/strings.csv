@@ -163,10 +163,10 @@ On play: Put Nothung (broken) into your artifacts.","Flying.
 On play: Put Nothung (broken) into your artifacts.","Flying.
 On play: Put Nothung (broken) into your artifacts."
 "CARD_SIEGMUND_RULES","Valhalla.
-On play, if you control Nothung (broken): Forge Nothung.","Valhalla.
-On play, if you control Nothung (broken): Forge Nothung.","Valhalla.
-On play, if you control Nothung (broken): Forge Nothung.","Valhalla.
-On play, if you control Nothung (broken): Forge Nothung."
+On play, if you control Nothung (broken): Reforge Nothung.","Valhalla.
+On play, if you control Nothung (broken): Reforge Nothung.","Valhalla.
+On play, if you control Nothung (broken): Reforge Nothung.","Valhalla.
+On play, if you control Nothung (broken): Reforge Nothung."
 "CARD_HORN_CALL_RULES","On play: Give a unit +2/+0 and Charge.","On play: Give a unit +2/+0 and Charge.","On play: Give a unit +2/+0 and Charge.","On play: Give a unit +2/+0 and Charge."
 "CARD_WINTERSTUERME_RULES","On play: Give a unit +2/+2.","On play: Give a unit +2/+2.","On play: Give a unit +2/+2.","On play: Give a unit +2/+2."
 "CARD_DRAGONS_BLOOD_RULES","On play: Draw 2 cards.","On play: Draw 2 cards.","On play: Draw 2 cards.","On play: Draw 2 cards."
@@ -175,7 +175,7 @@ On play, if you control Siegmund: Give all your units +1/+0.","On play: Draw 1 c
 On play, if you control Siegmund: Give all your units +1/+0.","On play: Draw 1 card.
 On play, if you control Siegmund: Give all your units +1/+0.","On play: Draw 1 card.
 On play, if you control Siegmund: Give all your units +1/+0."
-"CARD_NOTUNG_RULES","On play, if you control Nothung (broken): Forge Nothung.","On play, if you control Nothung (broken): Forge Nothung.","On play, if you control Nothung (broken): Forge Nothung.","On play, if you control Nothung (broken): Forge Nothung."
+"CARD_NOTUNG_RULES","On play, if you control Nothung (broken): Reforge Nothung.","On play, if you control Nothung (broken): Reforge Nothung.","On play, if you control Nothung (broken): Reforge Nothung.","On play, if you control Nothung (broken): Reforge Nothung."
 "CARD_NOTHUNG_RULES","Bearer: Wälsung.
 Bearer gets +3/+0.
 When its bearer dies, it shatters into Nothung (broken).","Bearer: Wälsung.
@@ -307,15 +307,15 @@ On play: Draw 1 card."
 "CARD_RAINBOW_BRIDGE_FLAVOUR","""The bridge leads to the castle, light but firm beneath your feet."" — Froh, Das Rheingold","""The bridge leads to the castle, light but firm beneath your feet."" — Froh, Das Rheingold","""The bridge leads to the castle, light but firm beneath your feet."" — Froh, Das Rheingold","""The bridge leads to the castle, light but firm beneath your feet."" — Froh, Das Rheingold"
 "CARD_ALBERICH_TOAD_NAME","Alberich, the Toad","Alberich, the Toad","Alberich, the Toad","Alberich, the Toad"
 "CARD_ALBERICH_TOAD_FLAVOUR","""There, the toad — seize it quickly!"" — Loge, Das Rheingold","""There, the toad — seize it quickly!"" — Loge, Das Rheingold","""There, the toad — seize it quickly!"" — Loge, Das Rheingold","""There, the toad — seize it quickly!"" — Loge, Das Rheingold"
-"CARD_MIMES_FORGE_NAME","Mime's Forge","Mime's Forge","Mime's Forge","Mime's Forge"
 "CARD_ANVILS_OF_NIBELHEIM_NAME","The Anvils of Nibelheim","The Anvils of Nibelheim","The Anvils of Nibelheim","The Anvils of Nibelheim"
 "CARD_FRICKAS_RAMS_RULES","Charge.","Charge.","Charge.","Charge."
 "CARD_FROH_RULES","On play: Restore 2 to your Leader.","On play: Restore 2 to your Leader.","On play: Restore 2 to your Leader.","On play: Restore 2 to your Leader."
 "CARD_THE_WANDERER_RULES","On play: Draw 1 card.","On play: Draw 1 card.","On play: Draw 1 card.","On play: Draw 1 card."
 "CARD_RAINBOW_BRIDGE_RULES","On play: Give all your units +0/+1.","On play: Give all your units +0/+1.","On play: Give all your units +0/+1.","On play: Give all your units +0/+1."
 "CARD_ALBERICH_TOAD_RULES","Invisible.","Invisible.","Invisible.","Invisible."
-"CARD_MIMES_FORGE_RULES","At the start of your turn: Restore 1 to your Leader.","At the start of your turn: Restore 1 to your Leader.","At the start of your turn: Restore 1 to your Leader.","At the start of your turn: Restore 1 to your Leader."
 "CARD_ANVILS_OF_NIBELHEIM_RULES","At the start of your turn: Summon Nibelung Miner.","At the start of your turn: Summon Nibelung Miner.","At the start of your turn: Summon Nibelung Miner.","At the start of your turn: Summon Nibelung Miner."
 "CARD_POTION_OF_FORGETFULNESS_NAME","Potion of Forgetfulness","Potion of Forgetfulness","Potion of Forgetfulness","Potion of Forgetfulness"
 "CARD_POTION_OF_FORGETFULNESS_FLAVOUR","""Were I to forget all you gave me, one lesson I would never forsake."" — Siegfried, before drinking, Götterdämmerung","""Were I to forget all you gave me, one lesson I would never forsake."" — Siegfried, before drinking, Götterdämmerung","""Were I to forget all you gave me, one lesson I would never forsake."" — Siegfried, before drinking, Götterdämmerung","""Were I to forget all you gave me, one lesson I would never forsake."" — Siegfried, before drinking, Götterdämmerung"
 "CARD_POTION_OF_FORGETFULNESS_RULES","On play: Take control of an enemy unit costing 4 or less.","On play: Take control of an enemy unit costing 4 or less.","On play: Take control of an enemy unit costing 4 or less.","On play: Take control of an enemy unit costing 4 or less."
+"CARD_MIMES_CAVE_NAME","Mime's Cave","Mime's Cave","Mime's Cave","Mime's Cave"
+"CARD_MIMES_CAVE_RULES","At the start of your turn: Restore 1 to your Leader.","At the start of your turn: Restore 1 to your Leader.","At the start of your turn: Restore 1 to your Leader.","At the start of your turn: Restore 1 to your Leader."

@@ -1,7 +1,7 @@
 # Progression
 
 > How the player grows their collection and what keeps them playing — all offline.
-> Status: Draft · Last updated: 2026-10-14
+> Status: Draft · Last updated: 2026-10-28
 
 ## Principles
 
@@ -28,7 +28,7 @@
 > Distinct from in-match Energy. The progression currency is **Rhinegold**.
 
 - Earned in quick matches and achievements.
-- Spent in the **Forge** to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values).
+- Spent in **Nibelheim** (the crafting screen) to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values).
 - Duplicate extra copies above the deck limit are automatically converted to Rhinegold.
 
 > **Decision (2026-10-09):** Direct crafting only — no random card packs.
@@ -37,7 +37,7 @@
 
 - *Renunciation of Love* — win a match while holding the Ring the whole game.
 - *Twilight* — win with your Leader at 1 Life.
-- *Forger* — forge Nothung in 10 matches.
+- *Notung! Notung!* — reforge Nothung in 10 matches.
 
 ## Cosmetics
 

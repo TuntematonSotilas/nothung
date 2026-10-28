@@ -15,7 +15,7 @@ enum Kind {
 	STEAL_RING,
 	RETURN_RING,
 	RESURRECT,
-	FORGE_CARD,
+	REFORGE,
 	CREATE_ARTIFACT,
 	## Moves a selected enemy unit to your board; amount = highest cost it can take (0 = any).
 	TAKE_CONTROL,

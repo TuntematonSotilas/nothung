@@ -1,7 +1,7 @@
 # Glossary
 
 > Shared vocabulary for game terms (used in docs, code and UI) and lore terms.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-28
 
 ## Game terms
 
@@ -12,8 +12,8 @@
 | **Leader** | The character representing a player; has Life and a Leader ability |
 | **Life** | Leader hit points; 0 = defeat |
 | **Energy** | In-match resource used to play cards and Leader abilities |
-| **Rhinegold** | Progression currency earned outside matches and spent in the Forge |
-| **Forge** | Collection screen where cards are crafted with Rhinegold |
+| **Rhinegold** | Progression currency earned outside matches and spent in Nibelheim |
+| **Nibelheim** | Collection screen where cards are crafted with Rhinegold (where the Nibelungs work the gold) |
 | **Unit / Spell / Artifact** | Card types — see [04-cards](04-cards.md#card-types) |
 | **Board** | Zone where units are in play |
 | **Graveyard** | Zone for destroyed units and used spells |

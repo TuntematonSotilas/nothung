@@ -1,7 +1,7 @@
 # Cards
 
 > Card anatomy, types, traits, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-27
+> Status: Draft · Last updated: 2026-10-28
 
 ## Card anatomy
 
@@ -53,7 +53,6 @@
 | **Charge** | Can attack the turn it is played |
 | **Flying** | Ignores Guard: can attack any target even when the enemy has Guard units (Valkyries, the dragon…) |
 | **Valhalla** | When destroyed, can be resurrected by Valkyrie effects (marks heroic units) |
-| **Forge X** | Spend X extra Energy when playing to upgrade the card |
 | **Leitmotif (Y)** | Bonus if you played another card with motif Y this turn |
 | **Cursed** | Holder suffers a drawback (Ring and related cards) |
 | **Invisible** | Cannot be attacked or targeted by the opponent until it attacks (Tarnhelm). Effects that hit all units still hit it; a hidden Guard does not force attacks |
@@ -62,7 +61,7 @@
 
 > **Decision (2026-10-15):** With a single board row ([03-game-rules](03-game-rules.md)), there is no blocking: **Flying = ignores Guard**.
 
-> **Decision (2026-10-09):** At most **10 traits** in v1.0, so rules text stays short on a phone screen. The list above is now **full (10/10)**: any new trait must replace one.
+> **Decision (2026-10-09):** At most **10 traits** in v1.0, so rules text stays short on a phone screen. The list above has **9 of 10** traits since *Forge X* (never used by a card) was dropped on 2026-10-28; *reforge* is an effect, not a trait.
 
 ## Rarities
 
@@ -78,7 +77,7 @@ On the card, rarity is a **letter in a coloured badge** in the top-right corner:
 > **Decision (2026-10-19):** Rarity of **named characters** depends on their weight in the story, not on having a name.
 > - **Legendary** (1 copy): the major characters and objects — Wotan, Brünnhilde, Siegfried, Siegmund, Alberich, Hagen, the Ring, Nothung, the Tarnhelm… (Wotan, Alberich and Siegfried are Leaders, not cards)
 >
-> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its forged form count as one sword), Valkyries — *Ride of the Valkyries* (Brünnhilde is the Leader), Neutral — *Hagen*. Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
+> **Decision (2026-10-26):** **one Legendary card per faction**, so every faction has its signature piece: Gods — *Wotan's Spear*, Nibelungs — *Tarnhelm*, Wälsungs — *Nothung* (*Nothung (broken)* and its reforged form count as one sword), Valkyries — *Ride of the Valkyries* (Brünnhilde is the Leader), Neutral — *Hagen*. Characters of the list above that are not the faction's Legendary are Epic (Siegmund).
 > - **Common / Rare / Epic** (by power): the secondary named characters — Fricka, Freia, Donner, Froh, Loge, the eight sister Valkyries, Mime, Sieglinde, the Rhinemaidens…
 >
 > A card named after a character must come from the libretto: no figure from Norse mythology that Wagner does not use ([canon notes](02-lore-and-setting.md#canon-notes-libretto)).
@@ -129,10 +128,10 @@ These cards follow the [canon notes](02-lore-and-setting.md#canon-notes-libretto
 | Name | Cost | Type | Faction | Stats | Text |
 |------|------|------|---------|-------|------|
 | Nothung (broken) | 1 | Artifact — Weapon | Wälsungs | – | Stays in your artifacts; reforged into *Nothung* by Siegmund or *Notung! Notung!*. Also brought by *Brünnhilde, Protector*. |
-| Nothung | – | Artifact — Relic, Weapon | Wälsungs | – | Created by forging only. **Bearer (Wälsung).** Bearer gets +3/+0. When its bearer dies, it shatters into *Nothung (broken)* in your artifacts (as with Siegmund). |
+| Nothung | – | Artifact — Relic, Weapon | Wälsungs | – | Created by reforging only. **Bearer (Wälsung).** Bearer gets +3/+0. When its bearer dies, it shatters into *Nothung (broken)* in your artifacts (as with Siegmund). |
 | Tarnhelm | 2 | Artifact — Relic | Nibelungs | – | Bearer gets +2/+2 and **Invisible** (cannot be attacked or targeted by the opponent until it attacks). |
 | Wotan's Spear | 5 | Artifact — Weapon | Gods | – | At the start of your turn: deal 1 damage to the enemy Leader (the treaties carved on it bind his foes). |
-| Siegmund | 4 | Unit — Wälsung, Hero | Wälsungs | 5/4 | **Valhalla.** On play: if you control *Nothung (broken)*, forge *Nothung* — he carries it. |
-| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, forge *Nothung* onto a Wälsung. |
+| Siegmund | 4 | Unit — Wälsung, Hero | Wälsungs | 5/4 | **Valhalla.** On play: if you control *Nothung (broken)*, reforge *Nothung* — he carries it. |
+| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, reforge *Nothung* onto a Wälsung. |
 | The Ring | 0 | Artifact | Neutral | – | Created by Nibelung cards only. Held by a player. Start of your turn: +1 Energy — or, if you control **Alberich**, +2 Energy and draw 1. **Cursed** (see [The Ring](03-game-rules.md#the-ring-signature-mechanic)). |
 

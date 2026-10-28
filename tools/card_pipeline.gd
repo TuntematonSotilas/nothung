@@ -497,13 +497,10 @@ func _parse_effect(source: String, path: String, line: int) -> EffectData:
 			if effect.target != EffectData.Target.SELECTED_UNIT:
 				_error(path, line, "take_control only targets selected_unit.")
 				return null
-		"forge":
-			effect.kind = EffectData.Kind.FORGE_CARD
-			if args.size() != 2:
-				_error(path, line, "forge expects artifact_card_id, extra_cost.")
+		"reforge":
+			effect.kind = EffectData.Kind.REFORGE
+			if not _read_card_ref(args, effect, "artifact", path, line):
 				return null
-			_add_card_ref(effect, "card", args[0], "artifact")
-			effect.amount = _argument_int(args[1], path, line)
 		_:
 			_error(path, line, "Unknown or unsupported effect: %s" % kind)
 			return null
@@ -793,10 +790,8 @@ func _effect_text(effect: EffectData) -> String:
 			if effect.amount == 0:
 				return "Take control of an enemy unit."
 			return "Take control of an enemy unit costing %d or less." % effect.amount
-		EffectData.Kind.FORGE_CARD:
-			if effect.amount == 0:
-				return "Forge %s." % _referenced_card_name(effect.card)
-			return "Forge %s for %d extra Energy." % [_referenced_card_name(effect.card), effect.amount]
+		EffectData.Kind.REFORGE:
+			return "Reforge %s." % _referenced_card_name(effect.card)
 		_:
 			return ""
 

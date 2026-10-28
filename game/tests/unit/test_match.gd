@@ -265,7 +265,7 @@ func test_relic_requires_matching_bearer_and_moves_to_graveyard_on_death() -> vo
 	assert_bool(engine.get_state().player(0).board.find(bearer.uid) == null).is_true()
 
 
-func test_conditional_forge_upgrades_a_relic_onto_its_required_bearer() -> void:
+func test_conditional_reforge_upgrades_a_relic_onto_its_required_bearer() -> void:
 	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 119)
 	_prepare_main_phase(engine)
 	var siegfried := _unit(&"siegfried", 0, 130, 5, 5, [])
@@ -290,8 +290,7 @@ func test_conditional_forge_upgrades_a_relic_onto_its_required_bearer() -> void:
 	forge_condition.kind = ConditionData.Kind.CONTROLS_CARD
 	forge_condition.card_id = &"siegfried"
 	var forge_effect := EffectData.new()
-	forge_effect.kind = EffectData.Kind.FORGE_CARD
-	forge_effect.amount = 4
+	forge_effect.kind = EffectData.Kind.REFORGE
 	forge_effect.card = reforged
 	var forge_ability := AbilityData.new()
 	forge_ability.condition = forge_condition
@@ -301,9 +300,8 @@ func test_conditional_forge_upgrades_a_relic_onto_its_required_bearer() -> void:
 	engine.get_state().player(0).hand.add(broken_instance)
 
 	var play_action := PlayCardAction.new(0, broken_instance.uid)
-	engine.get_state().player(0).energy = 4
-	assert_bool(engine.is_legal(play_action)).is_false()
-	engine.get_state().player(0).energy = 5
+	# Reforging costs nothing on top of the card.
+	engine.get_state().player(0).energy = 1
 	assert_bool(engine.is_legal(play_action)).is_true()
 	assert_bool(engine.apply(play_action)).is_true()
 	assert_int(engine.get_state().player(0).energy).is_equal(0)
