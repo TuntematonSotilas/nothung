@@ -11,7 +11,7 @@
 | `display/window/handheld/orientation` | Portrait |
 | `display/window/stretch/mode` | `canvas_items` |
 | `display/window/stretch/aspect` | `expand` (layouts use anchors/containers to absorb extra height) |
-| Safe area | Read `DisplayServer.get_display_safe_area()` and pad the root UI for notches |
+| Safe area | `ui/safe_area.gd` (`SafeArea`) reads `DisplayServer.get_display_safe_area()` (mobile only), converts it to viewport units and adds it to the root margins: menu screens (`MenuUI.screen_column`) and the duel, so nothing goes under the notch or the system bars |
 
 ## Scene composition
 

@@ -127,11 +127,11 @@ func _build_ui() -> void:
 
 	var margin: MarginContainer = MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", roundi(24 * _ui_scale))
-	margin.add_theme_constant_override("margin_top", roundi(28 * _ui_scale))
-	margin.add_theme_constant_override("margin_right", roundi(24 * _ui_scale))
-	margin.add_theme_constant_override("margin_bottom", roundi(26 * _ui_scale))
 	add_child(margin)
+	# Kept out of the notch and system bars.
+	SafeArea.pad(margin, {
+		"left": 24 * _ui_scale, "top": 28 * _ui_scale, "right": 24 * _ui_scale, "bottom": 26 * _ui_scale,
+	})
 	_main_layout = VBoxContainer.new()
 	_main_layout.add_theme_constant_override("separation", roundi(12 * _ui_scale))
 	margin.add_child(_main_layout)

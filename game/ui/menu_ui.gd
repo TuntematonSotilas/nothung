@@ -68,7 +68,8 @@ static func slider(value: float, step: float = 10.0) -> HSlider:
 	return result
 
 
-## Full-screen background plus a margin container holding the screen's column.
+## Full-screen background plus a margin container holding the screen's column, kept out of the notch
+## and system bars (SafeArea).
 static func screen_column(screen: Control, separation: int = 28) -> VBoxContainer:
 	var background := ColorRect.new()
 	background.color = Palette.BG
@@ -77,9 +78,8 @@ static func screen_column(screen: Control, separation: int = 28) -> VBoxContaine
 	screen.add_child(background)
 	var margin := MarginContainer.new()
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side: String in ["left", "top", "right", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, SCREEN_MARGIN)
 	screen.add_child(margin)
+	SafeArea.pad(margin, {"left": SCREEN_MARGIN, "top": SCREEN_MARGIN, "right": SCREEN_MARGIN, "bottom": SCREEN_MARGIN})
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override("separation", separation)
 	margin.add_child(column)
