@@ -1,7 +1,7 @@
 # UI implementation
 
 > How screens and interactions from [functional/07-ui-ux.md](../functional/07-ui-ux.md) are built in Godot.
-> Status: In progress · Last updated: 2026-10-22
+> Status: In progress · Last updated: 2026-10-28
 
 ## Display settings (`project.godot`)
 
@@ -15,7 +15,7 @@
 
 ## Scene composition
 
-- One scene per screen under `scenes/screens/`, swapped by the `SceneRouter` autoload (with a fade transition). The splash now starts a Gods-vs-Nibelungs duel.
+- One scene per screen under `scenes/screens/`, swapped by the `SceneRouter` autoload (with a fade transition): splash (title) → main menu → Quick match → duel. The main menu is the root of the back history (back quits there); leaving a duel clears the history and returns to the main menu.
 - Reusable components under `scenes/components/`; the first `CardView` and portrait duel screen are implemented.
 - UI built with `Control` nodes and containers; a shared `Theme` resource in `ui/theme/` for fonts, colours, styleboxes.
 
@@ -30,12 +30,20 @@
 - `scenes/screens/splash.tscn` is the project's startup scene.
 - The default Godot boot splash is disabled: `application/boot_splash/show_image=false` in `project.godot`, and `splash_screen/disable_godot_boot_splash=true` in the Android export preset. Both boot backgrounds use the clear colour (`#0E0F12`), so the launch goes straight from a dark screen to the Nothung splash. On Android 12+, the system still shows its own launch screen (app icon on that background) for a moment; it can't be removed.
 - Displays the game name and subtitle with a vector sword emblem; it uses no external assets.
-- The **Start Match** button opens the playable duel screen.
+- The **Start** button opens the main menu.
+
+## Menus
+
+- `scenes/screens/main_menu.tscn`: title, **Quick match**, **Settings**, and Campaign / Collection greyed out until they exist.
+- `scenes/screens/quick_match.tscn`: your deck (2 × 2 tiles: faction icon, faction, Leader, border in the faction colour, gold when selected), opponent (**Random** or a deck), difficulty (Easy / Normal / Hard with a one-line description), **Play**. Random is drawn among the other factions' decks when Play is pressed. The choices are saved in `Settings` (`quick_match` section) and offered again next time.
+- `scenes/screens/settings_menu.tscn`: music and sound-effect sliders (0–100 %, steps of 10), language tiles (device language, then each language under its own name). Each change goes through a `Settings.set_*()` setter, which applies it (locale, audio bus volume) and saves `settings.cfg` at once; the screen rebuilds itself after a language change.
+> **Decision (2026-10-28):** no animation speed nor text size option in Settings.
+- Menu screens are built in code with `ui/menu_ui.gd` (`MenuUI`: screen column, header with Back, labels, buttons, selectable tiles, touch-sized slider, faction order), sized for the 1080 × 1920 reference.
 
 ## CardView
 
 - `scenes/components/card_view.gd` displays translated name/rules, Energy cost and runtime/unit stats.
-- **Frame drawn in code** ([card frames](../functional/08-art-and-audio.md#card-frames)): `_card_style()` builds a `StyleBoxFlat` whose shape depends on the type (`SHAPE_RADIUS`; artifacts use `corner_detail = 1` for cut corners) and whose border takes the faction frame colour from `CardPalette` (`ui/theme/card_palette.gd`: faction frame / trim, card background, rarity colours, Ring) on the shared dark background. Children add the name banner (`NameBanner`, faction colour), the cost / attack / health holders (bare, no pill), the rarity badge (`RarityBadge`: letter on the rarity colour) and the relic ribbon. Sizes follow the card's size (`_face_k`), so hand, board and zoom cards share one layout.
+- **Frame drawn in code** ([card frames](../functional/08-art-and-audio.md#card-frames)): `_card_style()` builds a `StyleBoxFlat` whose shape depends on the type (`SHAPE_RADIUS`; spells and artifacts share the very rounded frame) and whose border takes the faction frame colour from `CardPalette` (`ui/theme/card_palette.gd`: faction frame / trim, card background, rarity colours, Ring) on the shared dark background. Children add the name banner (`NameBanner`, faction colour), the cost / attack / health holders (bare, no pill), the rarity badge (`RarityBadge`: letter on the rarity colour) and, for artifacts and relics, the type tab (`TypeTab`: faction colour, drawn out to the frame in the bottom-right corner with `expand_margin`). Sizes follow the card's size (`_face_k`), so hand, board and zoom cards share one layout.
 - Highlights are a `shadow` glow on the style; neither the card nor its face clip, so the glow and the full-width name banner can draw outside the face (the rules text clips itself).
 - The duel reconstructs hand/board/Leader/Energy/Life views from `Match` state after authoritative `GameEvent`s; views never mutate the rules engine.
 - Exhausted and ready units have distinct visual states. Dragging, zoom and pooling are not implemented yet.
@@ -50,8 +58,8 @@
 ## Duel and AI
 
 - `scenes/screens/duel.tscn` uses portrait containers for both boards, artifacts, Leaders, Energy, deck/graveyard counts, battle log and the scrollable hand.
-- The first match uses the generated Gods and Nibelungs starter decks. Redraw, action validation, turn updates, match results and rematches are wired to `Match`.
-- The AI (`ai/ai_player.gd`, Normal by default) runs on a `Thread` from a job of copies; the duel polls the thread each frame instead of blocking, and the main thread alone applies the returned action ([AI opponent](05-ai-opponent.md#threading)).
+- The duel plays the `DuelSetup` set by Quick match (`DuelSetup.next`: both decks and the AI difficulty), or Gods vs Nibelungs on Normal without one (tests). Rematches keep the setup. Redraw, action validation, turn updates, match results and rematches are wired to `Match`.
+- The AI (`ai/ai_player.gd`, difficulty from the setup) runs on a `Thread` from a job of copies; the duel polls the thread each frame instead of blocking, and the main thread alone applies the returned action ([AI opponent](05-ai-opponent.md#threading)).
 - A headless smoke test loads and starts the duel scene. The Android device play-through is still required before this milestone is complete.
 
 ## Animation pipeline
@@ -73,7 +81,7 @@ sequenceDiagram
 - The rules are resolved at once; animations only catch up (`duel.gd` `_play_fx`). The board is rebuilt **once per action**, after the events that need the old positions (spell, attack, damage, death), and before the draws, which need the new hand slots.
 - `scenes/components/duel_fx.gd` (`DuelFx`, on the `FxLayer` canvas layer, between the board and the modal layer) tweens **ghost** copies of cards; the duel hides the real view while its ghost plays. `CardView.shown_instance()` gives the stats as drawn, since the match has already changed them.
 - While a sequence runs, `DuelFx` stops taps (`MOUSE_FILTER_STOP`) and `_apply_action` ignores drags; the AI waits for `idle` before its next step, so each AI action is seen.
-- Speed from `Settings.animation_speed`: durations are divided by it (1×, 2×); `0` (instant) skips the animations and refreshes at once. UI integration tests run at instant speed; `tests/integration/test_duel_fx.gd` checks the animations.
+- Speed from `Settings.animation_speed` (not a user setting, not saved; 1 in the game): durations are divided by it; `0` (instant) skips the animations and refreshes at once. UI integration tests run at instant speed; `tests/integration/test_duel_fx.gd` checks the animations.
 
 ## Localisation
 

@@ -1,7 +1,7 @@
 # Game modes
 
 > Every way the player can play, and how modes connect.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-28
 
 ## Overview
 
@@ -60,6 +60,8 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 ## Quick match
 
 - Choose your deck, choose opponent deck (or random), choose difficulty (Easy / Normal / Hard).
+- Random draws a deck of another faction. The last choices are remembered for the next Quick match.
+- Until the deck builder exists, the choice is among the four starter decks.
 - Gives small rewards (see [06-progression](06-progression.md)).
 
 ## Deck builder

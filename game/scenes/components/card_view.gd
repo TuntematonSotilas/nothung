@@ -11,11 +11,12 @@ const CARD_SIZE: Vector2 = Vector2(216, 310)
 const LONG_PRESS_DURATION: float = 0.55
 ## Space between the frame and the card face (at hand size).
 const FACE_MARGIN: float = 14.0
-## Corner radius (at hand size) giving each type its frame shape; artifacts cut their corners (octagon).
+## Corner radius (at hand size) giving each type its frame shape; artifacts share the spells' rounded
+## frame and are told apart by the type tab in the bottom-right corner.
 const SHAPE_RADIUS: Dictionary = {
 	CardData.Type.UNIT: 8.0,
 	CardData.Type.SPELL: 30.0,
-	CardData.Type.ARTIFACT: 26.0,
+	CardData.Type.ARTIFACT: 30.0,
 }
 
 var card_data: CardData
@@ -43,6 +44,7 @@ var _cost_stone: PanelContainer
 var _cost_icon: TextureRect
 var _cost_label: Label
 var _faction_icon: TextureRect
+var _type_tab: PanelContainer
 var _type_label: Label
 var _type_icon: TextureRect
 var _rarity_badge: PanelContainer
@@ -50,8 +52,6 @@ var _rarity_label: Label
 var _name_label: Label
 var _art: TextureRect
 var _rules_label: Label
-var _ribbon: PanelContainer
-var _ribbon_label: Label
 var _stats_row: HBoxContainer
 var _attack_stone: PanelContainer
 var _attack_icon: TextureRect
@@ -268,7 +268,6 @@ func _refresh_text() -> void:
 	if is_unit:
 		_attack_label.text = str(card_instance.attack if card_instance != null else card_data.attack)
 		_health_label.text = str(card_instance.health if card_instance != null else card_data.health)
-	_ribbon.visible = card_data.is_relic()
 	_art.texture = card_data.art
 	_art.visible = card_data.art != null
 	_set_icon(_faction_icon, "res://ui/icons/faction_%s.svg" % card_data.faction)
@@ -278,7 +277,7 @@ func _refresh_text() -> void:
 
 
 ## Card face: cost, faction icon and rarity badge; name banner; illustration (when drawn); rules text;
-## "Bearer" ribbon for relics; attack / health (units) and the card type at the bottom.
+## attack / health (units) and the card type at the bottom (on a tab for artifacts and relics).
 ## Children of a Button do not change its size, so the card keeps its fixed size whatever the text.
 func _ensure_content() -> void:
 	if _content != null:
@@ -351,16 +350,6 @@ func _ensure_content() -> void:
 	_rules_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content.add_child(_rules_label)
 
-	_ribbon = PanelContainer.new()
-	_ribbon.name = "BearerRibbon"
-	_ribbon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ribbon.visible = false
-	_content.add_child(_ribbon)
-	_ribbon_label = _make_label("BearerLabel", Palette.TEXT)
-	_ribbon_label.text = "UI_BEARER"
-	_ribbon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_ribbon.add_child(_ribbon_label)
-
 	# Attack and health side by side at bottom-left (still visible when hand cards overlap), type at bottom-right.
 	_stats_row = HBoxContainer.new()
 	_stats_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -384,11 +373,20 @@ func _ensure_content() -> void:
 	stats_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stats_gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_stats_row.add_child(stats_gap)
+	# Artifacts and relics show it on a tab in the faction colour, filling the bottom-right corner.
+	_type_tab = PanelContainer.new()
+	_type_tab.name = "TypeTab"
+	_type_tab.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_type_tab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_stats_row.add_child(_type_tab)
+	var type_row: HBoxContainer = HBoxContainer.new()
+	type_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_type_tab.add_child(type_row)
 	_type_label = _make_label("TypeLabel", Palette.TEXT_MUTED)
 	_type_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_stats_row.add_child(_type_label)
+	type_row.add_child(_type_label)
 	_type_icon = _make_icon_slot("TypeIcon")
-	_stats_row.add_child(_type_icon)
+	type_row.add_child(_type_icon)
 	_apply_face_scale()
 
 
@@ -446,16 +444,16 @@ func _stone_row(stone: PanelContainer) -> HBoxContainer:
 
 
 ## Light text on the dark card background; the name takes the faction's text colour (dark on the
-## light Valkyries / Neutral banners); the relic ribbon picks the ink that reads on its trim.
+## light Valkyries / Neutral banners), and so does the type on the artifact tab.
 func _apply_face_colors() -> void:
 	var colors: Dictionary = CardPalette.colors_for(card_data)
 	var ink: Color = CardPalette.TEXT_LIGHT
 	_rules_label.add_theme_color_override("font_color", ink)
 	_name_label.add_theme_color_override("font_color", colors["text"])
-	_type_label.add_theme_color_override("font_color", Color(ink, 0.75))
+	var type_ink: Color = colors["text"] if _has_type_tab() else Color(ink, 0.75)
+	_type_label.add_theme_color_override("font_color", type_ink)
 	_faction_icon.modulate = colors["frame"]
-	_type_icon.modulate = Color(ink, 0.75)
-	_ribbon_label.add_theme_color_override("font_color", CardPalette.ink_on(colors["trim"]))
+	_type_icon.modulate = type_ink
 
 
 ## Fonts, icons and margins follow the card's actual size (board cards are smaller than hand cards).
@@ -478,7 +476,6 @@ func _apply_face_scale() -> void:
 	_type_label.add_theme_font_size_override("font_size", roundi(13 * k))
 	_name_label.add_theme_font_size_override("font_size", roundi(18 * k))
 	_rules_label.add_theme_font_size_override("font_size", roundi(15 * k))
-	_ribbon_label.add_theme_font_size_override("font_size", roundi(12 * k))
 	_attack_label.add_theme_font_size_override("font_size", roundi(18 * k))
 	_health_label.add_theme_font_size_override("font_size", roundi(18 * k))
 	_stats_row.add_theme_constant_override("separation", roundi(6 * k))
@@ -496,7 +493,7 @@ func _notification(what: int) -> void:
 		_apply_face_scale()
 
 
-## Frame, name banner, rarity badge, stones and ribbon styles; called when the card, its state or its size changes.
+## Frame, name banner, rarity badge, stones and type tab styles; called when the card, its state or its size changes.
 func _apply_styles() -> void:
 	add_theme_stylebox_override("normal", _card_style())
 	add_theme_stylebox_override("hover", _card_style(true))
@@ -505,7 +502,6 @@ func _apply_styles() -> void:
 	if _content == null:
 		return
 	var colors: Dictionary = CardPalette.colors_for(card_data)
-	var trim: Color = colors["trim"]
 	var k: float = _face_k
 	# Full-width band: drawn out to the frame on both sides, the name stays aligned with the face.
 	var banner: StyleBoxFlat = StyleBoxFlat.new()
@@ -529,12 +525,24 @@ func _apply_styles() -> void:
 	# Cost, attack and health are bare icon + number (no pill around them).
 	for stone: PanelContainer in [_cost_stone, _attack_stone, _health_stone]:
 		stone.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	var ribbon: StyleBoxFlat = StyleBoxFlat.new()
-	ribbon.bg_color = trim
-	ribbon.set_corner_radius_all(roundi(3 * k))
-	ribbon.content_margin_top = 1.0 * k
-	ribbon.content_margin_bottom = 1.0 * k
-	_ribbon.add_theme_stylebox_override("panel", ribbon)
+	if not _has_type_tab():
+		_type_tab.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		return
+	# Drawn out to the frame on the right and at the bottom, following the card's rounded corner.
+	var tab: StyleBoxFlat = StyleBoxFlat.new()
+	tab.bg_color = colors["frame"]
+	tab.expand_margin_right = to_frame
+	tab.expand_margin_bottom = to_frame
+	tab.expand_margin_top = 6.0 * k
+	tab.content_margin_left = 14.0 * k
+	tab.corner_radius_top_left = roundi(16 * k)
+	tab.corner_radius_bottom_right = maxi(0, roundi(_shape_radius() - _frame_width()))
+	tab.anti_aliasing = true
+	_type_tab.add_theme_stylebox_override("panel", tab)
+
+
+func _has_type_tab() -> bool:
+	return card_data != null and card_data.type == CardData.Type.ARTIFACT
 
 
 ## Thickness of the faction-coloured frame.
@@ -547,13 +555,10 @@ func _shape_radius() -> float:
 	return float(SHAPE_RADIUS.get(card_type, 8.0)) * _face_k
 
 
-## Frame shape by type: unit = rectangle with small corners, spell = very rounded, artifact = octagon.
+## Frame shape by type: unit = rectangle with small corners, spell and artifact = very rounded.
 func _shaped_box(radius: float) -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
 	box.set_corner_radius_all(roundi(radius))
-	if card_data != null and card_data.type == CardData.Type.ARTIFACT:
-		# One segment per corner: straight cut corners, i.e. an octagon.
-		box.corner_detail = 1
 	box.anti_aliasing = true
 	return box
 

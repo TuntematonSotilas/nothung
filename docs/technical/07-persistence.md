@@ -1,7 +1,7 @@
 # Persistence
 
 > What is saved on the device, in which format, and how saves evolve across versions.
-> Status: Draft · Last updated: 2026-10-15
+> Status: Draft · Last updated: 2026-10-28
 
 ## What is saved
 
@@ -10,7 +10,7 @@
 | Player profile: collection, Rhinegold, unlocks, achievements | `user://profile.json` | After each reward / change |
 | Decks | `user://profile.json` (section `decks`) | On deck save |
 | Campaign progress | `user://profile.json` (section `campaign`) | After each campaign duel or Quest ending |
-| Settings | `user://settings.cfg` (`ConfigFile`) | On change |
+| Settings: volumes (`audio`), language (`display`), last Quick match choices (`quick_match`) | `user://settings.cfg` (`ConfigFile`) | On change (every setter of the Settings screen) |
 | Match in progress | `user://current_match.json` (seed + decks + action list) | After each action, and when the app goes to background |
 
 On Android `user://` maps to the app's private internal storage.

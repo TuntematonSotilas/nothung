@@ -13,12 +13,12 @@ const BACKGROUND: Color = Color("#16181D")
 const FACTIONS: Dictionary = {
 	&"gods": {"frame": Color("#2E4A7D"), "trim": Color("#B8C4D6"), "text": TEXT_LIGHT},
 	&"nibelungs": {"frame": Color("#4E3366"), "trim": Color("#2B2930"), "text": TEXT_LIGHT},
-	&"walsungs": {"frame": Color("#8B2323"), "trim": Color("#B07D4F"), "text": TEXT_LIGHT},
-	&"valkyries": {"frame": Color("#DDE2E8"), "trim": Color("#6F7C8A"), "text": TEXT_DARK},
+	&"walsungs": {"frame": Color("#3B6E3E"), "trim": Color("#B07D4F"), "text": TEXT_LIGHT},
+	&"valkyries": {"frame": Color("#E0A0B8"), "trim": Color("#9C4A6E"), "text": TEXT_DARK},
 	&"neutral": {"frame": Color("#A39A86"), "trim": Color("#DCCFAE"), "text": TEXT_DARK},
 	# Reserved for expansions.
 	&"giants": {"frame": Color("#6B5A4C"), "trim": Color("#9C9286"), "text": TEXT_LIGHT},
-	&"gibichungs": {"frame": Color("#2D5641"), "trim": Color("#A8B59A"), "text": TEXT_LIGHT},
+	&"gibichungs": {"frame": Color("#8A4A24"), "trim": Color("#D8B07A"), "text": TEXT_LIGHT},
 }
 
 ## The Ring (and Cursed cards) use dark gold whatever their faction.

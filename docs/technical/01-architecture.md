@@ -1,7 +1,7 @@
 # Architecture
 
 > High-level structure of the Godot project and the rules that keep it maintainable.
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-28
 
 ## Stack
 
@@ -71,7 +71,7 @@ Keep them few and thin.
 | `SaveManager` | Read/write player profile ([07-persistence](07-persistence.md)) |
 | `SceneRouter` | Screen transitions, back-button handling |
 | `AudioManager` | Music / SFX buses, leitmotif stingers |
-| `Settings` | User settings (volumes, language, animation speed) |
+| `Settings` | User settings (volumes, language, last Quick match choices) |
 
 The `Match` itself is **not** an autoload: it is created per duel and owned by the duel scene.
 

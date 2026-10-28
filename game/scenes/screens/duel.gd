@@ -17,8 +17,8 @@ var _match: Match
 var _ui_scale: float = 1.0
 var _board_card_scale: float = 1.0
 var _ai_busy: bool = false
-## Opponent difficulty (the quick match menu will set it).
-var ai_difficulty: AIProfile.Difficulty = AIProfile.Difficulty.NORMAL
+## Decks and AI difficulty, from Quick match (DuelSetup.next) or the default; kept for rematches.
+var _setup: DuelSetup
 var _ai_profile: AIProfile
 var _ai_thread: Thread
 var _selected_hand_uid: int = -1
@@ -92,6 +92,7 @@ func _ready() -> void:
 		MIN_UI_SCALE,
 		MAX_UI_SCALE
 	)
+	_setup = DuelSetup.next if DuelSetup.next != null else DuelSetup.new()
 	_build_ui()
 	_start_match()
 
@@ -270,8 +271,8 @@ func _start_match() -> void:
 	_clear_undo()
 	_log_lines.clear()
 	_pending_events.clear()
-	_ai_profile = AIProfile.preset(ai_difficulty)
-	_match = Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), int(Time.get_unix_time_from_system()))
+	_ai_profile = AIProfile.preset(_setup.difficulty)
+	_match = Match.new(CardDatabase.get_deck(_setup.player_deck), CardDatabase.get_deck(_setup.opponent_deck), int(Time.get_unix_time_from_system()))
 	_match.event_emitted.connect(_on_match_event)
 	_refresh()
 	_continue_ai()
@@ -1069,13 +1070,19 @@ func _show_leave_confirmation(panel: PanelContainer) -> void:
 	var confirm: Button = _button("UI_LEAVE", 420)
 	confirm.name = "ConfirmLeaveButton"
 	confirm.pressed.connect(func() -> void:
-		SceneRouter.go_to("res://scenes/screens/splash.tscn", false)
+		_go_to_main_menu()
 	)
 	content.add_child(confirm)
 	var cancel: Button = _button("UI_CANCEL", 420)
 	cancel.theme_type_variation = &"ButtonPrimary"
 	cancel.pressed.connect(_show_pause_menu.bind(panel))
 	content.add_child(cancel)
+
+
+## Leaving the duel starts over from the main menu: no way "back" into a finished or abandoned match.
+func _go_to_main_menu() -> void:
+	SceneRouter.clear_history()
+	SceneRouter.go_to("res://scenes/screens/main_menu.tscn", false)
 
 
 func _close_pause() -> void:
@@ -1422,7 +1429,7 @@ func _show_results() -> void:
 	content.add_child(rematch)
 	var home: Button = _button("UI_HOME", 250)
 	home.pressed.connect(func() -> void:
-		SceneRouter.go_to("res://scenes/screens/splash.tscn", false)
+		_go_to_main_menu()
 	)
 	content.add_child(home)
 

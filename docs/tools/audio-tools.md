@@ -1,7 +1,7 @@
 # Audio tools
 
 > Recommended software and workflow for music (Wagner leitmotifs) and sound effects. Direction and rights: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-09
+> Status: Draft · Last updated: 2026-10-28
 
 Prices and licences change — check them before buying.
 
@@ -66,6 +66,6 @@ Possible for prototyping. For the final game, check the tool's commercial terms 
 | SFX | WAV 16-bit (short), OGG (long) | WAV = lowest latency |
 | Loudness | Music ~ −16 LUFS, SFX balanced against music | Keep consistent across files |
 
-- Godot audio buses: `Master` → `Music`, `SFX`, `Stingers` (volumes from Settings).
+- Godot audio buses (`game/default_bus_layout.tres`): `Master` → `Music`, `SFX`, with their volumes set from Settings (0 mutes the bus). A `Stingers` bus will be added with the first stingers.
 - For layered / adaptive music (e.g. add the Curse motif over the board music while the Ring is held), look at Godot's `AudioStreamInteractive` / `AudioStreamSynchronized` (Godot 4.3+).
 - Keep a `CREDITS.md` entry for every third-party sound (source URL + licence).

@@ -1,7 +1,7 @@
 # Project structure
 
 > Folder layout of the repository and the Godot project, plus naming conventions.
-> Status: Draft · Last updated: 2026-10-16
+> Status: Draft · Last updated: 2026-10-28
 
 ## Repository
 
@@ -39,7 +39,7 @@ res://
 │   ├── leaders/
 │   └── campaign/               # Chapter & duel definitions
 ├── scenes/
-│   ├── screens/                # main_menu.tscn, duel.tscn, deck_builder.tscn…
+│   ├── screens/                # splash, main_menu, quick_match, settings_menu, duel…
 │   ├── components/             # card_view.tscn, hand_view.tscn, board_view.tscn…
 │   └── popups/
 ├── ui/

@@ -1,7 +1,7 @@
 # AI opponent
 
 > How the computer opponent chooses its moves. Supports [functional/05-game-modes.md](../functional/05-game-modes.md).
-> Status: In progress · Last updated: 2026-10-27
+> Status: In progress · Last updated: 2026-10-28
 
 ## Requirements
 
@@ -115,4 +115,4 @@ Rules that make this safe:
 
 For debugging and tests, `AIPlayer.choose()` can also run **synchronously** on the calling thread.
 
-The duel uses **Normal** until the quick match menu (milestone 5) lets the player choose (`duel.gd: ai_difficulty`).
+The player picks the difficulty in **Quick match**; the duel reads it from `DuelSetup` (Normal when started without one, e.g. in tests).

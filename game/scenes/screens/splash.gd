@@ -16,8 +16,9 @@ func _ready() -> void:
 	fade_in.tween_property(content, "modulate:a", 1.0, 1.0)
 
 
+## The title screen opens the main menu, which becomes the root of the back history.
 func _on_start_pressed() -> void:
-	SceneRouter.go_to("res://scenes/screens/duel.tscn")
+	SceneRouter.go_to("res://scenes/screens/main_menu.tscn", false)
 
 
 func _draw() -> void:

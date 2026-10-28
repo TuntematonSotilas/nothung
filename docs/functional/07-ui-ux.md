@@ -16,8 +16,7 @@
 
 ```mermaid
 flowchart TD
-    Splash --> Title
-    Title --> MainMenu
+    Splash[Splash / Title] --> MainMenu
     MainMenu --> Campaign
     MainMenu --> QuickMatch
     MainMenu --> Collection
@@ -25,7 +24,7 @@ flowchart TD
     MainMenu -->|interrupted match| Duel
     Campaign --> ChapterMap --> StoryPanel --> DeckSelect
     ChapterMap --> Quest --> Results
-    QuickMatch --> DeckSelect
+    QuickMatch --> OpeningHand
     DeckSelect --> OpeningHand --> Duel
     Duel --> Pause
     Duel --> Results
@@ -38,7 +37,9 @@ flowchart TD
 
 | Screen | Key elements |
 |--------|--------------|
+| Title | Game name, subtitle, sword emblem, **Start** (the startup screen doubles as the title) |
 | Main menu | Campaign, Quick match, Collection, Settings; Rhinegold counter; **Resume match** prompt (Resume / Abandon) when a match was interrupted ([persistence](../technical/07-persistence.md#resume-an-interrupted-match)) |
+| Quick match | Your deck and the opponent's (**Random** or a deck) as tiles with faction icon, faction and Leader; difficulty Easy / Normal / Hard with a one-line description; **Play**. Last choices remembered |
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |
@@ -48,7 +49,7 @@ flowchart TD
 | **Duel** | Top bar: whose turn (no how-to instructions: the gold and red borders show what to tap, greyed cards and buttons what cannot be used), turn number (each player counts their own turns), Götterdämmerung countdown (from turn 7, then "Valhalla burns" once it is active), pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
 | Results | Win/lose, rewards, continue |
 | Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
-| Settings | Audio volumes, language, animation speed, reset progress |
+| Settings | Music and sound-effect volumes, language (device language or English / Deutsch / Español / Français); reset progress once the profile save exists |
 
 ## Duel screen layout (portrait)
 
@@ -117,14 +118,14 @@ flowchart TD
 | Unit destroyed | Red tint and shake, then the card shrinks, sinks and fades (0.35 s) |
 | Card drawn | A card back flies in from the right edge and turns into the card at its place in the hand (0.3 s). Enemy draws: a small card back slides into the enemy Leader panel |
 
-- The screen is locked while an animation plays (about 0.5–1 s); the AI waits for each animation before its next step. The **animation speed** setting (1×, 2×, instant) scales them.
-- AI turn is visible step by step; speed configurable (1×, 2×, instant).
+- The screen is locked while an animation plays (about 0.5–1 s); the AI waits for each animation before its next step.
+- AI turn is visible step by step.
 - Log of the last actions accessible from the duel screen.
 
 > **Playable match (2026-10-16):** the initial duel is launched from the splash screen. Tap-to-select/tap-target and drag-and-drop controls are verified on Android, as is long-press card zoom. A full match was played to its result screen on the Android emulator.
 
 ## Accessibility
 
-- Text size option; colour-blind safe faction colours (don't rely on colour alone — use icons).
+- Colour-blind safe faction colours (don't rely on colour alone — use icons).
 - No time pressure on the player's turn.
 - Haptic feedback toggle.

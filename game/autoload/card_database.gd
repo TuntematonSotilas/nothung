@@ -41,6 +41,14 @@ func get_deck(deck_id: StringName) -> DeckData:
 	return _decks.get(deck_id, null) as DeckData
 
 
+## Returns the IDs of every registered deck (the starter decks for now).
+func deck_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for deck_id: StringName in _decks.keys():
+		ids.append(deck_id)
+	return ids
+
+
 ## Returns the number of registered card definitions.
 func card_count() -> int:
 	return _cards.size()

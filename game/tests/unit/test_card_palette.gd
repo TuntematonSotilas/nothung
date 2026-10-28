@@ -28,21 +28,20 @@ func test_card_view_shape_follows_the_type() -> void:
 	var spell_style: StyleBoxFlat = spell.get_theme_stylebox("normal") as StyleBoxFlat
 	var artifact_style: StyleBoxFlat = artifact.get_theme_stylebox("normal") as StyleBoxFlat
 	assert_int(spell_style.corner_radius_top_left).is_greater(unit_style.corner_radius_top_left * 2)
-	# Octagon: cut (one-segment) corners.
-	assert_int(artifact_style.corner_detail).is_equal(1)
-	assert_int(unit_style.corner_detail).is_greater(1)
+	# Artifacts share the spells' rounded frame; the type tab tells them apart.
+	assert_int(artifact_style.corner_radius_top_left).is_equal(spell_style.corner_radius_top_left)
 
 
 func test_card_view_colours_follow_faction_rarity_and_ring() -> void:
 	var valkyrie: CardView = await _view(CardData.Type.UNIT, &"valkyries", CardData.Rarity.EPIC)
 	var style: StyleBoxFlat = valkyrie.get_theme_stylebox("normal") as StyleBoxFlat
 	# Faction colour on the frame (border), dark background.
-	assert_str(style.border_color.to_html(false)).is_equal("dde2e8")
+	assert_str(style.border_color.to_html(false)).is_equal("e0a0b8")
 	assert_str(style.bg_color.to_html(false)).is_equal("16181d")
 	var name_label: Label = valkyrie.find_child("NameLabel", true, false) as Label
 	# Name on a banner in the faction colour, in that faction's text colour (dark on Valkyries).
 	var banner: PanelContainer = valkyrie.find_child("NameBanner", true, false) as PanelContainer
-	assert_str((banner.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.to_html(false)).is_equal("dde2e8")
+	assert_str((banner.get_theme_stylebox("panel") as StyleBoxFlat).bg_color.to_html(false)).is_equal("e0a0b8")
 	assert_str(name_label.get_theme_color("font_color").to_html(false)).is_equal("1c1a17")
 	var rules_label: Label = valkyrie.find_child("RulesLabel", true, false) as Label
 	assert_str(rules_label.get_theme_color("font_color").to_html(false)).is_equal("f4efe4")
@@ -66,11 +65,17 @@ func test_highlight_glows_without_hiding_the_faction_frame() -> void:
 	assert_str(style.shadow_color.to_html(false)).is_equal(Palette.LIFE.to_html(false))
 
 
-func test_relics_show_the_bearer_ribbon() -> void:
-	var relic: CardView = await _view(CardData.Type.ARTIFACT, &"gods", CardData.Rarity.RARE, false, [&"relic"])
-	assert_bool((relic.find_child("BearerRibbon", true, false) as Control).visible).is_true()
-	var plain: CardView = await _view(CardData.Type.ARTIFACT)
-	assert_bool((plain.find_child("BearerRibbon", true, false) as Control).visible).is_false()
+func test_artifacts_show_their_type_on_a_faction_tab() -> void:
+	var artifact: CardView = await _view(CardData.Type.ARTIFACT, &"valkyries")
+	var tab: StyleBoxFlat = artifact.find_child("TypeTab", true, false).get_theme_stylebox("panel") as StyleBoxFlat
+	assert_object(tab).is_not_null()
+	assert_str(tab.bg_color.to_html(false)).is_equal("e0a0b8")
+	var type_label: Label = artifact.find_child("TypeLabel", true, false) as Label
+	assert_str(type_label.text).is_equal("Artifact")
+	# The type reads in the faction's text colour (dark on the light Valkyries tab).
+	assert_str(type_label.get_theme_color("font_color").to_html(false)).is_equal("1c1a17")
+	var spell: CardView = await _view(CardData.Type.SPELL, &"valkyries")
+	assert_object(spell.find_child("TypeTab", true, false).get_theme_stylebox("panel")).is_instanceof(StyleBoxEmpty)
 
 
 func _view(

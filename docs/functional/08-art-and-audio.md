@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-23
+> Status: Draft · Last updated: 2026-10-28
 
 ## Art direction
 
@@ -20,7 +20,7 @@ Readability at phone size is the priority: one clear subject per illustration, h
 | Visual cue | Encodes | Values |
 |------------|---------|--------|
 | **Frame colour** | Faction | See faction palette below |
-| **Frame shape** | Type | **Unit**: rectangular frame with Attack ⚔ and Health ♥ stones · **Spell**: rounded, parchment-like frame · **Artifact**: octagonal frame · **Relic**: octagonal frame + "Bearer" ribbon |
+| **Frame shape** | Type | **Unit**: rectangular frame with Attack ⚔ and Health ♥ stones · **Spell**: very rounded frame · **Artifact** / **Relic**: very rounded frame + type tab in the faction colour (bottom-right corner) |
 | **Rarity badge** (top right) | Rarity | A letter on the rarity colour: **C** Common grey · **R** Rare blue · **E** Epic purple · **L** Legendary gold (see [rarity colours](#rarity-colours)) |
 
 Why faction rather than type: decks are one faction + Neutral, so colour tells at a glance which side a card belongs to (collection, deck builder, enemy board). With only 3 types, shape is enough to tell them apart.
@@ -31,22 +31,22 @@ Why faction rather than type: decks are one faction + Neutral, so colour tells a
 
 ### Faction palette (draft)
 
-Muted, slightly desaturated tones to match the Romantic direction (aged pigments, not saturated UI colours). Each faction has a **frame** colour (main fill) and a **trim** colour (borders, ornaments, type line). Hues are spread around the colour wheel, and the two light frames (Valkyries, Neutral) are told apart by temperature (cool vs warm).
+Muted, slightly desaturated tones to match the Romantic direction (aged pigments, not saturated UI colours). Each faction has a **frame** colour (main fill) and a **trim** colour (borders, ornaments, type line). Hues are spread around the colour wheel, and the two light frames (Valkyries, Neutral) are told apart by hue (pink vs parchment).
 
 | Faction | Colour | Frame | Trim | Card text | Symbol |
 |---------|--------|-------|------|-----------|--------|
 | Gods | Blue / silver | `#2E4A7D` | `#B8C4D6` | Light | Spear |
 | Nibelungs | Purple / charcoal (Tarnhelm sorcery, Nibelheim) | `#4E3366` | `#2B2930` | Light | Anvil |
-| Wälsungs & Heroes | Red | `#8B2323` | `#B07D4F` (bronze) | Light | Sword |
-| Valkyries | White / steel | `#DDE2E8` | `#6F7C8A` | Dark | Winged helm |
+| Wälsungs & Heroes | Forest green (the Wölfings' forest, the ash tree) | `#3B6E3E` | `#B07D4F` (bronze) | Light | Sword |
+| Valkyries | Light pink | `#E0A0B8` | `#9C4A6E` | Dark | Winged helm |
 | Neutral | Grey / parchment | `#A39A86` | `#DCCFAE` | Dark | Rhine wave |
 | **Ring / Cursed** (any faction) | Dark gold | `#7A5A14` | `#C9A33A` | Light | — |
 | *Reserved — Giants (expansion)* | *Brown / stone* | *`#6B5A4C`* | *`#9C9286`* | *Light* | *Club* |
-| *Reserved — Gibichungs (expansion)* | *Deep green* | *`#2D5641`* | *`#A8B59A`* | *Light* | *Goblet* |
+| *Reserved — Gibichungs (expansion)* | *Rust* | *`#8A4A24`* | *`#D8B07A`* | *Light* | *Goblet* |
 
-Shared text colours: **Light** = `#F4EFE4` (warm off-white), **Dark** = `#1C1A17` (ink). Every frame meets a WCAG contrast ratio of at least **5.5:1** with its text colour (target ≥ 4.5:1).
+Shared text colours: **Light** = `#F4EFE4` (warm off-white), **Dark** = `#1C1A17` (ink). Every frame meets a WCAG contrast ratio of at least **5:1** with its text colour (target ≥ 4.5:1).
 
-*Nibelungs moved from "dark gold / black" to purple so they don't clash with the dark-gold Ring / Cursed frame. Values are a starting point: adjust them on the mood board, keeping the contrast target and the hue spacing.*
+*Nibelungs moved from "dark gold / black" to purple so they don't clash with the dark-gold Ring / Cursed frame. Valkyries moved from white / steel to light pink (2026-10-28): the white frame looked unfinished on the dark card background. Wälsungs moved from red to forest green the same day; Gibichungs, which had the green, take rust. Values are a starting point: adjust them on the mood board, keeping the contrast target and the hue spacing.*
 
 ### Rarity colours
 
@@ -104,14 +104,16 @@ Game logo for *Nothung: The Ring Card Game* built around the sword Nothung (e.g.
 
 > **Decision (2026-10-23):** Frames are **drawn by the game** (Godot `StyleBox` shapes and colours, no image), not painted. They stay sharp at any size and need no art. Only the illustrations and the card-type icons are drawn by hand. **Update (2026-10-23):** the faction colour is on the frame (thin border) and on the name banner only; the card background stays dark until the illustrations, which include their own background.
 
-Frames follow the [card colour system](#card-colour-system): 4 shapes × the faction colours + the dark-gold Ring / Cursed variant. Colours: `game/ui/theme/card_palette.gd` (checked against the tables above by a test).
+Frames follow the [card colour system](#card-colour-system): 2 shapes (+ the artifact type tab) × the faction colours + the dark-gold Ring / Cursed variant. Colours: `game/ui/theme/card_palette.gd` (checked against the tables above by a test).
 
 | Type | Frame |
 |------|-------|
 | Unit | Rectangle with small corners; Attack and Health (icon + number) at the bottom left (still visible when hand cards overlap) |
 | Spell | Very rounded corners |
-| Artifact | **Octagon** (cut corners) |
-| Relic | Octagon + a **Bearer** ribbon in the trim colour above the bottom edge |
+| Artifact | Very rounded corners, like spells, + a **type tab** (*Artifact*) in the faction colour filling the bottom-right corner (type in the faction's card text colour) |
+| Relic | Same as an artifact, the tab reads *Relic* |
+
+> **Decision (2026-10-28):** the octagon (cut corners) for artifacts and relics is dropped: it did not look good. Artifacts and relics take the spells' rounded frame and are told apart by the type tab. The relic **Bearer** ribbon is dropped too: the tab already says *Relic*, and the Bearer requirement is in the rules text.
 
 - Every frame: a thin border in the **faction frame colour** (dark gold for the Ring) and the card **name on a banner** in that colour (full-width band), on a **dark background** (`#16181D`) that the card illustration will cover. Top row: cost (left), then the **faction icon** in the faction colour and the **rarity badge** (letter C / R / E / L on the rarity colour) on the right. Bottom row: attack and health (units, left) and the **card type** (name, then its icon once drawn) on the right. Cost, attack and health are bare icon + number, without a pill.
 - The illustration (`assets/art/cards/<id>.png`) is shown between the name and the rules text when it exists.

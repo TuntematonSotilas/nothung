@@ -95,12 +95,12 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 5 — Menus & meta
 
-- [ ] Title and main menu
-- [ ] Quick match (deck / opponent / difficulty)
+- [x] Title and main menu (Campaign, Collection, Settings greyed out until they exist) ([UI implementation](technical/06-ui-implementation.md#menus))
+- [x] Quick match (deck / opponent or Random / difficulty, last choices remembered)
 - [ ] Collection, deck builder, Nibelheim (card crafting) ([game modes](functional/05-game-modes.md), [progression](functional/06-progression.md))
 - [ ] Profile save (atomic JSON, migrations) ([persistence](technical/07-persistence.md))
 - [ ] Resume an interrupted match
-- [ ] Settings: audio, language, animation speed, text size
+- [x] Settings: music / sound-effect volumes, language ([UI implementation](technical/06-ui-implementation.md#menus)); *reset progress* comes with the profile save
 - [ ] Achievements
 
 ## 6 — Test matches

@@ -14,12 +14,12 @@
 │                         │
 │ Guard.                  │  traits
 │ On play: draw a card.   │  rules text
-│ [       BEARER        ] │  ribbon, relics only
 │ ⚔ 3  ♥ 5        Unit ▣  │  attack · health (units) · type name + icon
+│                ▐Artifact│  artifacts / relics: type on a tab in the faction colour, bottom-right corner
 └─────────────────────────┘
 ```
 
-> **Updated (2026-10-23):** layout as built in the game ([card frames](08-art-and-audio.md#card-frames)). Frames are drawn by the game, not painted: the faction colour is on the border and the name banner, the background stays dark until the illustration covers it. The **frame shape** encodes the type (unit: rectangle · spell: very rounded · artifact: octagon · relic: octagon + Bearer ribbon). Subtype and flavour text are not shown on the card face yet (planned for the zoomed card).
+> **Updated (2026-10-23):** layout as built in the game ([card frames](08-art-and-audio.md#card-frames)). Frames are drawn by the game, not painted: the faction colour is on the border and the name banner, the background stays dark until the illustration covers it. The **frame shape** encodes the type (unit: rectangle · spell, artifact and relic: very rounded); artifacts and relics also show their type (*Artifact* / *Relic*) on a **tab in the faction colour** in the bottom-right corner. **Update (2026-10-28):** the octagon and the Bearer ribbon were dropped; the Bearer requirement is in the rules text. Subtype and flavour text are not shown on the card face yet (planned for the zoomed card).
 
 | Field | Required | Notes |
 |-------|----------|-------|
