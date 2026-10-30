@@ -16,7 +16,7 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | Done |
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | In progress |
-| 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | To do |
+| 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | In progress (achievements and phone checks left) |
 | 6 | [Test matches](#6--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
 | 7 | [Campaign](#7--campaign) | Prologue + chapter 1 playable | To do |
 | 8 | [Release](#8--release) | Internal build on Google Play | To do |
@@ -96,15 +96,16 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 5 — Menus & meta
 
-- [x] Title and main menu (Campaign, Collection, Settings greyed out until they exist) ([UI implementation](technical/06-ui-implementation.md#menus))
-- [x] Quick match (deck / opponent or Random / difficulty, last choices remembered)
+- [x] Title and main menu: Quick match, Collection, Settings, Rhinegold counter; Campaign greyed out until it exists ([UI implementation](technical/06-ui-implementation.md#menus))
+- [x] Quick match (your deck ready to play / opponent starter deck or Random / difficulty, last choices remembered)
 - [x] Collection screen: every card with the copies owned, faction chips + filters (cost, type, rarity, trait, owned / missing), card shown large; new profile owns the four starter decks
-- [ ] Deck builder (decks from the collection, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
-- [ ] Nibelheim (card crafting with Rhinegold) + Quick match rewards ([progression](functional/06-progression.md))
-- [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)); nothing writes to it yet: rewards and decks come with the collection and the campaign
+- [x] Deck builder (decks from the collection, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
+- [x] Nibelheim (card crafting with Rhinegold) + Quick match rewards ([progression](functional/06-progression.md))
+- [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)): collection, Leaders, decks, Rhinegold
 - [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))
 - [x] Settings: music / sound-effect volumes, language, reset progress ([UI implementation](technical/06-ui-implementation.md#menus))
-- [ ] Achievements
+- [ ] Achievements ([progression](functional/06-progression.md#achievements-examples))
+- [ ] Check on the phone: scrolling the card grids with a finger (a scroll must not open a card), typing a deck name with the Android keyboard, resuming after the app is force-stopped mid-duel, menu titles clear of the notch
 
 ## 6 — Test matches
 

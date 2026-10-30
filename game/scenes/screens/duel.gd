@@ -78,6 +78,8 @@ var _undo_log_lines: Array[String] = []
 ## Events of the action being applied, animated once it resolves (see _play_fx).
 var _pending_events: Array[GameEvent] = []
 var _fx: DuelFx
+## Rhinegold paid for this match's win (0 until then); taken back if the winning play is undone.
+var _reward: int = 0
 ## The Götterdämmerung explanation pops up once per match.
 var _doom_explained: bool = false
 
@@ -270,6 +272,7 @@ func _build_ui() -> void:
 func _start_match() -> void:
 	_results_shown = false
 	_doom_explained = false
+	_reward = 0
 	_clear_undo()
 	_log_lines.clear()
 	_pending_events.clear()
@@ -282,8 +285,8 @@ func _start_match() -> void:
 		_match = resumed.replay(CardDatabase)
 		_record = resumed
 	if _match == null:
-		var player_deck: DeckData = CardDatabase.get_deck(_setup.player_deck)
-		var opponent_deck: DeckData = CardDatabase.get_deck(_setup.opponent_deck)
+		var player_deck: DeckData = _setup.player_deck
+		var opponent_deck: DeckData = _setup.opponent_deck
 		var match_seed: int = int(Time.get_unix_time_from_system())
 		_match = Match.new(player_deck, opponent_deck, match_seed)
 		_record = MatchRecord.create(player_deck, opponent_deck, match_seed)
@@ -307,6 +310,19 @@ func _save_progress() -> void:
 		SaveManager.delete_match()
 	else:
 		SaveManager.save_match(_record.to_dict())
+	_settle_reward()
+
+
+## A win pays once; undoing the winning play from the results takes it back.
+func _settle_reward() -> void:
+	var state: GameState = _match.get_state()
+	var won: bool = state.phase == GameState.Phase.GAME_OVER and state.winner == HUMAN_PLAYER
+	if won and _reward == 0 and _setup.rewards:
+		_reward = Progression.quick_match_reward(_setup.difficulty)
+		SaveManager.add_rhinegold(_reward)
+	elif not won and _reward > 0:
+		SaveManager.add_rhinegold(-_reward)
+		_reward = 0
 
 
 func _record_action(action: Action) -> void:
@@ -1456,6 +1472,13 @@ func _show_results() -> void:
 	content.add_theme_constant_override("separation", 20)
 	center.add_child(content)
 	content.add_child(_label(_status_text(_match.get_state()), 42, Palette.ACCENT))
+	if _reward > 0:
+		var reward: Label = _label("", 28, Palette.ACCENT)
+		reward.name = "RewardLabel"
+		reward.text = tr("UI_REWARD").format({"amount": _reward})
+		reward.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		content.add_child(reward)
 	_results_undo_button = _button("UI_UNDO_PLAY", 250)
 	_set_button_icon(_results_undo_button, "undo", Palette.TEXT)
 	_results_undo_button.visible = false

@@ -33,8 +33,10 @@ static func default_profile() -> Dictionary:
 		"decks": [],
 		"campaign": {},
 		"achievements": [],
-		# Until the campaign unlocks factions, a new player owns the four starter decks.
+		# Until the campaign unlocks factions, a new player owns the four starter decks, and gets a
+		# copy of each as an editable deck.
 		"starter_collection_granted": false,
+		"starter_decks_copied": false,
 	}
 
 
@@ -82,12 +84,87 @@ func rhinegold() -> int:
 	return int(profile.get("rhinegold", 0))
 
 
-## Gives the starter decks' cards and Leaders once per profile. Returns whether the profile changed.
+## Adds (or, negative, takes back) Rhinegold, never below 0, and saves.
+func add_rhinegold(amount: int) -> void:
+	profile["rhinegold"] = maxi(0, rhinegold() + amount)
+	save_profile()
+	profile_changed.emit()
+
+
+## Nibelheim: one more copy of the card for its price. False (nothing spent) when the player cannot
+## afford it or already has as many copies as a deck can hold.
+func craft(card: CardData) -> bool:
+	var price: int = Progression.craft_price(card)
+	if rhinegold() < price or not Progression.can_craft(card, owned_count(card.id)):
+		return false
+	profile["rhinegold"] = rhinegold() - price
+	profile["collection"][String(card.id)] = owned_count(card.id) + 1
+	save_profile()
+	profile_changed.emit()
+	return true
+
+
+func decks() -> Array:
+	return profile["decks"]
+
+
+## The player's deck with this ID, or {} when there is none.
+func find_deck(deck_id: String) -> Dictionary:
+	for entry: Dictionary in profile["decks"]:
+		if str(entry.get("id", "")) == deck_id:
+			return entry
+	return {}
+
+
+## A new deck, saved; {} when every slot is used.
+func create_deck(leader_id: String, cards: Array = [], deck_name: String = "") -> Dictionary:
+	var entry: Dictionary = add_deck(profile, leader_id, cards, deck_name)
+	if not entry.is_empty():
+		save_profile()
+	return entry
+
+
+## Saves the profile after a deck (an entry of decks()) was changed in place.
+func update_deck(_entry: Dictionary) -> void:
+	save_profile()
+
+
+func delete_deck(deck_id: String) -> void:
+	var entry: Dictionary = find_deck(deck_id)
+	if not entry.is_empty():
+		(profile["decks"] as Array).erase(entry)
+		save_profile()
+
+
+func duplicate_deck(deck_id: String, copy_name: String) -> Dictionary:
+	var source: Dictionary = find_deck(deck_id)
+	if source.is_empty():
+		return {}
+	return create_deck(str(source["leader"]), (source["cards"] as Array).duplicate(), copy_name)
+
+
+## Appends a deck with a new ID; {} when every slot is used.
+static func add_deck(data: Dictionary, leader_id: String, cards: Array = [], deck_name: String = "") -> Dictionary:
+	var deck_list: Array = data["decks"]
+	if deck_list.size() >= DeckRules.MAX_DECKS:
+		return {}
+	var next: int = 1
+	for existing: Variant in deck_list:
+		if existing is Dictionary:
+			next = maxi(next, str((existing as Dictionary).get("id", "")).trim_prefix("deck_").to_int() + 1)
+	var entry: Dictionary = {"id": "deck_%d" % next, "name": deck_name, "leader": leader_id, "cards": cards}
+	deck_list.append(entry)
+	return entry
+
+
+## Gives the starter decks' cards and Leaders, and their copies as decks, once per profile.
+## Returns whether the profile changed.
 func _grant_starter_collection() -> bool:
-	if profile.get("starter_collection_granted", false) or not is_inside_tree():
+	var done: bool = profile.get("starter_collection_granted", false) and profile.get("starter_decks_copied", false)
+	if done or not is_inside_tree():
 		return false
 	var starters: Array[DeckData] = []
-	for deck_id: StringName in CardDatabase.deck_ids():
+	for deck_id: StringName in MenuUI.ordered_decks(CardDatabase.deck_ids()):
 		if String(deck_id).ends_with("_starter"):
 			starters.append(CardDatabase.get_deck(deck_id))
 	add_starter_decks(profile, starters)
@@ -95,19 +172,27 @@ func _grant_starter_collection() -> bool:
 
 
 ## Owned copies become what the decks need (not the sum: decks share the collection), Leaders are
-## unlocked.
+## unlocked; each starter deck is copied into the player's decks. Each part is done once.
 static func add_starter_decks(data: Dictionary, starters: Array[DeckData]) -> void:
-	var collection: Dictionary = data["collection"]
-	var leaders: Array = data["leaders"]
-	for deck: DeckData in starters:
-		if not leaders.has(String(deck.leader.id)):
-			leaders.append(String(deck.leader.id))
-		var counts: Dictionary = {}
-		for card: CardData in deck.cards:
-			counts[String(card.id)] = int(counts.get(String(card.id), 0)) + 1
-		for card_id: String in counts:
-			collection[card_id] = maxi(int(collection.get(card_id, 0)), int(counts[card_id]))
-	data["starter_collection_granted"] = true
+	if not data.get("starter_collection_granted", false):
+		var collection: Dictionary = data["collection"]
+		var leaders: Array = data["leaders"]
+		for deck: DeckData in starters:
+			if not leaders.has(String(deck.leader.id)):
+				leaders.append(String(deck.leader.id))
+			var counts: Dictionary = {}
+			for card: CardData in deck.cards:
+				counts[String(card.id)] = int(counts.get(String(card.id), 0)) + 1
+			for card_id: String in counts:
+				collection[card_id] = maxi(int(collection.get(card_id, 0)), int(counts[card_id]))
+		data["starter_collection_granted"] = true
+	if not data.get("starter_decks_copied", false):
+		for deck: DeckData in starters:
+			var cards: Array = []
+			for card: CardData in deck.cards:
+				cards.append(String(card.id))
+			add_deck(data, String(deck.leader.id), cards)
+		data["starter_decks_copied"] = true
 
 
 ## Atomic write: write a temp file, keep the previous profile as backup, then swap.
@@ -224,10 +309,11 @@ static func _migrate_v1_to_v2(data: Dictionary) -> void:
 		data.erase("hoard")
 
 
-## v2 → v3: owned Leaders, and the starter collection, granted on the next load.
+## v2 → v3: owned Leaders, and the starter collection and decks, granted on the next load.
 static func _migrate_v2_to_v3(data: Dictionary) -> void:
 	data["leaders"] = []
 	data["starter_collection_granted"] = false
+	data["starter_decks_copied"] = false
 
 
 func _backup_path() -> String:

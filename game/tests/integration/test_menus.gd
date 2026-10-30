@@ -24,6 +24,8 @@ func before_test() -> void:
 	Settings.path = directory + "/settings.cfg"
 	SaveManager.path = directory + "/profile.json"
 	SaveManager.match_path = directory + "/current_match.json"
+	# A new player's profile: the starter decks as deck_1 (Gods) … deck_4 (Valkyries).
+	SaveManager.reset_profile()
 	Settings.animation_speed = 0.0
 	DuelSetup.next = null
 
@@ -62,8 +64,8 @@ func test_collection_shows_every_card_with_the_copies_owned() -> void:
 	var screen: Control = await _open("res://scenes/screens/collection.tscn")
 	var grid: GridContainer = screen.find_child("CardGrid", true, false) as GridContainer
 	assert_int(grid.get_child_count()).is_equal(CardDatabase.card_ids().size())
-	assert_str((screen.find_child("Card_loge", true, false).find_child("Owned", true, false) as Label).text).is_equal("× 2")
-	assert_str((screen.find_child("Card_froh", true, false).find_child("Owned", true, false) as Label).text).is_equal("UI_NOT_OWNED")
+	assert_str((screen.find_child("Card_loge", true, false).find_child("Caption", true, false) as Label).text).is_equal("× 2")
+	assert_str((screen.find_child("Card_froh", true, false).find_child("Caption", true, false) as Label).text).is_equal("UI_NOT_OWNED")
 	# Gods first, by cost: the first card is the cheapest Gods card.
 	var first: CardData = (grid.get_child(0).get_child(0) as CardView).card_data
 	assert_str(String(first.faction)).is_equal("gods")
@@ -91,7 +93,7 @@ func test_collection_card_opens_large_with_its_copies() -> void:
 	(screen.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
 	var detail: Control = screen.find_child("CardDetail", true, false) as Control
 	assert_object(detail).is_not_null()
-	assert_str((detail.find_child("OwnedCopies", true, false) as Label).text).contains("2")
+	assert_str((detail.find_child("Line0", true, false) as Label).text).contains("2")
 	screen.queue_free()
 
 
@@ -104,6 +106,105 @@ func test_new_profile_owns_the_four_starter_decks() -> void:
 			assert_int(SaveManager.owned_count(card.id)).is_greater_equal(deck.cards.count(card))
 	assert_bool(SaveManager.profile["starter_collection_granted"]).is_true()
 	assert_int(SaveManager.rhinegold()).is_equal(0)
+
+
+func test_my_decks_lists_the_starter_copies_and_creates_a_deck() -> void:
+	var screen: Control = await _open("res://scenes/screens/deck_list.tscn")
+	for index: int in range(1, 5):
+		assert_object(screen.find_child("Deck_deck_%d" % index, true, false)).is_not_null()
+	(screen.find_child("NewDeckButton", true, false) as Button).pressed.emit()
+	assert_object(screen.find_child("LeaderPicker", true, false)).is_not_null()
+	# Choosing a Leader opens the editor (scene change): create the deck the same way here.
+	var entry: Dictionary = SaveManager.create_deck("wotan")
+	assert_str(str(entry["id"])).is_equal("deck_5")
+	assert_int(SaveManager.decks().size()).is_equal(5)
+	screen.queue_free()
+
+
+func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
+	SaveManager.profile["collection"]["loge"] = 2
+	var entry: Dictionary = SaveManager.create_deck("wotan")
+	DeckEditor.deck_id = str(entry["id"])
+	var editor: DeckEditor = await _open("res://scenes/screens/deck_editor.tscn") as DeckEditor
+	assert_str((editor.find_child("DeckStatus", true, false) as Label).text).contains("0 / 20")
+	# Only Gods and Neutral cards.
+	assert_object(editor.find_child("Card_loge", true, false)).is_not_null()
+	assert_object(editor.find_child("Card_mime", true, false)).is_null()
+
+	(editor.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
+	assert_bool(editor.add_card(&"loge")).is_true()
+	# Rare: at most 2 copies; a third tap shows why instead.
+	(editor.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
+	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
+	# Saved at once.
+	var saved: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveManager.path))
+	var saved_deck: Dictionary = (saved["decks"] as Array).filter(func(d: Dictionary) -> bool: return d["id"] == entry["id"])[0]
+	assert_int((saved_deck["cards"] as Array).count("loge")).is_equal(2)
+
+	(editor.find_child("DeckTab", true, false) as Button).pressed.emit()
+	assert_str((editor.find_child("DeckTab", true, false) as Button).text).contains("2")
+	(editor.find_child("Row_loge", true, false) as Button).pressed.emit()
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
+	var name_edit: LineEdit = editor.find_child("DeckName", true, false) as LineEdit
+	name_edit.text_changed.emit("Valhalla rush")
+	assert_str(str(SaveManager.find_deck(str(entry["id"]))["name"])).is_equal("Valhalla rush")
+	editor.queue_free()
+
+
+func test_deck_editor_shows_ready_for_a_full_valid_deck() -> void:
+	DeckEditor.deck_id = "deck_1"
+	var editor: Control = await _open("res://scenes/screens/deck_editor.tscn")
+	assert_str((editor.find_child("DeckStatus", true, false) as Label).text).is_equal(tr("UI_DECK_READY"))
+	var curve: HBoxContainer = editor.find_child("EnergyCurve", true, false) as HBoxContainer
+	assert_int(curve.get_child_count()).is_equal(7)
+	editor.queue_free()
+
+
+func test_nibelheim_forges_the_missing_copies() -> void:
+	SaveManager.profile["rhinegold"] = 150
+	SaveManager.profile["collection"].erase("loge")
+	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
+	# Complete cards are hidden: nothing to forge.
+	var complete: CardData = CardDatabase.get_card(&"wotans_ravens")
+	assert_int(SaveManager.owned_count(complete.id)).is_equal(complete.deck_limit())
+	assert_bool((screen.find_child("Card_wotans_ravens", true, false) as Control).visible).is_false()
+	assert_bool((screen.find_child("Card_loge", true, false) as Control).visible).is_true()
+
+	(screen.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
+	var forge: Button = screen.find_child("ForgeButton", true, false) as Button
+	assert_bool(forge.disabled).is_false()
+	forge.pressed.emit()
+	assert_int(SaveManager.owned_count(&"loge")).is_equal(1)
+	assert_int(SaveManager.rhinegold()).is_equal(50)
+	assert_str((screen.find_child("RhinegoldValue", true, false) as Label).text).is_equal("50")
+	# The second copy costs 100: greyed, with what is missing.
+	await get_tree().process_frame
+	(screen.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
+	assert_bool((screen.find_child("ForgeButton", true, false) as Button).disabled).is_true()
+	assert_str((screen.find_child("Line1", true, false) as Label).text).contains("50")
+	screen.queue_free()
+
+
+func test_quick_match_win_pays_rhinegold_once() -> void:
+	var setup := DuelSetup.new(CardDatabase.get_deck(&"walsungs_starter"), CardDatabase.get_deck(&"valkyries_starter"), AIProfile.Difficulty.HARD)
+	setup.rewards = true
+	DuelSetup.next = setup
+	var duel: Control = await _open("res://scenes/screens/duel.tscn")
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	state.phase = GameState.Phase.GAME_OVER
+	state.winner = 0
+	duel.call("_save_progress")
+	duel.call("_save_progress")
+	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD))
+	# Undoing the winning play takes it back.
+	state.phase = GameState.Phase.MAIN
+	state.winner = -1
+	duel.call("_save_progress")
+	assert_int(SaveManager.rhinegold()).is_equal(0)
+	duel.queue_free()
+	await get_tree().process_frame
 
 
 func _press(screen: Control, chip_name: String) -> void:
@@ -121,45 +222,63 @@ func _visible_cards(grid: GridContainer) -> Array[StringName]:
 
 
 func test_quick_match_starts_from_the_remembered_choices() -> void:
-	Settings.quick_match_deck = "valkyries_starter"
+	Settings.quick_match_deck = "deck_4"
 	Settings.quick_match_opponent = "walsungs_starter"
 	Settings.quick_match_difficulty = AIProfile.Difficulty.HARD
 	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
-	assert_bool(_tile(screen, "Player_valkyries_starter").button_pressed).is_true()
+	assert_bool(_tile(screen, "Player_deck_4").button_pressed).is_true()
 	assert_bool(_tile(screen, "Opponent_walsungs_starter").button_pressed).is_true()
 	assert_bool(_tile(screen, "Difficulty2").button_pressed).is_true()
 	var setup: DuelSetup = screen.call("build_setup")
-	assert_str(String(setup.player_deck)).is_equal("valkyries_starter")
-	assert_str(String(setup.opponent_deck)).is_equal("walsungs_starter")
+	assert_str(String(setup.player_deck.id)).is_equal("deck_4")
+	assert_str(String(setup.player_deck.leader.id)).is_equal("brunnhilde")
+	assert_str(String(setup.opponent_deck.id)).is_equal("walsungs_starter")
 	assert_int(setup.difficulty).is_equal(AIProfile.Difficulty.HARD)
 	screen.queue_free()
 
 
+func test_quick_match_offers_only_the_decks_ready_to_play() -> void:
+	(SaveManager.find_deck("deck_2")["cards"] as Array).pop_back()
+	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
+	assert_object(_tile(screen, "Player_deck_1")).is_not_null()
+	assert_object(_tile(screen, "Player_deck_2")).is_null()
+	screen.queue_free()
+
+
+func test_quick_match_without_a_playable_deck_cannot_start() -> void:
+	for entry: Dictionary in SaveManager.decks():
+		(entry["cards"] as Array).pop_back()
+	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
+	assert_object(screen.find_child("NoPlayableDeck", true, false)).is_not_null()
+	assert_bool((screen.find_child("PlayButton", true, false) as Button).disabled).is_true()
+	screen.queue_free()
+
+
 func test_quick_match_choices_stay_single_and_build_the_setup() -> void:
-	Settings.quick_match_deck = "gods_starter"
+	Settings.quick_match_deck = "deck_1"
 	Settings.quick_match_opponent = "random"
 	Settings.quick_match_difficulty = AIProfile.Difficulty.NORMAL
 	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
-	_tile(screen, "Player_nibelungs_starter").pressed.emit()
+	_tile(screen, "Player_deck_2").pressed.emit()
 	_tile(screen, "Opponent_valkyries_starter").pressed.emit()
 	_tile(screen, "Difficulty0").pressed.emit()
 
 	var pressed_players: int = 0
-	for deck_id: String in ["gods_starter", "nibelungs_starter", "walsungs_starter", "valkyries_starter"]:
+	for deck_id: String in ["deck_1", "deck_2", "deck_3", "deck_4"]:
 		if _tile(screen, "Player_" + deck_id).button_pressed:
 			pressed_players += 1
 	assert_int(pressed_players).is_equal(1)
 	assert_bool(_tile(screen, "OpponentRandom").button_pressed).is_false()
 	assert_bool(_tile(screen, "Difficulty1").button_pressed).is_false()
 	var setup: DuelSetup = screen.call("build_setup")
-	assert_str(String(setup.player_deck)).is_equal("nibelungs_starter")
-	assert_str(String(setup.opponent_deck)).is_equal("valkyries_starter")
+	assert_str(String(setup.player_deck.leader.id)).is_equal("alberich")
+	assert_str(String(setup.opponent_deck.id)).is_equal("valkyries_starter")
 	assert_int(setup.difficulty).is_equal(AIProfile.Difficulty.EASY)
 	screen.queue_free()
 
 
 func test_random_opponent_is_another_faction() -> void:
-	Settings.quick_match_deck = "walsungs_starter"
+	Settings.quick_match_deck = "deck_3"
 	Settings.quick_match_opponent = "random"
 	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
 	var rng := RandomNumberGenerator.new()
@@ -167,14 +286,14 @@ func test_random_opponent_is_another_faction() -> void:
 	var seen: Dictionary = {}
 	for attempt: int in 30:
 		var setup: DuelSetup = screen.call("build_setup", rng)
-		assert_str(String(setup.opponent_deck)).is_not_equal("walsungs_starter")
-		seen[setup.opponent_deck] = true
+		assert_str(String(setup.opponent_deck.id)).is_not_equal("walsungs_starter")
+		seen[setup.opponent_deck.id] = true
 	assert_int(seen.size()).is_equal(3)
 	screen.queue_free()
 
 
 func test_duel_plays_the_quick_match_setup() -> void:
-	DuelSetup.next = DuelSetup.new(&"walsungs_starter", &"valkyries_starter", AIProfile.Difficulty.EASY)
+	DuelSetup.next = DuelSetup.new(CardDatabase.get_deck(&"walsungs_starter"), CardDatabase.get_deck(&"valkyries_starter"), AIProfile.Difficulty.EASY)
 	var duel: Control = await _open("res://scenes/screens/duel.tscn")
 	var state: GameState = (duel.get("_match") as Match).get_state()
 	assert_str(String(state.player(0).leader.id)).is_equal("siegfried")
@@ -217,7 +336,7 @@ func test_settings_changes_are_applied_and_saved() -> void:
 
 
 func test_duel_saves_the_match_in_progress_and_resumes_it() -> void:
-	DuelSetup.next = DuelSetup.new(&"walsungs_starter", &"valkyries_starter", AIProfile.Difficulty.EASY)
+	DuelSetup.next = DuelSetup.new(CardDatabase.get_deck(&"walsungs_starter"), CardDatabase.get_deck(&"valkyries_starter"), AIProfile.Difficulty.EASY)
 	var duel: Control = await _open("res://scenes/screens/duel.tscn")
 	assert_bool(SaveManager.has_match()).is_true()
 	duel.call("_confirm_redraw")
@@ -228,7 +347,8 @@ func test_duel_saves_the_match_in_progress_and_resumes_it() -> void:
 	duel.queue_free()
 	await get_tree().process_frame
 
-	var setup := DuelSetup.new(record.player_deck_id, record.opponent_deck_id, record.difficulty as AIProfile.Difficulty)
+	var decks: Array[DeckData] = record.rebuild_decks(CardDatabase)
+	var setup := DuelSetup.new(decks[0], decks[1], record.difficulty as AIProfile.Difficulty)
 	setup.resume = record
 	DuelSetup.next = setup
 	var resumed: Control = await _open("res://scenes/screens/duel.tscn")
@@ -242,7 +362,7 @@ func test_duel_saves_the_match_in_progress_and_resumes_it() -> void:
 
 
 func test_finished_match_is_not_kept() -> void:
-	DuelSetup.next = DuelSetup.new(&"walsungs_starter", &"valkyries_starter", AIProfile.Difficulty.EASY)
+	DuelSetup.next = DuelSetup.new(CardDatabase.get_deck(&"walsungs_starter"), CardDatabase.get_deck(&"valkyries_starter"), AIProfile.Difficulty.EASY)
 	var duel: Control = await _open("res://scenes/screens/duel.tscn")
 	assert_bool(SaveManager.has_match()).is_true()
 	duel.call("_apply_action", ConcedeAction.new(0))

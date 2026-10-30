@@ -72,8 +72,11 @@ func _offer_resume() -> void:
 
 
 func _resume(record: MatchRecord) -> void:
-	var setup := DuelSetup.new(record.player_deck_id, record.opponent_deck_id, record.difficulty as AIProfile.Difficulty)
+	var decks: Array[DeckData] = record.rebuild_decks(CardDatabase)
+	var setup := DuelSetup.new(decks[0], decks[1], record.difficulty as AIProfile.Difficulty)
 	setup.resume = record
+	# Only Quick matches are saved for now.
+	setup.rewards = true
 	DuelSetup.next = setup
 	SceneRouter.go_to(DUEL_SCENE)
 

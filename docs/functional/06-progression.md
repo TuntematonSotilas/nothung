@@ -31,7 +31,8 @@
 > Distinct from in-match Energy. The progression currency is **Rhinegold**.
 
 - Earned in quick matches and achievements.
-- Spent in **Nibelheim** (the crafting screen) to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values).
+- Spent in **Nibelheim** (the crafting screen) to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values), one copy at a time, up to the copies a deck can hold (2, or 1 for Epic and Legendary): beyond that a copy is useless, so Nibelheim does not offer it.
+- A Quick match win pays at the end of the match and is shown on the results. Undoing the winning play from the results takes it back (it is paid again if the match is won again).
 - Duplicate extra copies above the deck limit are automatically converted to Rhinegold.
 
 > **Decision (2026-10-09):** Direct crafting only — no random card packs.

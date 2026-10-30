@@ -52,18 +52,18 @@ static func chip(text: String, color: Color = Palette.BORDER, icon_path: String 
 	result.custom_minimum_size = Vector2(0, 72)
 	result.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	result.clip_text = true
-	result.add_theme_font_size_override("font_size", 22)
+	result.add_theme_font_size_override("font_size", 20)
 	for state: String in ["font_color", "font_pressed_color", "font_hover_color", "font_hover_pressed_color", "font_focus_color"]:
 		result.add_theme_color_override(state, Palette.TEXT)
 	for state: String in ["normal", "hover"]:
 		var style: StyleBoxFlat = _tile_style(Palette.SURFACE if state == "normal" else Palette.SURFACE_RAISED, color, 3)
-		style.content_margin_left = 8
-		style.content_margin_right = 8
+		style.content_margin_left = 4
+		style.content_margin_right = 4
 		result.add_theme_stylebox_override(state, style)
 	for state: String in ["pressed", "hover_pressed"]:
 		var style: StyleBoxFlat = _tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 5)
-		style.content_margin_left = 8
-		style.content_margin_right = 8
+		style.content_margin_left = 4
+		style.content_margin_right = 4
 		result.add_theme_stylebox_override(state, style)
 	result.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	if icon_path != "" and ResourceLoader.exists(icon_path):
@@ -145,6 +145,31 @@ static func choice_tile(text: String, color: Color, height: int, icon_path: Stri
 			# Faction colours are dark (made for card frames): lighten the icon so it reads on the tile.
 			tile.add_theme_color_override(state, color.lightened(0.3))
 	return tile
+
+
+## The player's Rhinegold: value in gold, caption under it (right of a screen header).
+static func rhinegold_counter() -> Control:
+	var box := VBoxContainer.new()
+	box.name = "RhinegoldCounter"
+	box.add_theme_constant_override("separation", 0)
+	var value: Label = label(str(SaveManager.rhinegold()), 34, Palette.ACCENT)
+	value.name = "RhinegoldValue"
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	value.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	box.add_child(value)
+	var caption: Label = label("UI_RHINEGOLD", 18, Palette.TEXT_MUTED)
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	box.add_child(caption)
+	return box
+
+
+## A player deck's own name, or its faction's when it has none (the Leader is shown next to it).
+static func deck_name(entry: Dictionary) -> String:
+	var custom: String = str(entry.get("name", "")).strip_edges()
+	if not custom.is_empty():
+		return custom
+	var leader: LeaderData = CardDatabase.get_leader(StringName(str(entry.get("leader", ""))))
+	return faction_name(leader.faction) if leader != null else "?"
 
 
 ## Display name of a faction (localised).

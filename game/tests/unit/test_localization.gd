@@ -40,7 +40,7 @@ func test_translations_are_loaded() -> void:
 func test_texts_are_translated() -> void:
 	var allowed: PackedStringArray = [
 		"UI_APP_NAME", "UI_APP_SUBTITLE", "UI_START", "UI_COLLECTION", "UI_DIFFICULTY_NORMAL", "UI_FACTION_NEUTRAL", "UI_DUEL",
-		"UI_PAUSE", "UI_DECK", "UI_HAND", "UI_DOOM_IN",
+		"UI_PAUSE", "UI_DECK", "UI_HAND", "UI_DOOM_IN", "UI_DECK_SLOTS", "UI_NIBELHEIM",
 	]
 	for row: PackedStringArray in _rows().slice(1):
 		if row[0] in allowed or row[0].ends_with("_NAME"):

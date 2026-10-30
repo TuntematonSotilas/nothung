@@ -28,11 +28,12 @@ On Android `user://` maps to the app's private internal storage.
   "collection": { "loge": 2, "fafner": 1, "wotans_spear": 1 },
   "leaders": ["wotan", "alberich", "siegfried", "brunnhilde"],
   "decks": [
-    { "name": "Hoard of Nibelheim", "leader": "alberich", "cards": ["alberich_lord", "..."] }
+    { "id": "deck_2", "name": "Hoard of Nibelheim", "leader": "alberich", "cards": ["nibelung_miner", "..."] }
   ],
   "campaign": { "rheingold": { "completed": true, "duels_won": ["rg_01", "rg_02"], "quest_endings": { "rg_q1": ["hoard_found"] } } },
   "achievements": ["renunciation_of_love"],
-  "starter_collection_granted": true
+  "starter_collection_granted": true,
+  "starter_decks_copied": true
 }
 ```
 
@@ -51,8 +52,10 @@ On Android `user://` maps to the app's private internal storage.
 
 - `version` field at the root. `SaveManager` runs migrations `v1 → v2 → …` sequentially on load.
 - The `v1 → v2` migration renames the progression balance from `hoard` to `rhinegold` without changing its value.
-- The `v2 → v3` migration adds the owned `leaders` and `starter_collection_granted: false`.
-- **Starter collection:** while `starter_collection_granted` is false, loading (or resetting) the profile adds the starter decks' Leaders and cards (`SaveManager.add_starter_decks()`: each card up to the copies a deck uses, not the sum) and saves. See [progression](../functional/06-progression.md#starting-collection).
+- The `v2 → v3` migration adds the owned `leaders`, `starter_collection_granted: false` and `starter_decks_copied: false`.
+- **Decks:** `id` (`deck_<n>`, never reused while the deck exists; Quick match remembers it), `name` (empty = the faction's name), `leader`, `cards` (one ID per copy). At most 12 (`DeckRules.MAX_DECKS`). `SaveManager.create_deck()` / `update_deck()` / `delete_deck()` / `duplicate_deck()` save at once.
+- **Rhinegold:** `SaveManager.add_rhinegold()` (never below 0) and `craft()` (price from `Progression`, up to a deck's worth of copies) save at once.
+- **Starter collection:** while `starter_collection_granted` is false, loading (or resetting) the profile adds the starter decks' Leaders and cards (`SaveManager.add_starter_decks()`: each card up to the copies a deck uses, not the sum); while `starter_decks_copied` is false, it copies each starter deck into `decks` (Gods, Nibelungs, Wälsungs, Valkyries). Then it saves. See [progression](../functional/06-progression.md#starting-collection).
 - Every change to the save schema requires a migration function + a unit test with a sample old save.
 
 ## Resume an interrupted match

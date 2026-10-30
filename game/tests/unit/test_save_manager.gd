@@ -136,9 +136,38 @@ func test_starter_decks_give_what_each_deck_needs_not_the_sum() -> void:
 	var starters: Array[DeckData] = [gods, gods]
 	SaveManagerScript.add_starter_decks(data, starters)
 	assert_array(data["leaders"]).is_equal(["wotan"])
+	# Each starter deck is copied as an editable deck.
+	assert_int((data["decks"] as Array).size()).is_equal(2)
+	assert_str(str(data["decks"][1]["id"])).is_equal("deck_2")
+	assert_int((data["decks"][0]["cards"] as Array).size()).is_equal(20)
 	for card: CardData in gods.cards:
 		assert_int(int(data["collection"][String(card.id)])).is_equal(maxi(gods.cards.count(card), 2 if card.id == &"froh" else 0))
 	assert_bool(data["starter_collection_granted"]).is_true()
+
+
+func test_crafting_spends_rhinegold_up_to_a_deck_s_worth() -> void:
+	_manager.load_profile()
+	var loge: CardData = CardDatabase.get_card(&"loge")
+	_manager.profile["rhinegold"] = Progression.craft_price(loge) + 30
+	assert_bool(_manager.craft(loge)).is_true()
+	assert_int(_manager.owned_count(&"loge")).is_equal(1)
+	assert_int(_manager.rhinegold()).is_equal(30)
+	# Not enough left.
+	assert_bool(_manager.craft(loge)).is_false()
+	assert_int(_manager.owned_count(&"loge")).is_equal(1)
+	# A Legendary already owned: a deck holds only one.
+	var spear: CardData = CardDatabase.get_card(&"wotans_spear")
+	_manager.profile["rhinegold"] = 10000
+	_manager.profile["collection"]["wotans_spear"] = 1
+	assert_bool(_manager.craft(spear)).is_false()
+	assert_int(_manager.rhinegold()).is_equal(10000)
+
+
+func test_rhinegold_never_goes_below_zero() -> void:
+	_manager.load_profile()
+	_manager.add_rhinegold(15)
+	_manager.add_rhinegold(-40)
+	assert_int(_manager.rhinegold()).is_equal(0)
 
 
 func test_migration_v1_renames_hoard_to_rhinegold() -> void:

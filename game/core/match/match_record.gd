@@ -7,7 +7,7 @@ extends RefCounted
 
 const VERSION: int = 1
 
-## Where the decks came from (Quick match starter decks), so a rematch after resuming plays them again.
+## Where the decks came from (a player deck ID or a starter deck ID), for bug reports.
 var player_deck_id: StringName
 var opponent_deck_id: StringName
 var difficulty: int = 0
@@ -62,12 +62,7 @@ static func undo_play(engine: Match, snapshot: GameState, card_uid: int) -> bool
 ## Rebuilds the match, or returns null when it cannot be resumed: unknown card, card data changed
 ## since the match started, or an entry the engine rejects. `database` resolves IDs (CardDatabase).
 func replay(database: Object) -> Match:
-	var rebuilt: Array[DeckData] = []
-	for snapshot: Dictionary in decks:
-		var deck: DeckData = _rebuild_deck(snapshot, database)
-		if deck == null:
-			return null
-		rebuilt.append(deck)
+	var rebuilt: Array[DeckData] = rebuild_decks(database)
 	if rebuilt.size() != 2 or content_hash_of(rebuilt) != content_hash:
 		return null
 	var engine := Match.new(rebuilt[0], rebuilt[1], seed)
@@ -86,6 +81,18 @@ func replay(database: Object) -> Match:
 			return null
 		before_play = snapshot
 	return engine
+
+
+## The two decks from their snapshots (a rematch after resuming plays them again); empty when a card
+## or Leader is unknown.
+func rebuild_decks(database: Object) -> Array[DeckData]:
+	var rebuilt: Array[DeckData] = []
+	for snapshot: Dictionary in decks:
+		var deck: DeckData = _rebuild_deck(snapshot, database)
+		if deck == null:
+			return []
+		rebuilt.append(deck)
+	return rebuilt
 
 
 func to_dict() -> Dictionary:

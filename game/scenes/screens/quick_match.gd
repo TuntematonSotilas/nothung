@@ -1,13 +1,16 @@
 extends Control
 
-## Quick match: choose your deck, the opponent's deck (or Random) and the AI difficulty, then play.
-## The choices are remembered in Settings for next time.
+## Quick match: choose one of your playable decks, the opponent's deck (a starter deck, or Random) and
+## the AI difficulty, then play. The choices are remembered in Settings for next time.
 
 const DUEL_SCENE: String = "res://scenes/screens/duel.tscn"
 const RANDOM: StringName = &"random"
 const DIFFICULTY_KEYS: Array[String] = ["UI_DIFFICULTY_EASY", "UI_DIFFICULTY_NORMAL", "UI_DIFFICULTY_HARD"]
 
+## Starter decks: the AI's decks.
 var _deck_ids: Array[StringName] = []
+## The player's decks that can be played (DeckRules.problems() is empty), by ID.
+var _player_decks: Dictionary = {}
 var _player_deck: StringName
 var _opponent_deck: StringName
 var _difficulty: AIProfile.Difficulty
@@ -19,9 +22,12 @@ var _difficulty_hint: Label
 
 func _ready() -> void:
 	_deck_ids = MenuUI.ordered_decks(CardDatabase.deck_ids())
+	for entry: Dictionary in SaveManager.decks():
+		if DeckRules.problems(entry, CardDatabase, SaveManager.owned_count).is_empty():
+			_player_decks[StringName(str(entry["id"]))] = entry
 	_player_deck = StringName(Settings.quick_match_deck)
-	if not _deck_ids.has(_player_deck):
-		_player_deck = _deck_ids[0]
+	if not _player_decks.has(_player_deck):
+		_player_deck = _player_decks.keys()[0] if not _player_decks.is_empty() else &""
 	_opponent_deck = StringName(Settings.quick_match_opponent)
 	if _opponent_deck != RANDOM and not _deck_ids.has(_opponent_deck):
 		_opponent_deck = RANDOM
@@ -35,7 +41,23 @@ func _build() -> void:
 	column.add_child(MenuUI.header("UI_QUICK_MATCH"))
 
 	column.add_child(_section("UI_YOUR_DECK"))
-	column.add_child(_deck_grid(_player_tiles, _on_player_deck_chosen, _player_deck))
+	if _player_decks.is_empty():
+		var none: Label = MenuUI.label("UI_NO_PLAYABLE_DECK", 26, Palette.LIFE)
+		none.name = "NoPlayableDeck"
+		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		column.add_child(none)
+	elif _player_decks.size() <= 4:
+		column.add_child(_player_deck_grid())
+	else:
+		# Up to 12 decks: two rows and a half shown, the rest scrolls.
+		var scroll := ScrollContainer.new()
+		scroll.name = "PlayerDeckScroll"
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		scroll.custom_minimum_size.y = 400
+		var grid: GridContainer = _player_deck_grid()
+		grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.add_child(grid)
+		column.add_child(scroll)
 
 	column.add_child(_section("UI_OPPONENT"))
 	var random_tile: Button = MenuUI.choice_tile(tr("UI_RANDOM"), Palette.BORDER, 96)
@@ -72,16 +94,18 @@ func _build() -> void:
 	play.name = "PlayButton"
 	play.theme_type_variation = &"ButtonPrimary"
 	play.pressed.connect(_on_play_pressed)
+	play.disabled = _player_decks.is_empty()
 	column.add_child(play)
 
 
 ## The setup the Play button would start; Random is resolved here, among the other factions' decks.
 func build_setup(rng: RandomNumberGenerator = null) -> DuelSetup:
+	var player: DeckData = DeckRules.to_deck_data(_player_decks[_player_deck], CardDatabase)
 	var opponent: StringName = _opponent_deck
 	if opponent == RANDOM:
 		var candidates: Array[StringName] = []
 		for deck_id: StringName in _deck_ids:
-			if deck_id != _player_deck:
+			if CardDatabase.get_deck(deck_id).leader.faction != player.leader.faction:
 				candidates.append(deck_id)
 		if candidates.is_empty():
 			candidates = _deck_ids
@@ -89,7 +113,7 @@ func build_setup(rng: RandomNumberGenerator = null) -> DuelSetup:
 			rng = RandomNumberGenerator.new()
 			rng.randomize()
 		opponent = candidates[rng.randi_range(0, candidates.size() - 1)]
-	return DuelSetup.new(_player_deck, opponent, _difficulty)
+	return DuelSetup.new(player, CardDatabase.get_deck(opponent), _difficulty)
 
 
 func _on_play_pressed() -> void:
@@ -98,11 +122,35 @@ func _on_play_pressed() -> void:
 	Settings.quick_match_difficulty = _difficulty
 	Settings.save_settings()
 	DuelSetup.next = build_setup()
+	DuelSetup.next.rewards = true
 	SceneRouter.go_to(DUEL_SCENE, false)
 
 
 func _section(key: String) -> Label:
 	return MenuUI.label(key, 26, Palette.TEXT_MUTED)
+
+
+## The player's playable decks: name and Leader, faction icon and colour.
+func _player_deck_grid() -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 16)
+	grid.add_theme_constant_override("v_separation", 16)
+	for deck_id: StringName in _player_decks:
+		var entry: Dictionary = _player_decks[deck_id]
+		var leader: LeaderData = CardDatabase.get_leader(StringName(str(entry["leader"])))
+		var colors: Dictionary = CardPalette.FACTIONS.get(leader.faction, CardPalette.FACTIONS[&"neutral"])
+		var text: String = "%s
+%s" % [MenuUI.deck_name(entry), tr("LEADER_%s_NAME" % String(leader.id).to_upper())]
+		var tile: Button = MenuUI.choice_tile(text, colors["frame"], 150, "res://ui/icons/faction_%s.svg" % leader.faction)
+		tile.name = "Player_%s" % deck_id
+		tile.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		tile.clip_text = true
+		tile.button_pressed = deck_id == _player_deck
+		tile.pressed.connect(_on_player_deck_chosen.bind(deck_id))
+		_player_tiles[deck_id] = tile
+		grid.add_child(tile)
+	return grid
 
 
 ## Two columns of deck tiles: faction icon, faction and Leader, border in the faction colour.

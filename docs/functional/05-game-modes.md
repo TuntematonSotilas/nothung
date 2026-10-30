@@ -1,7 +1,7 @@
 # Game modes
 
 > Every way the player can play, and how modes connect.
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-10-30
 
 ## Overview
 
@@ -61,7 +61,7 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 
 - Choose your deck, choose opponent deck (or random), choose difficulty (Easy / Normal / Hard).
 - Random draws a deck of another faction. The last choices are remembered for the next Quick match.
-- Until the deck builder exists, the choice is among the four starter decks.
+- Your deck is one of **your decks that are ready to play** (deck builder); the opponent plays a starter deck. With no deck ready, Play is greyed out and the screen says where to complete one.
 - Gives small rewards (see [06-progression](06-progression.md)).
 
 ## Deck builder
@@ -69,7 +69,13 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 - Browse collection with filters (faction, cost, type, rarity, trait, owned/not owned).
 - Create, rename, duplicate, delete decks; live validation of deck rules.
 - Mana-curve chart and card-type breakdown.
-- Number of deck slots: 12 (proposal).
+- Number of deck slots: 12.
+- A new deck starts from its **Leader** (one of the Leaders owned) and is empty; the Leader cannot be changed afterwards (duplicate the deck or start a new one).
+- Only cards of the Leader's faction and Neutral cards can be added, up to the copy limit and the copies owned. A deck can be saved unfinished; only decks **ready to play** (20 cards, every rule met) are offered in Quick match.
+- The four starter decks are copied into the player's decks once (they can then be edited like any deck).
+- Every change is saved at once; there is no Save button.
+
+> **Decision (2026-10-30):** the starter decks are **editable copies** in the player's 12 slots (not fixed decks next to them). A deck without a name shows its faction's name.
 
 ## Optional / post-launch ideas
 

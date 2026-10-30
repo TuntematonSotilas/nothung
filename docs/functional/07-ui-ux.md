@@ -39,7 +39,7 @@ flowchart TD
 |--------|--------------|
 | Title | Game name, subtitle, sword emblem, **Start** (the startup screen doubles as the title) |
 | Main menu | Campaign, Quick match, Collection, Settings; Rhinegold counter; **Resume match** prompt (Resume / Abandon) when a match was interrupted ([persistence](../technical/07-persistence.md#resume-an-interrupted-match)) |
-| Quick match | Your deck and the opponent's (**Random** or a deck) as tiles with faction icon, faction and Leader; difficulty Easy / Normal / Hard with a one-line description; **Play**. Last choices remembered |
+| Quick match | Your deck (your decks ready to play: name and Leader; scrolls beyond four) and the opponent's (**Random** or a starter deck) as tiles with faction icon, faction and Leader; difficulty Easy / Normal / Hard with a one-line description; **Play**. Last choices remembered |
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
 | Deck select | Deck list, Leader portrait, validity indicator |
@@ -47,9 +47,12 @@ flowchart TD
 | Götterdämmerung | Popup opened automatically at the first Götterdämmerung damage of the match (red frame): what it does; closed by **Understood** or a tap outside the panel. Once per match ([rules](03-game-rules.md#götterdämmerung-turn-limit)) |
 | Pause | Themed panel: **Resume** (primary), **Leave**; leaving asks for confirmation inside the panel. The Android back button opens / closes it during a match |
 | **Duel** | Top bar: whose turn (no how-to instructions: the gold and red borders show what to tap, greyed cards and buttons what cannot be used), turn number (each player counts their own turns), Götterdämmerung countdown (from turn 7, then "Valhalla burns" once it is active), pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
-| Results | Win/lose, rewards, continue |
-| Collection | Rhinegold counter. Faction chips (All + one icon per faction) always shown; **Filters** (with the number of active filters) unfolds chip rows for cost (0–5, 6+), type, rarity, trait and owned / missing — one chip per row, "All" first. Count "owned / shown". Grid of 3 cards per row, by faction, cost, then name; under each card "× n" or "Not owned" (card faded). Tapping a card opens it large with its flavour and "Owned: n (up to m per deck)"; tapping anywhere closes it |
-| Deck builder | Card grid, filters, deck list panel, mana curve |
+| Results | Win/lose, rewards ("+20 Rhinegold" after a Quick match win), continue |
+| Collection | Rhinegold counter. Faction chips (All + one icon per faction) always shown; **Filters** (with the number of active filters) unfolds chip rows for cost (0–5, 6+), type, rarity, trait and owned / missing — one chip per row, "All" first; each row has its caption on the left (Energy, with the Energy icon; Type; Rarity; Trait; Copies) so the chips line up. Count "owned / shown". Grid of 3 cards per row, by faction, cost, then name; under each card "× n" or "Not owned" (card faded). Tapping a card opens it large with its flavour and "Owned: n (up to m per deck)"; tapping anywhere closes it |
+| Collection links | **My decks** (highlighted) and **Nibelheim**, side by side under the header |
+| My decks | Slots used ("4 / 12"); **New deck** (greyed with a message when the 12 slots are used) asks for the Leader among those owned, creates the empty deck and opens it; one tile per deck: faction icon and colour, name, Leader · "Ready to play" or the first problem ("17 / 20 cards") |
+| Deck editor | Always in sight: faction icon, **name** (framed field; empty = the faction's name), Leader, state ("Ready to play" in gold, or every problem in red). Two tabs: **Cards** (the Leader's faction and Neutral cards, filters as in the Collection with "Owned" preselected; under each card "in deck / available"; a tap adds a copy, or shows the card with why it cannot be added) and **Deck (n / 20)** (Energy curve 0–6+, units / spells / artifacts, "Tap a card to take it out", one row per card: cost, name, × copies; then **Duplicate** and **Delete**, which asks first, Cancel highlighted) |
+| Nibelheim | Rhinegold counter; one line of story; the Collection filters; the cards still missing copies (up to a deck's worth), each with "owned / max · price". A tap shows the card large with **Forge — price** (greyed, with the Rhinegold missing, when short) |
 | Settings | Music and sound-effect volumes, language (device language or English / Deutsch / Español / Français); **reset progress** (collection, decks, Rhinegold, campaign, achievements; asks for confirmation, Cancel highlighted; settings are kept) |
 
 ## Duel screen layout (portrait)
