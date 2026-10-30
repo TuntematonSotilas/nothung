@@ -163,6 +163,25 @@ static func rhinegold_counter() -> Control:
 	return box
 
 
+## The player's decks that can be played (no DeckRules problem), in slot order.
+static func playable_decks() -> Array[Dictionary]:
+	var playable: Array[Dictionary] = []
+	for entry: Dictionary in SaveManager.decks():
+		if DeckRules.problems(entry, CardDatabase, SaveManager.owned_count).is_empty():
+			playable.append(entry)
+	return playable
+
+
+## The current deck: the last one chosen (Settings.quick_match_deck) if it can be played, else the first
+## deck ready to play; {} when there is none.
+static func current_deck() -> Dictionary:
+	var playable: Array[Dictionary] = playable_decks()
+	for entry: Dictionary in playable:
+		if str(entry["id"]) == Settings.quick_match_deck:
+			return entry
+	return playable[0] if not playable.is_empty() else {}
+
+
 ## A player deck's own name, or its faction's when it has none (the Leader is shown next to it).
 static func deck_name(entry: Dictionary) -> String:
 	var custom: String = str(entry.get("name", "")).strip_edges()

@@ -15,6 +15,8 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 | `end_turn.svg` | Next button | Delapouite |
 | `undo.svg` | Anticlockwise rotation | Delapouite |
 | `close.svg` | Cross mark | Lorc |
+| `settings.svg` | Cog | Lorc |
+| `nibelheim.svg` | Anvil impact | Lorc |
 | `faction_gods.svg` | Barbed spear | Lorc |
 | `faction_nibelungs.svg` | Anvil | Lorc |
 | `faction_walsungs.svg` | Broadsword | Lorc |

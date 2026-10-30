@@ -74,6 +74,9 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 - Only cards of the Leader's faction and Neutral cards can be added, up to the copy limit and the copies owned. A deck can be saved unfinished; only decks **ready to play** (20 cards, every rule met) are offered in Quick match.
 - The four starter decks are copied into the player's decks once (they can then be edited like any deck).
 - Every change is saved at once; there is no Save button.
+- Cards are added by **drag and drop** onto the deck zone (hold a moment to pick a card up, so the grid still scrolls with a swipe), and taken out by dragging them out of it or tapping them.
+
+> **Decision (2026-10-30):** the deck editor is **one screen with drag and drop** (deck zone above the cards), not two tabs.
 
 > **Decision (2026-10-30):** the starter decks are **editable copies** in the player's 12 slots (not fixed decks next to them). A deck without a name shows its faction's name.
 

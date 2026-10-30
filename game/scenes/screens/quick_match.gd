@@ -22,12 +22,9 @@ var _difficulty_hint: Label
 
 func _ready() -> void:
 	_deck_ids = MenuUI.ordered_decks(CardDatabase.deck_ids())
-	for entry: Dictionary in SaveManager.decks():
-		if DeckRules.problems(entry, CardDatabase, SaveManager.owned_count).is_empty():
-			_player_decks[StringName(str(entry["id"]))] = entry
-	_player_deck = StringName(Settings.quick_match_deck)
-	if not _player_decks.has(_player_deck):
-		_player_deck = _player_decks.keys()[0] if not _player_decks.is_empty() else &""
+	for entry: Dictionary in MenuUI.playable_decks():
+		_player_decks[StringName(str(entry["id"]))] = entry
+	_player_deck = StringName(str(MenuUI.current_deck().get("id", "")))
 	_opponent_deck = StringName(Settings.quick_match_opponent)
 	if _opponent_deck != RANDOM and not _deck_ids.has(_opponent_deck):
 		_opponent_deck = RANDOM

@@ -2,17 +2,20 @@ class_name CardGrid
 extends ScrollContainer
 
 ## A scrolling grid of cards, 3 per row, scaled to the given width. Each cell is the CardView and a
-## caption under it. A press that scrolled the grid is a scroll, not a tap.
+## caption under it. A press that scrolled the grid is a scroll, not a tap; with `pick_enabled`, a long
+## press picks the card up to drag it (PressPick).
 
 signal card_tapped(data: CardData)
+signal card_picked(data: CardData)
+signal card_released(data: CardData, position: Vector2)
 
 const COLUMNS: int = 3
 const CARD_GAP: int = 20
-const TAP_SCROLL_TOLERANCE: int = 12
 
+## Set before adding cards.
+var pick_enabled: bool = false
 var _grid: GridContainer
 var _card_scale: float = 1.0
-var _scroll_at_press: int = 0
 
 
 func _init(width: float) -> void:
@@ -39,11 +42,11 @@ func add_card(data: CardData) -> VBoxContainer:
 	view.mouse_filter = Control.MOUSE_FILTER_PASS
 	view.set_view_scale(_card_scale)
 	view.set_card(data, null, false, -1, "hand", false)
-	view.button_down.connect(func() -> void: _scroll_at_press = scroll_vertical)
-	view.pressed.connect(func() -> void:
-		if absi(scroll_vertical - _scroll_at_press) <= TAP_SCROLL_TOLERANCE:
-			card_tapped.emit(data))
 	cell.add_child(view)
+	var press: PressPick = PressPick.attach(view, self, pick_enabled)
+	press.tapped.connect(func() -> void: card_tapped.emit(data))
+	press.picked.connect(func() -> void: card_picked.emit(data))
+	press.released.connect(func(position: Vector2) -> void: card_released.emit(data, position))
 	var caption: Label = MenuUI.label("", 24, Palette.TEXT_MUTED)
 	caption.name = "Caption"
 	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

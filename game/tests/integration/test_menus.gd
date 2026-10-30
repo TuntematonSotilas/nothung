@@ -50,10 +50,33 @@ func after_test() -> void:
 func test_main_menu_offers_quick_match_collection_and_settings_and_greys_out_the_campaign() -> void:
 	SaveManager.profile["rhinegold"] = 320
 	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
-	for button_name: String in ["QuickMatchButton", "CollectionButton", "SettingsButton"]:
+	for button_name: String in ["NibelheimButton", "SettingsButton", "CurrentDeck", "MyDecksButton", "QuickMatchButton", "CollectionButton"]:
 		assert_bool((menu.find_child(button_name, true, false) as Button).disabled).is_false()
 	assert_bool((menu.find_child("CampaignButton", true, false) as Button).disabled).is_true()
 	assert_str((menu.find_child("RhinegoldLabel", true, false) as Label).text).starts_with("320 ")
+	menu.queue_free()
+
+
+func test_main_menu_shows_the_current_deck_and_lets_choose_another() -> void:
+	Settings.quick_match_deck = "deck_1"
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_str((menu.find_child("CurrentDeckName", true, false) as Label).text).is_equal(MenuUI.deck_name(SaveManager.find_deck("deck_1")))
+	# Wotan has his art; the others show their faction icon until theirs exists.
+	assert_object((menu.find_child("LeaderPortrait", true, false) as TextureRect).texture).is_same(CardDatabase.get_leader(&"wotan").art)
+	(menu.find_child("CurrentDeck", true, false) as Button).pressed.emit()
+	(menu.find_child("Pick_deck_3", true, false) as Button).pressed.emit()
+	assert_str(Settings.quick_match_deck).is_equal("deck_3")
+	await get_tree().process_frame
+	assert_str((menu.find_child("CurrentDeckName", true, false) as Label).text).is_equal(MenuUI.deck_name(SaveManager.find_deck("deck_3")))
+	assert_object(menu.find_child("DeckPicker", true, false)).is_null()
+	menu.queue_free()
+
+
+func test_main_menu_without_a_playable_deck_points_to_my_decks() -> void:
+	for entry: Dictionary in SaveManager.decks():
+		(entry["cards"] as Array).pop_back()
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_object(menu.find_child("NoPlayableDeck", true, false)).is_not_null()
 	menu.queue_free()
 
 
@@ -131,22 +154,40 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	assert_object(editor.find_child("Card_loge", true, false)).is_not_null()
 	assert_object(editor.find_child("Card_mime", true, false)).is_null()
 
-	(editor.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
+	var zone: Control = editor.find_child("DeckZone", true, false) as Control
+	await get_tree().process_frame
+	var on_zone: Vector2 = zone.get_global_rect().get_center()
+	var outside: Vector2 = zone.get_global_rect().position + Vector2(10, zone.size.y + 300)
+	var loge: CardData = CardDatabase.get_card(&"loge")
+	# Long-press a card and drop it on the deck zone: added.
+	editor.call("_begin_drag", loge, false)
+	editor.drop_at(on_zone)
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
-	assert_bool(editor.add_card(&"loge")).is_true()
-	# Rare: at most 2 copies; a third tap shows why instead.
+	# Dropped elsewhere: nothing happens.
+	editor.call("_begin_drag", loge, false)
+	editor.drop_at(outside)
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
+	# A tap shows the card with Add.
 	(editor.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
+	(editor.find_child("AddButton", true, false) as Button).pressed.emit()
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
+	# Rare: at most 2 copies; a third drop shows why instead.
+	editor.call("_begin_drag", loge, false)
+	editor.drop_at(on_zone)
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
 	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
 	# Saved at once.
 	var saved: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveManager.path))
 	var saved_deck: Dictionary = (saved["decks"] as Array).filter(func(d: Dictionary) -> bool: return d["id"] == entry["id"])[0]
 	assert_int((saved_deck["cards"] as Array).count("loge")).is_equal(2)
+	assert_str((editor.find_child("DeckCount", true, false) as Label).text).contains("2")
 
-	(editor.find_child("DeckTab", true, false) as Button).pressed.emit()
-	assert_str((editor.find_child("DeckTab", true, false) as Button).text).contains("2")
-	(editor.find_child("Row_loge", true, false) as Button).pressed.emit()
+	# A deck card dragged out of the zone is taken out; a tap on its chip too.
+	editor.call("_begin_drag", loge, true)
+	editor.drop_at(outside)
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
+	(editor.find_child("Chip_loge", true, false) as Button).pressed.emit()
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(0)
 	var name_edit: LineEdit = editor.find_child("DeckName", true, false) as LineEdit
 	name_edit.text_changed.emit("Valhalla rush")
 	assert_str(str(SaveManager.find_deck(str(entry["id"]))["name"])).is_equal("Valhalla rush")

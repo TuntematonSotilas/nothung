@@ -3,6 +3,8 @@
 > Screens, navigation and interaction design for an Android phone.
 > Status: Draft · Last updated: 2026-10-30
 
+> **Decision (2026-10-30):** the main menu is built around the **current deck** (Leader portrait in the centre, deck builder under it); the game modes sit below it, Nibelheim and Settings in the top corners, Collection — the least used — small at the bottom.
+
 ## Platform constraints
 
 - **Portrait** orientation, one-handed use where possible.
@@ -20,6 +22,7 @@ flowchart TD
     MainMenu --> Campaign
     MainMenu --> QuickMatch
     MainMenu --> Collection
+    MainMenu --> DeckBuilder
     MainMenu --> Settings
     MainMenu -->|interrupted match| Duel
     Campaign --> ChapterMap --> StoryPanel --> DeckSelect
@@ -38,7 +41,7 @@ flowchart TD
 | Screen | Key elements |
 |--------|--------------|
 | Title | Game name, subtitle, sword emblem, **Start** (the startup screen doubles as the title) |
-| Main menu | Campaign, Quick match, Collection, Settings; Rhinegold counter; **Resume match** prompt (Resume / Abandon) when a match was interrupted ([persistence](../technical/07-persistence.md#resume-an-interrupted-match)) |
+| Main menu | Top: **Nibelheim** (forge icon + name, the Rhinegold under it) on the left, **Settings** (cog) on the right; the title. Centre: the **current deck** (Leader portrait framed in the faction colour — the faction icon until the Leader's art exists —, then, unframed, deck name, Leader and "Tap to change": a tap lists the decks ready to play; the choice is also Quick match's deck), **My decks** under it. Then **Campaign** (greyed out until it exists) and **Quick match** side by side; **Collection**, smaller, at the bottom. Without a deck ready to play, the deck panel says so and opens My decks; **Resume match** prompt (Resume / Abandon) when a match was interrupted ([persistence](../technical/07-persistence.md#resume-an-interrupted-match)) |
 | Quick match | Your deck (your decks ready to play: name and Leader; scrolls beyond four) and the opponent's (**Random** or a starter deck) as tiles with faction icon, faction and Leader; difficulty Easy / Normal / Hard with a one-line description; **Play**. Last choices remembered |
 | Chapter map | Chapter nodes (duels and Quests), progress, rewards preview, Quest endings found / missing |
 | Quest | Illustration (top), story text, 2–3 choice buttons (≥ 48 dp); back opens a pause menu (resume / quit Quest) |
@@ -51,7 +54,7 @@ flowchart TD
 | Collection | Rhinegold counter. Faction chips (All + one icon per faction) always shown; **Filters** (with the number of active filters) unfolds chip rows for cost (0–5, 6+), type, rarity, trait and owned / missing — one chip per row, "All" first; each row has its caption on the left (Energy, with the Energy icon; Type; Rarity; Trait; Copies) so the chips line up. Count "owned / shown". Grid of 3 cards per row, by faction, cost, then name; under each card "× n" or "Not owned" (card faded). Tapping a card opens it large with its flavour and "Owned: n (up to m per deck)"; tapping anywhere closes it |
 | Collection links | **My decks** (highlighted) and **Nibelheim**, side by side under the header |
 | My decks | Slots used ("4 / 12"); **New deck** (greyed with a message when the 12 slots are used) asks for the Leader among those owned, creates the empty deck and opens it; one tile per deck: faction icon and colour, name, Leader · "Ready to play" or the first problem ("17 / 20 cards") |
-| Deck editor | Always in sight: faction icon, **name** (framed field; empty = the faction's name), Leader, state ("Ready to play" in gold, or every problem in red). Two tabs: **Cards** (the Leader's faction and Neutral cards, filters as in the Collection with "Owned" preselected; under each card "in deck / available"; a tap adds a copy, or shows the card with why it cannot be added) and **Deck (n / 20)** (Energy curve 0–6+, units / spells / artifacts, "Tap a card to take it out", one row per card: cost, name, × copies; then **Duplicate** and **Delete**, which asks first, Cancel highlighted) |
+| Deck editor | One screen, **drag and drop**. Top: faction icon, **name** (framed field; empty = the faction's name), Leader, state ("Ready to play" in gold, or every problem in red). **Deck zone**: "Deck n / 20", a small Energy curve (0–6+), units / spells / artifacts, one chip per card (cost · name × copies, framed in the card's colour; empty: how to add cards). Below: the Leader's faction and Neutral cards, filters as in the Collection with "Owned" preselected, "in deck / available" under each card. **Hold a card a moment (¼ s) to pick it up** — with a mouse, just drag it —, then drop it on the deck zone (gold while it is over it) to add it — or, if it cannot be added, the card shows why; a finger moving at once scrolls the grid. Drag a chip out of the zone, or tap it, to take a copy out. Tapping a card shows it large with **Add to the deck** (greyed, with the reason, when it cannot). **Duplicate** and **Delete** (asks first, Cancel highlighted) at the bottom |
 | Nibelheim | Rhinegold counter; one line of story; the Collection filters; the cards still missing copies (up to a deck's worth), each with "owned / max · price". A tap shows the card large with **Forge — price** (greyed, with the Rhinegold missing, when short) |
 | Settings | Music and sound-effect volumes, language (device language or English / Deutsch / Español / Français); **reset progress** (collection, decks, Rhinegold, campaign, achievements; asks for confirmation, Cancel highlighted; settings are kept) |
 
@@ -87,7 +90,7 @@ flowchart TD
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
 - **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.
 - **Play areas wrap**: when units do not fit on one line (up to 6 per side), they continue on a second line instead of widening the screen.
-- Icons (Life, Energy, pause, end turn, undo, close) come from game-icons.net ([CREDITS](../../CREDITS.md)); faction and card-type icons will be hand-drawn ([art & audio](08-art-and-audio.md#icons)).
+- Icons (Life, Energy, pause, end turn, undo, close, settings, Nibelheim forge) come from game-icons.net ([CREDITS](../../CREDITS.md)); faction and card-type icons will be hand-drawn ([art & audio](08-art-and-audio.md#icons)).
 - A painted board can sit behind the duel (`assets/art/boards/<board_id>.png`, dimmed); see [art & audio](08-art-and-audio.md#duel-backgrounds).
 
 ## Gestures
