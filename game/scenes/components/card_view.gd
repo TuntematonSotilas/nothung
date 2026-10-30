@@ -11,13 +11,12 @@ const CARD_SIZE: Vector2 = Vector2(216, 310)
 const LONG_PRESS_DURATION: float = 0.55
 ## Space between the frame and the card face (at hand size).
 const FACE_MARGIN: float = 14.0
-## Corner radius (at hand size) giving each type its frame shape; artifacts share the spells' rounded
-## frame and are told apart by the type tab in the bottom-right corner.
-const SHAPE_RADIUS: Dictionary = {
-	CardData.Type.UNIT: 8.0,
-	CardData.Type.SPELL: 30.0,
-	CardData.Type.ARTIFACT: 30.0,
-}
+## Every frame is a rectangle; units keep a thin border, spells / artifacts / relics a double border
+## whose motif tells the type (CardFrameBand). Corner radius at hand size.
+const UNIT_RADIUS: float = 8.0
+const BAND_RADIUS: float = 4.0
+## Space between the double border and the card face (at hand size).
+const BAND_FACE_GAP: float = 4.0
 
 var card_data: CardData
 var card_instance: CardInstance
@@ -44,7 +43,7 @@ var _cost_stone: PanelContainer
 var _cost_icon: TextureRect
 var _cost_label: Label
 var _faction_icon: TextureRect
-var _type_tab: PanelContainer
+var _frame_band: CardFrameBand
 var _type_label: Label
 var _type_icon: TextureRect
 var _rarity_badge: PanelContainer
@@ -272,18 +271,25 @@ func _refresh_text() -> void:
 	_art.visible = card_data.art != null
 	_set_icon(_faction_icon, "res://ui/icons/faction_%s.svg" % card_data.faction)
 	_apply_face_colors()
-	_apply_styles()
+	# The face margin depends on the type (double border or not).
+	_apply_face_scale()
 	tooltip_text = "%s\n%s" % [card_name, rules]
 
 
 ## Card face: cost, faction icon and rarity badge; name banner; illustration (when drawn); rules text;
-## attack / health (units) and the card type at the bottom (on a tab for artifacts and relics).
+## attack / health (units) and the card type at the bottom.
 ## Children of a Button do not change its size, so the card keeps its fixed size whatever the text.
 func _ensure_content() -> void:
 	if _content != null:
 		return
 	# No clipping: the highlight glow and the name banner draw outside the face (texts clip themselves).
 	clip_contents = false
+	# Double border of spells / artifacts / relics, behind the face.
+	_frame_band = CardFrameBand.new()
+	_frame_band.name = "FrameBand"
+	_frame_band.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_frame_band.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_frame_band)
 	_content = VBoxContainer.new()
 	_content.name = "CardFace"
 	_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -373,20 +379,11 @@ func _ensure_content() -> void:
 	stats_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stats_gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_stats_row.add_child(stats_gap)
-	# Artifacts and relics show it on a tab in the faction colour, filling the bottom-right corner.
-	_type_tab = PanelContainer.new()
-	_type_tab.name = "TypeTab"
-	_type_tab.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_type_tab.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_stats_row.add_child(_type_tab)
-	var type_row: HBoxContainer = HBoxContainer.new()
-	type_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_type_tab.add_child(type_row)
 	_type_label = _make_label("TypeLabel", Palette.TEXT_MUTED)
 	_type_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	type_row.add_child(_type_label)
+	_stats_row.add_child(_type_label)
 	_type_icon = _make_icon_slot("TypeIcon")
-	type_row.add_child(_type_icon)
+	_stats_row.add_child(_type_icon)
 	_apply_face_scale()
 
 
@@ -444,16 +441,15 @@ func _stone_row(stone: PanelContainer) -> HBoxContainer:
 
 
 ## Light text on the dark card background; the name takes the faction's text colour (dark on the
-## light Valkyries / Neutral banners), and so does the type on the artifact tab.
+## light Valkyries / Neutral banners).
 func _apply_face_colors() -> void:
 	var colors: Dictionary = CardPalette.colors_for(card_data)
 	var ink: Color = CardPalette.TEXT_LIGHT
 	_rules_label.add_theme_color_override("font_color", ink)
 	_name_label.add_theme_color_override("font_color", colors["text"])
-	var type_ink: Color = colors["text"] if _has_type_tab() else Color(ink, 0.75)
-	_type_label.add_theme_color_override("font_color", type_ink)
+	_type_label.add_theme_color_override("font_color", Color(ink, 0.75))
 	_faction_icon.modulate = colors["frame"]
-	_type_icon.modulate = type_ink
+	_type_icon.modulate = Color(ink, 0.75)
 
 
 ## Fonts, icons and margins follow the card's actual size (board cards are smaller than hand cards).
@@ -466,7 +462,7 @@ func _apply_face_scale() -> void:
 	if k <= 0.0:
 		k = _view_scale
 	_face_k = k
-	var margin: float = FACE_MARGIN * k
+	var margin: float = _face_margin()
 	_content.offset_left = margin
 	_content.offset_top = margin
 	_content.offset_right = -margin
@@ -493,7 +489,7 @@ func _notification(what: int) -> void:
 		_apply_face_scale()
 
 
-## Frame, name banner, rarity badge, stones and type tab styles; called when the card, its state or its size changes.
+## Frame, double border, name banner, rarity badge and stones; called when the card, its state or its size changes.
 func _apply_styles() -> void:
 	add_theme_stylebox_override("normal", _card_style())
 	add_theme_stylebox_override("hover", _card_style(true))
@@ -503,10 +499,19 @@ func _apply_styles() -> void:
 		return
 	var colors: Dictionary = CardPalette.colors_for(card_data)
 	var k: float = _face_k
-	# Full-width band: drawn out to the frame on both sides, the name stays aligned with the face.
+	_frame_band.visible = _has_band()
+	if _frame_band.visible:
+		_frame_band.pattern = CardFrameBand.pattern_for(card_data)
+		_frame_band.color = colors["frame"]
+		_frame_band.k = k
+		_frame_band.outer_line = _frame_width()
+		_frame_band.queue_redraw()
+	# Full-width band: drawn out to the frame (the inner line of a double border) on both sides, the
+	# name stays aligned with the face.
 	var banner: StyleBoxFlat = StyleBoxFlat.new()
 	banner.bg_color = colors["frame"]
-	var to_frame: float = FACE_MARGIN * k - float(_frame_width())
+	var frame_edge: float = CardFrameBand.WIDTH * k if _has_band() else float(_frame_width())
+	var to_frame: float = _face_margin() - frame_edge
 	banner.expand_margin_left = to_frame
 	banner.expand_margin_right = to_frame
 	banner.content_margin_left = 0.0
@@ -525,24 +530,15 @@ func _apply_styles() -> void:
 	# Cost, attack and health are bare icon + number (no pill around them).
 	for stone: PanelContainer in [_cost_stone, _attack_stone, _health_stone]:
 		stone.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	if not _has_type_tab():
-		_type_tab.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-		return
-	# Drawn out to the frame on the right and at the bottom, following the card's rounded corner.
-	var tab: StyleBoxFlat = StyleBoxFlat.new()
-	tab.bg_color = colors["frame"]
-	tab.expand_margin_right = to_frame
-	tab.expand_margin_bottom = to_frame
-	tab.expand_margin_top = 6.0 * k
-	tab.content_margin_left = 14.0 * k
-	tab.corner_radius_top_left = roundi(16 * k)
-	tab.corner_radius_bottom_right = maxi(0, roundi(_shape_radius() - _frame_width()))
-	tab.anti_aliasing = true
-	_type_tab.add_theme_stylebox_override("panel", tab)
 
 
-func _has_type_tab() -> bool:
-	return card_data != null and card_data.type == CardData.Type.ARTIFACT
+## Spells, artifacts and relics have the double border; units a single thin one.
+func _has_band() -> bool:
+	return card_data != null and card_data.type != CardData.Type.UNIT
+
+
+func _face_margin() -> float:
+	return (CardFrameBand.WIDTH + BAND_FACE_GAP if _has_band() else FACE_MARGIN) * _face_k
 
 
 ## Thickness of the faction-coloured frame.
@@ -551,11 +547,10 @@ func _frame_width() -> int:
 
 
 func _shape_radius() -> float:
-	var card_type: CardData.Type = card_data.type if card_data != null else CardData.Type.UNIT
-	return float(SHAPE_RADIUS.get(card_type, 8.0)) * _face_k
+	return (BAND_RADIUS if _has_band() else UNIT_RADIUS) * _face_k
 
 
-## Frame shape by type: unit = rectangle with small corners, spell and artifact = very rounded.
+## Rectangular frame, with small rounded corners.
 func _shaped_box(radius: float) -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
 	box.set_corner_radius_all(roundi(radius))

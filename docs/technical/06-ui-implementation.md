@@ -1,7 +1,7 @@
 # UI implementation
 
 > How screens and interactions from [functional/07-ui-ux.md](../functional/07-ui-ux.md) are built in Godot.
-> Status: In progress · Last updated: 2026-10-28
+> Status: In progress · Last updated: 2026-10-30
 
 ## Display settings (`project.godot`)
 
@@ -43,7 +43,7 @@
 ## CardView
 
 - `scenes/components/card_view.gd` displays translated name/rules, Energy cost and runtime/unit stats.
-- **Frame drawn in code** ([card frames](../functional/08-art-and-audio.md#card-frames)): `_card_style()` builds a `StyleBoxFlat` whose shape depends on the type (`SHAPE_RADIUS`; spells and artifacts share the very rounded frame) and whose border takes the faction frame colour from `CardPalette` (`ui/theme/card_palette.gd`: faction frame / trim, card background, rarity colours, Ring) on the shared dark background. Children add the name banner (`NameBanner`, faction colour), the cost / attack / health holders (bare, no pill), the rarity badge (`RarityBadge`: letter on the rarity colour) and, for artifacts and relics, the type tab (`TypeTab`: faction colour, drawn out to the frame in the bottom-right corner with `expand_margin`). Sizes follow the card's size (`_face_k`), so hand, board and zoom cards share one layout.
+- **Frame drawn in code** ([card frames](../functional/08-art-and-audio.md#card-frames)): `_card_style()` builds a rectangular `StyleBoxFlat` (`UNIT_RADIUS` / `BAND_RADIUS` corners) whose border takes the faction frame colour from `CardPalette` (`ui/theme/card_palette.gd`: faction frame / trim, card background, rarity colours, Ring) on the shared dark background. Children add the name banner (`NameBanner`, faction colour), the cost / attack / health holders (bare, no pill), the rarity badge (`RarityBadge`: letter on the rarity colour) and, for spells, artifacts and relics, the double border (`FrameBand`, `scenes/components/card_frame_band.gd`: inner line + zigzag / hatching / beads drawn in `_draw()`, behind the face; the face margin and the name banner then stop at the inner line). Sizes follow the card's size (`_face_k`), so hand, board and zoom cards share one layout.
 - Highlights are a `shadow` glow on the style; neither the card nor its face clip, so the glow and the full-width name banner can draw outside the face (the rules text clips itself).
 - The duel reconstructs hand/board/Leader/Energy/Life views from `Match` state after authoritative `GameEvent`s; views never mutate the rules engine.
 - Exhausted and ready units have distinct visual states. Dragging, zoom and pooling are not implemented yet.

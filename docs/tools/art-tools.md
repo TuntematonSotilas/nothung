@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-23
+> Status: Draft · Last updated: 2026-10-30
 
 Prices and licences change — check them before buying.
 
@@ -10,7 +10,7 @@ Prices and licences change — check them before buying.
 A final card is **not** a single image. It is composed at runtime by the `CardView` scene ([technical/06-ui-implementation.md](../technical/06-ui-implementation.md)):
 
 ```
-CardView = frame + rarity badge drawn by Godot (shape by type, colour by faction, letter by rarity)
+CardView = frame + rarity badge drawn by Godot (border motif by type, colour by faction, letter by rarity)
          + artwork + faction icon
          + text rendered by Godot (name, cost, rules, stats)
 ```

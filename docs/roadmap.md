@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-10-30
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -136,7 +136,7 @@ No code dependency: can start now ([art & audio](functional/08-art-and-audio.md)
 - [ ] Mood board (validates the faction palette)
 - [ ] Paper workflow test on 2–3 cards: ink + digital colour vs watercolour
 - [ ] Full logo with the title, built on the icon emblem
-- [x] Card frames drawn by the game: shape by type, faction colour on border + name banner, rarity letter badge ([card frames](functional/08-art-and-audio.md#card-frames))
+- [x] Card frames drawn by the game: rectangles, double border with a motif by type (spell / artifact / relic), faction colour on border + name banner, rarity letter badge ([card frames](functional/08-art-and-audio.md#card-frames))
 - [x] Faction icons (game-icons.net)
 - [ ] Card-type and trait icons
 - [ ] Leitmotif stingers and first music loop ([audio tools](tools/audio-tools.md))

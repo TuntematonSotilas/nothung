@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-10-30
 
 ## Art direction
 
@@ -20,7 +20,7 @@ Readability at phone size is the priority: one clear subject per illustration, h
 | Visual cue | Encodes | Values |
 |------------|---------|--------|
 | **Frame colour** | Faction | See faction palette below |
-| **Frame shape** | Type | **Unit**: rectangular frame with Attack ⚔ and Health ♥ stones · **Spell**: very rounded frame · **Artifact** / **Relic**: very rounded frame + type tab in the faction colour (bottom-right corner) |
+| **Frame** | Type | Rectangular for every type. **Unit**: thin border, Attack ⚔ and Health ♥ stones · **Spell** / **Artifact** / **Relic**: double border with a motif between the two lines — zigzag (spell), diagonal hatching (artifact), beads (relic) |
 | **Rarity badge** (top right) | Rarity | A letter on the rarity colour: **C** Common grey · **R** Rare blue · **E** Epic purple · **L** Legendary gold (see [rarity colours](#rarity-colours)) |
 
 Why faction rather than type: decks are one faction + Neutral, so colour tells at a glance which side a card belongs to (collection, deck builder, enemy board). With only 3 types, shape is enough to tell them apart.
@@ -104,16 +104,18 @@ Game logo for *Nothung: The Ring Card Game* built around the sword Nothung (e.g.
 
 > **Decision (2026-10-23):** Frames are **drawn by the game** (Godot `StyleBox` shapes and colours, no image), not painted. They stay sharp at any size and need no art. Only the illustrations and the card-type icons are drawn by hand. **Update (2026-10-23):** the faction colour is on the frame (thin border) and on the name banner only; the card background stays dark until the illustrations, which include their own background.
 
-Frames follow the [card colour system](#card-colour-system): 2 shapes (+ the artifact type tab) × the faction colours + the dark-gold Ring / Cursed variant. Colours: `game/ui/theme/card_palette.gd` (checked against the tables above by a test).
+Frames follow the [card colour system](#card-colour-system): 4 frames (thin border, 3 double-border motifs) × the faction colours + the dark-gold Ring / Cursed variant. Colours: `game/ui/theme/card_palette.gd` (checked against the tables above by a test).
 
 | Type | Frame |
 |------|-------|
 | Unit | Rectangle with small corners; Attack and Health (icon + number) at the bottom left (still visible when hand cards overlap) |
-| Spell | Very rounded corners |
-| Artifact | Very rounded corners, like spells, + a **type tab** (*Artifact*) in the faction colour filling the bottom-right corner (type in the faction's card text colour) |
-| Relic | Same as an artifact, the tab reads *Relic* |
+| Spell | Rectangle with a **double border** (16 px band at hand size: outer and inner lines of 3 px in the faction colour) and a **zigzag** between the two lines |
+| Artifact | Same double border, with **diagonal hatching** |
+| Relic | Same double border, with **beads** |
 
-> **Decision (2026-10-28):** the octagon (cut corners) for artifacts and relics is dropped: it did not look good. Artifacts and relics take the spells' rounded frame and are told apart by the type tab. The relic **Bearer** ribbon is dropped too: the tab already says *Relic*, and the Bearer requirement is in the rules text.
+> **Decision (2026-10-28):** the octagon (cut corners) for artifacts and relics is dropped: it did not look good. The relic **Bearer** ribbon is dropped too: the type already says *Relic*, and the Bearer requirement is in the rules text.
+
+> **Decision (2026-10-30):** every frame is a **rectangle** (no more rounded spells). Spells, artifacts and relics get a **double border** whose motif tells the type: zigzag (spell), diagonal hatching (artifact), beads (relic); small diamonds fill the corners. The card face and the name banner sit inside the inner line. This replaces the rounded frame and the artifact type tab.
 
 - Every frame: a thin border in the **faction frame colour** (dark gold for the Ring) and the card **name on a banner** in that colour (full-width band), on a **dark background** (`#16181D`) that the card illustration will cover. Top row: cost (left), then the **faction icon** in the faction colour and the **rarity badge** (letter C / R / E / L on the rarity colour) on the right. Bottom row: attack and health (units, left) and the **card type** (name, then its icon once drawn) on the right. Cost, attack and health are bare icon + number, without a pill.
 - The illustration (`assets/art/cards/<id>.png`) is shown between the name and the rules text when it exists.

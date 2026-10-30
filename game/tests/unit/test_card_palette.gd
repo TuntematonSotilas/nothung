@@ -27,9 +27,9 @@ func test_card_view_shape_follows_the_type() -> void:
 	var unit_style: StyleBoxFlat = unit.get_theme_stylebox("normal") as StyleBoxFlat
 	var spell_style: StyleBoxFlat = spell.get_theme_stylebox("normal") as StyleBoxFlat
 	var artifact_style: StyleBoxFlat = artifact.get_theme_stylebox("normal") as StyleBoxFlat
-	assert_int(spell_style.corner_radius_top_left).is_greater(unit_style.corner_radius_top_left * 2)
-	# Artifacts share the spells' rounded frame; the type tab tells them apart.
-	assert_int(artifact_style.corner_radius_top_left).is_equal(spell_style.corner_radius_top_left)
+	# Every frame is a rectangle with small corners.
+	for style: StyleBoxFlat in [unit_style, spell_style, artifact_style]:
+		assert_int(style.corner_radius_top_left).is_less_equal(8)
 
 
 func test_card_view_colours_follow_faction_rarity_and_ring() -> void:
@@ -65,17 +65,24 @@ func test_highlight_glows_without_hiding_the_faction_frame() -> void:
 	assert_str(style.shadow_color.to_html(false)).is_equal(Palette.LIFE.to_html(false))
 
 
-func test_artifacts_show_their_type_on_a_faction_tab() -> void:
-	var artifact: CardView = await _view(CardData.Type.ARTIFACT, &"valkyries")
-	var tab: StyleBoxFlat = artifact.find_child("TypeTab", true, false).get_theme_stylebox("panel") as StyleBoxFlat
-	assert_object(tab).is_not_null()
-	assert_str(tab.bg_color.to_html(false)).is_equal("e0a0b8")
-	var type_label: Label = artifact.find_child("TypeLabel", true, false) as Label
-	assert_str(type_label.text).is_equal("Artifact")
-	# The type reads in the faction's text colour (dark on the light Valkyries tab).
-	assert_str(type_label.get_theme_color("font_color").to_html(false)).is_equal("1c1a17")
-	var spell: CardView = await _view(CardData.Type.SPELL, &"valkyries")
-	assert_object(spell.find_child("TypeTab", true, false).get_theme_stylebox("panel")).is_instanceof(StyleBoxEmpty)
+func test_double_border_motif_tells_the_type() -> void:
+	var unit: CardView = await _view(CardData.Type.UNIT)
+	assert_bool((unit.find_child("FrameBand", true, false) as CardFrameBand).visible).is_false()
+	var expected: Dictionary = {
+		CardFrameBand.Pattern.ZIGZAG: await _view(CardData.Type.SPELL, &"valkyries"),
+		CardFrameBand.Pattern.HATCH: await _view(CardData.Type.ARTIFACT, &"valkyries"),
+		CardFrameBand.Pattern.BEADS: await _view(CardData.Type.ARTIFACT, &"valkyries", CardData.Rarity.RARE, false, [&"relic"]),
+	}
+	for pattern: CardFrameBand.Pattern in expected:
+		var band: CardFrameBand = (expected[pattern] as CardView).find_child("FrameBand", true, false) as CardFrameBand
+		assert_bool(band.visible).is_true()
+		assert_int(band.pattern).is_equal(pattern)
+		# Drawn in the faction colour.
+		assert_str(band.color.to_html(false)).is_equal("e0a0b8")
+	# The face sits inside the double border.
+	var face: Control = (expected[CardFrameBand.Pattern.HATCH] as CardView).find_child("CardFace", true, false) as Control
+	var unit_face: Control = unit.find_child("CardFace", true, false) as Control
+	assert_float(face.offset_left).is_greater(unit_face.offset_left)
 
 
 func _view(
@@ -92,6 +99,7 @@ func _view(
 	data.rarity = rarity
 	data.is_ring = is_ring
 	data.subtypes = subtypes
+	data.attachable = subtypes.has(&"relic")
 	var view: CardView = auto_free(CardView.new()) as CardView
 	view.set_card(data)
 	add_child(view)
