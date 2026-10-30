@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-10-30
 
 ## Platform constraints
 
@@ -48,8 +48,9 @@ flowchart TD
 | Pause | Themed panel: **Resume** (primary), **Leave**; leaving asks for confirmation inside the panel. The Android back button opens / closes it during a match |
 | **Duel** | Top bar: whose turn (no how-to instructions: the gold and red borders show what to tap, greyed cards and buttons what cannot be used), turn number (each player counts their own turns), Götterdämmerung countdown (from turn 7, then "Valhalla burns" once it is active), pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
 | Results | Win/lose, rewards, continue |
-| Collection / Deck builder | Card grid, filters, deck list panel, mana curve |
-| Settings | Music and sound-effect volumes, language (device language or English / Deutsch / Español / Français); reset progress once the profile save exists |
+| Collection | Rhinegold counter. Faction chips (All + one icon per faction) always shown; **Filters** (with the number of active filters) unfolds chip rows for cost (0–5, 6+), type, rarity, trait and owned / missing — one chip per row, "All" first. Count "owned / shown". Grid of 3 cards per row, by faction, cost, then name; under each card "× n" or "Not owned" (card faded). Tapping a card opens it large with its flavour and "Owned: n (up to m per deck)"; tapping anywhere closes it |
+| Deck builder | Card grid, filters, deck list panel, mana curve |
+| Settings | Music and sound-effect volumes, language (device language or English / Deutsch / Español / Français); **reset progress** (collection, decks, Rhinegold, campaign, achievements; asks for confirmation, Cancel highlighted; settings are kept) |
 
 ## Duel screen layout (portrait)
 

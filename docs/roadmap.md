@@ -98,10 +98,12 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 - [x] Title and main menu (Campaign, Collection, Settings greyed out until they exist) ([UI implementation](technical/06-ui-implementation.md#menus))
 - [x] Quick match (deck / opponent or Random / difficulty, last choices remembered)
-- [ ] Collection, deck builder, Nibelheim (card crafting) ([game modes](functional/05-game-modes.md), [progression](functional/06-progression.md))
-- [ ] Profile save (atomic JSON, migrations) ([persistence](technical/07-persistence.md))
-- [ ] Resume an interrupted match
-- [x] Settings: music / sound-effect volumes, language ([UI implementation](technical/06-ui-implementation.md#menus)); *reset progress* comes with the profile save
+- [x] Collection screen: every card with the copies owned, faction chips + filters (cost, type, rarity, trait, owned / missing), card shown large; new profile owns the four starter decks
+- [ ] Deck builder (decks from the collection, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
+- [ ] Nibelheim (card crafting with Rhinegold) + Quick match rewards ([progression](functional/06-progression.md))
+- [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)); nothing writes to it yet: rewards and decks come with the collection and the campaign
+- [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))
+- [x] Settings: music / sound-effect volumes, language, reset progress ([UI implementation](technical/06-ui-implementation.md#menus))
 - [ ] Achievements
 
 ## 6 — Test matches

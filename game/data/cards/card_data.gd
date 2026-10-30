@@ -35,6 +35,12 @@ func is_unit() -> bool:
 	return type == Type.UNIT
 
 
+## Copies allowed in a deck: 1 for Epic and Legendary cards, 2 otherwise
+## (docs/functional/04-cards.md#deckbuilding-rules).
+func deck_limit() -> int:
+	return 1 if rarity in [Rarity.EPIC, Rarity.LEGENDARY] else 2
+
+
 ## Returns whether this artifact is equipment.
 func is_relic() -> bool:
 	return type == Type.ARTIFACT and attachable and StringName("relic") in subtypes

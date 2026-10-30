@@ -615,7 +615,7 @@ func _validate_decks() -> bool:
 				_error(path, 0, "%s cannot include %s from faction %s." % [deck_id, card.id, card.faction])
 			var count: int = int(copies.get(card.id, 0)) + 1
 			copies[card.id] = count
-			var limit: int = 1 if card.rarity in [CardData.Rarity.EPIC, CardData.Rarity.LEGENDARY] else 2
+			var limit: int = card.deck_limit()
 			if count > limit:
 				_error(path, 0, "%s exceeds the %d-copy limit for %s." % [deck_id, limit, card.id])
 	return _errors.is_empty()

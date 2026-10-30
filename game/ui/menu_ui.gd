@@ -24,8 +24,9 @@ static func button(key: String, height: int = 104, font_size: int = 30) -> Butto
 	return result
 
 
-## Back button, centred title, and a spacer as wide as the button so the title stays centred.
-static func header(title_key: String) -> HBoxContainer:
+## Back button, centred title, and on the right `right` (e.g. a counter) or a spacer, as wide as the
+## button so the title stays centred.
+static func header(title_key: String, right: Control = null) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	var back: Button = button("UI_BACK", 88, 26)
 	back.name = "BackButton"
@@ -36,10 +37,43 @@ static func header(title_key: String) -> HBoxContainer:
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	row.add_child(title)
-	var balance := Control.new()
+	var balance: Control = right if right != null else Control.new()
 	balance.custom_minimum_size.x = 200
 	row.add_child(balance)
 	return row
+
+
+## A filter chip: toggle button, one of a ButtonGroup row; gold border when pressed. An icon chip
+## shows the icon only, tinted with `color`.
+static func chip(text: String, color: Color = Palette.BORDER, icon_path: String = "") -> Button:
+	var result := Button.new()
+	result.toggle_mode = true
+	result.text = text
+	result.custom_minimum_size = Vector2(0, 72)
+	result.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	result.clip_text = true
+	result.add_theme_font_size_override("font_size", 22)
+	for state: String in ["font_color", "font_pressed_color", "font_hover_color", "font_hover_pressed_color", "font_focus_color"]:
+		result.add_theme_color_override(state, Palette.TEXT)
+	for state: String in ["normal", "hover"]:
+		var style: StyleBoxFlat = _tile_style(Palette.SURFACE if state == "normal" else Palette.SURFACE_RAISED, color, 3)
+		style.content_margin_left = 8
+		style.content_margin_right = 8
+		result.add_theme_stylebox_override(state, style)
+	for state: String in ["pressed", "hover_pressed"]:
+		var style: StyleBoxFlat = _tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 5)
+		style.content_margin_left = 8
+		style.content_margin_right = 8
+		result.add_theme_stylebox_override(state, style)
+	result.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	if icon_path != "" and ResourceLoader.exists(icon_path):
+		result.icon = load(icon_path) as Texture2D
+		result.expand_icon = true
+		result.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		result.add_theme_constant_override("icon_max_width", 44)
+		for state: String in ["icon_normal_color", "icon_pressed_color", "icon_hover_color", "icon_hover_pressed_color", "icon_focus_color"]:
+			result.add_theme_color_override(state, color.lightened(0.3))
+	return result
 
 
 ## A 0–100 slider sized for touch: thick track, gold fill and a large round grabber.

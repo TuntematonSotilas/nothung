@@ -1,15 +1,20 @@
 extends GdUnitTestSuite
 
 var _animation_speed: float
+var _match_path: String
 
 
 func before() -> void:
 	_animation_speed = Settings.animation_speed
+	# The duel saves the match in progress: keep the real file out of the tests.
+	_match_path = SaveManager.match_path
+	SaveManager.match_path = create_temp_dir("duel_%d" % Time.get_ticks_usec()) + "/current_match.json"
 	Settings.animation_speed = 2.0
 
 
 func after() -> void:
 	Settings.animation_speed = _animation_speed
+	SaveManager.match_path = _match_path
 
 
 func test_spell_plays_over_the_old_board_then_refreshes() -> void:

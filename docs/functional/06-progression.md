@@ -1,7 +1,7 @@
 # Progression
 
 > How the player grows their collection and what keeps them playing — all offline.
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-10-30
 
 ## Principles
 
@@ -12,6 +12,9 @@
 
 - One **starter deck** per faction unlocked as the campaign introduces it.
 - After the tutorial: Gods starter deck + Nibelungs starter deck.
+- Owning a starter deck means owning its Leader and, for each card, the copies the deck uses — not the sum over several decks: decks share the collection.
+
+> **Decision (2026-10-30):** until the tutorial and the campaign exist, a new profile owns the **four** starter decks. The rule above applies once the campaign unlocks factions.
 
 ## Rewards
 
@@ -20,7 +23,7 @@
 | Campaign duel (first win) | Specific cards / Leader (fixed, story-related) |
 | Campaign Quest (each ending, first time) | Card, Rhinegold or cosmetic ([Quests](05-game-modes.md#quests-non-combat-stages)) |
 | Campaign chapter complete | Legendary card + faction starter deck |
-| Quick match win | Rhinegold |
+| Quick match win | Rhinegold: 10 (Easy) / 20 (Normal) / 40 (Hard); nothing for a loss, a draw or leaving |
 | Achievements | Rhinegold, card backs, cosmetic frames |
 
 ## Meta currency

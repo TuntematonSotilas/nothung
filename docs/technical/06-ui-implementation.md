@@ -34,9 +34,10 @@
 
 ## Menus
 
-- `scenes/screens/main_menu.tscn`: title, **Quick match**, **Settings**, and Campaign / Collection greyed out until they exist.
+- `scenes/screens/main_menu.tscn`: title, Rhinegold counter, **Quick match**, **Collection**, **Settings**, and Campaign greyed out until it exists. When `SaveManager.has_match()`, it first replays the saved match: if it replays, a modal offers **Resume** (highlighted; opens the duel with `DuelSetup.resume`) or **Abandon**; otherwise the file is set aside and a short message explains it.
 - `scenes/screens/quick_match.tscn`: your deck (2 × 2 tiles: faction icon, faction, Leader, border in the faction colour, gold when selected), opponent (**Random** or a deck), difficulty (Easy / Normal / Hard with a one-line description), **Play**. Random is drawn among the other factions' decks when Play is pressed. The choices are saved in `Settings` (`quick_match` section) and offered again next time.
-- `scenes/screens/settings_menu.tscn`: music and sound-effect sliders (0–100 %, steps of 10), language tiles (device language, then each language under its own name). Each change goes through a `Settings.set_*()` setter, which applies it (locale, audio bus volume) and saves `settings.cfg` at once; the screen rebuilds itself after a language change.
+- `scenes/screens/collection.tscn`: one `CardView` per card (zoom gesture off) in a 3-column `GridContainer`, scaled to the screen width; filters are chip rows (`MenuUI.chip()`, one `ButtonGroup` per row) and simply hide the cells that do not match (`matches()`, static, unit-testable). A press that scrolled the grid by more than a few pixels does not open the card. Owned copies come from `SaveManager.owned_count()`.
+- `scenes/screens/settings_menu.tscn`: music and sound-effect sliders (0–100 %, steps of 10), language tiles (device language, then each language under its own name). Each change goes through a `Settings.set_*()` setter, which applies it (locale, audio bus volume) and saves `settings.cfg` at once; the screen rebuilds itself after a language change. *Progress* section: **Reset progress** swaps in a confirmation (Cancel highlighted, Erase in red), then calls `SaveManager.reset_profile()` and shows "Progress reset."
 > **Decision (2026-10-28):** no animation speed nor text size option in Settings.
 - Menu screens are built in code with `ui/menu_ui.gd` (`MenuUI`: screen column, header with Back, labels, buttons, selectable tiles, touch-sized slider, faction order), sized for the 1080 × 1920 reference.
 

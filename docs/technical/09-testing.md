@@ -1,7 +1,7 @@
 # Testing
 
 > Test strategy and tooling.
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-10-30
 
 ## Framework
 
@@ -34,6 +34,7 @@
 
 - Tests create matches with a fixed seed and stacked decks (`Match.create_for_test(deck_order_a, deck_order_b)`).
 - A replay test re-applies a saved action list and compares the final state hash.
+- `tests/unit/test_match_record.gd` replays a recorded match (after a JSON round trip, with an undone play) to the same state hash, and checks what must not replay (changed card data, unknown card, rejected action).
 - **Resume tests** ([07-persistence](07-persistence.md#resume-an-interrupted-match)): save `current_match.json` at random points of scripted matches, rebuild, and check the state hash equals the live one; a file with a wrong `content_hash` or an illegal action is rejected cleanly.
 
 ## Running headless

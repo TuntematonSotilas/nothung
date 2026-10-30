@@ -1,16 +1,21 @@
 extends GdUnitTestSuite
 
 var _animation_speed: float
+var _match_path: String
 
 
 # Animations off: these tests check the state right after each action (animations: test_duel_fx.gd).
 func before() -> void:
 	_animation_speed = Settings.animation_speed
+	# The duel saves the match in progress: keep the real file out of the tests.
+	_match_path = SaveManager.match_path
+	SaveManager.match_path = create_temp_dir("duel_%d" % Time.get_ticks_usec()) + "/current_match.json"
 	Settings.animation_speed = 0.0
 
 
 func after() -> void:
 	Settings.animation_speed = _animation_speed
+	SaveManager.match_path = _match_path
 
 
 func test_wotan_portrait_is_loaded_and_displayed_in_duel() -> void:

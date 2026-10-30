@@ -1,8 +1,8 @@
 extends Control
 
-## Settings: music and sound-effect volumes, language.
+## Settings: music and sound-effect volumes, language, reset progress.
 ## Every change is applied and saved at once (Settings); the screen is rebuilt when the language
-## changes, so its own texts follow.
+## changes, so its own texts follow. Resetting progress asks for confirmation first.
 
 const LANGUAGES: Array[String] = ["", "en", "de", "es", "fr"]
 ## Language names are written in their own language (not translated).
@@ -42,6 +42,13 @@ func _build() -> void:
 		languages.add_child(tile)
 	body.add_child(languages)
 
+	body.add_child(_section("UI_PROGRESS"))
+	var progress := VBoxContainer.new()
+	progress.name = "Progress"
+	progress.add_theme_constant_override("separation", 16)
+	body.add_child(progress)
+	_show_reset_button(progress, false)
+
 
 func _section(key: String) -> Label:
 	return MenuUI.label(key, 26, Palette.TEXT_MUTED)
@@ -74,6 +81,49 @@ func _volume_row(node_name: String, key: String, volume: float, apply: Callable)
 		value.text = "%d %%" % roundi(new_value)
 		apply.call(new_value / 100.0))
 	return row
+
+
+func _show_reset_button(box: VBoxContainer, done: bool) -> void:
+	_clear(box)
+	if done:
+		var message: Label = MenuUI.label("UI_PROGRESS_RESET_DONE", 26, Palette.TEXT_MUTED)
+		message.name = "ResetDone"
+		box.add_child(message)
+	var reset: Button = MenuUI.button("UI_RESET_PROGRESS")
+	reset.name = "ResetProgressButton"
+	reset.pressed.connect(_show_reset_confirmation.bind(box))
+	box.add_child(reset)
+
+
+## Cancel is the highlighted choice: erasing cannot be undone.
+func _show_reset_confirmation(box: VBoxContainer) -> void:
+	_clear(box)
+	var question: Label = MenuUI.label("UI_RESET_PROGRESS_CONFIRM", 26)
+	question.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	box.add_child(question)
+	var buttons := HBoxContainer.new()
+	buttons.add_theme_constant_override("separation", 24)
+	box.add_child(buttons)
+	var cancel: Button = MenuUI.button("UI_CANCEL")
+	cancel.name = "CancelResetButton"
+	cancel.theme_type_variation = &"ButtonPrimary"
+	cancel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cancel.pressed.connect(_show_reset_button.bind(box, false))
+	buttons.add_child(cancel)
+	var erase: Button = MenuUI.button("UI_RESET_PROGRESS_ERASE")
+	erase.name = "ConfirmResetButton"
+	erase.add_theme_color_override("font_color", Palette.LIFE)
+	erase.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	erase.pressed.connect(func() -> void:
+		SaveManager.reset_profile()
+		_show_reset_button(box, true))
+	buttons.add_child(erase)
+
+
+func _clear(box: Node) -> void:
+	for child: Node in box.get_children():
+		box.remove_child(child)
+		child.queue_free()
 
 
 func _on_language_chosen(code: String) -> void:

@@ -310,8 +310,7 @@ func _valid_deck(deck: DeckData) -> bool:
 					return false
 		var copies: int = int(copy_counts.get(card.id, 0)) + 1
 		copy_counts[card.id] = copies
-		var limit: int = 1 if card.rarity in [CardData.Rarity.EPIC, CardData.Rarity.LEGENDARY] else 2
-		if copies > limit:
+		if copies > card.deck_limit():
 			return false
 	return true
 

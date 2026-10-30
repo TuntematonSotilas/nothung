@@ -14,6 +14,8 @@ const HIDDEN_ALPHA: float = 0.45
 @export var board_id: String = "default"
 
 var _match: Match
+## What happened in this match, saved after every change to resume it if the app is killed.
+var _record: MatchRecord
 var _ui_scale: float = 1.0
 var _board_card_scale: float = 1.0
 var _ai_busy: bool = false
@@ -272,10 +274,49 @@ func _start_match() -> void:
 	_log_lines.clear()
 	_pending_events.clear()
 	_ai_profile = AIProfile.preset(_setup.difficulty)
-	_match = Match.new(CardDatabase.get_deck(_setup.player_deck), CardDatabase.get_deck(_setup.opponent_deck), int(Time.get_unix_time_from_system()))
+	_match = null
+	var resumed: MatchRecord = _setup.resume
+	_setup.resume = null
+	if resumed != null:
+		# Replayed without animations; the main menu has already checked that it replays.
+		_match = resumed.replay(CardDatabase)
+		_record = resumed
+	if _match == null:
+		var player_deck: DeckData = CardDatabase.get_deck(_setup.player_deck)
+		var opponent_deck: DeckData = CardDatabase.get_deck(_setup.opponent_deck)
+		var match_seed: int = int(Time.get_unix_time_from_system())
+		_match = Match.new(player_deck, opponent_deck, match_seed)
+		_record = MatchRecord.create(player_deck, opponent_deck, match_seed)
+		_record.difficulty = _setup.difficulty
+	# A resumed match past the start of Götterdämmerung has already shown its explanation.
+	for player: PlayerState in _match.get_state().players:
+		if player.turns_taken >= Match.DOOM_START_TURN:
+			_doom_explained = true
 	_match.event_emitted.connect(_on_match_event)
+	_save_progress()
 	_refresh()
 	_continue_ai()
+
+
+## Saved after every change (and when the app goes to background), deleted once the match is over.
+## See docs/technical/07-persistence.md#resume-an-interrupted-match.
+func _save_progress() -> void:
+	if _record == null or _match == null:
+		return
+	if _match.get_state().phase == GameState.Phase.GAME_OVER:
+		SaveManager.delete_match()
+	else:
+		SaveManager.save_match(_record.to_dict())
+
+
+func _record_action(action: Action) -> void:
+	_record.add_action(action)
+	_save_progress()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_save_progress()
 
 
 func _refresh() -> void:
@@ -689,6 +730,7 @@ func _confirm_redraw() -> void:
 	var action: RedrawAction = RedrawAction.new(HUMAN_PLAYER, _redraw_selected)
 	_pending_events.clear()
 	if _match.apply(action):
+		_record_action(action)
 		_redraw_selected.clear()
 		_play_fx(action)
 		_continue_ai()
@@ -981,18 +1023,12 @@ func _on_undo_play_pressed() -> void:
 		_refresh()
 		return
 	_pending_events.clear()
-	if not _match.restore_snapshot(_undo_snapshot):
+	if not MatchRecord.undo_play(_match, _undo_snapshot, _undo_card_uid):
 		_clear_undo()
 		_refresh()
 		return
-	var player: PlayerState = _match.get_state().player(HUMAN_PLAYER)
-	var card: CardInstance = player.hand.remove_uid(_undo_card_uid)
-	if card == null:
-		push_error("Cannot undo the card play because the card is missing from the restored hand.")
-		_clear_undo()
-		_refresh()
-		return
-	player.deck.add(card)
+	_record.add_undo_play(_undo_card_uid)
+	_save_progress()
 	_log_lines = _undo_log_lines.duplicate()
 	_clear_undo()
 	_results_shown = false
@@ -1081,6 +1117,8 @@ func _show_leave_confirmation(panel: PanelContainer) -> void:
 
 ## Leaving the duel starts over from the main menu: no way "back" into a finished or abandoned match.
 func _go_to_main_menu() -> void:
+	# Leaving abandons the match: nothing to resume.
+	SaveManager.delete_match()
 	SceneRouter.clear_history()
 	SceneRouter.go_to("res://scenes/screens/main_menu.tscn", false)
 
@@ -1131,6 +1169,7 @@ func _apply_action(action: Action) -> void:
 	if not applied:
 		_pending_events.clear()
 		return
+	_record_action(action)
 	if action is PlayCardAction:
 		_undo_snapshot = snapshot
 		_undo_card_uid = (action as PlayCardAction).card_uid
@@ -1174,6 +1213,7 @@ func _finish_ai_redraw() -> void:
 		push_error("AI returned an invalid redraw action.")
 		_ai_busy = false
 		return
+	_record_action(action)
 	await _play_fx(action)
 	_ai_busy = false
 	_continue_ai()
@@ -1198,6 +1238,7 @@ func _run_ai_turn() -> void:
 		_ai_busy = false
 		push_error("AI returned an invalid action.")
 		return
+	_record_action(action)
 	# Still busy while animating, so no second AI loop starts meanwhile.
 	await _play_fx(action)
 	_ai_busy = false

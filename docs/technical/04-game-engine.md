@@ -1,7 +1,7 @@
 # Game engine
 
 > The rules engine: state, turn flow, actions, effect resolution. Implements [functional/03-game-rules.md](../functional/03-game-rules.md).
-> Status: Implemented · Last updated: 2026-10-28
+> Status: Implemented · Last updated: 2026-10-30
 
 ## Responsibilities
 
@@ -32,7 +32,7 @@ func state_hash() -> String                    # SHA-256 over canonical runtime 
 
 Implementation: `game/core/match/match.gd`. Match setup validates two 20-card decks (leader faction or Neutral, rarity copy limits), assigns unique card instance IDs, shuffles both decks and selects the starting player with the match RNG. The opening hands contain four cards for the starting player and five for the other; each player can Redraw once, then the first turn starts. The second player receives one extra Energy on their first turn.
 
-Actions are `RefCounted` value objects in `core/actions/`. `Action.to_record()` and `Action.from_record()` encode/decode replay-safe JSON dictionaries. They contain stable instance IDs and primitive values, never scene nodes or resource paths.
+Actions are `RefCounted` value objects in `core/actions/`. `Action.to_record()` and `Action.from_record()` encode/decode replay-safe JSON dictionaries. They contain stable instance IDs and primitive values, never scene nodes or resource paths. `MatchRecord` (`core/match/match_record.gd`) stores them with the seed and deck snapshots to resume an interrupted match ([persistence](07-persistence.md#resume-an-interrupted-match)).
 
 `get_legal_actions(player)` returns the possible action objects for that player in the current phase. During Redraw, each subset of the current hand is offered. During the Main phase, unit-targeting actions are expanded per valid target. `is_legal()` remains the authority: illegal actions return `false` without changing the state.
 
