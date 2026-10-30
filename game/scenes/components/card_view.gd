@@ -242,6 +242,11 @@ func _on_long_press_timeout() -> void:
 	zoom_requested.emit(card_data, card_instance)
 
 
+## "unit", "spell", "artifact" or "relic": names the type icon and the UI_TYPE_* translation key.
+static func type_id_of(data: CardData) -> String:
+	return "relic" if data.is_relic() else String(CardData.Type.keys()[data.type]).to_lower()
+
+
 func _refresh_text() -> void:
 	text = ""
 	_ensure_content()
@@ -255,8 +260,8 @@ func _refresh_text() -> void:
 	if rules.begins_with("CARD_"):
 		rules = ""
 	_cost_label.text = str(card_data.cost)
-	var type_id: String = "relic" if card_data.is_relic() else String(CardData.Type.keys()[card_data.type]).to_lower()
-	_type_label.text = type_id.capitalize()
+	var type_id: String = type_id_of(card_data)
+	_type_label.text = tr("UI_TYPE_%s" % type_id.to_upper())
 	_rarity_label.text = CardPalette.rarity_letter(card_data.rarity)
 	_set_icon(_type_icon, "res://ui/icons/type_%s.svg" % type_id)
 	_name_label.text = card_name

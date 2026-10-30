@@ -542,7 +542,7 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 		var placeholder: ColorRect = ColorRect.new()
 		placeholder.color = Color("#20242d")
 		artwork = placeholder
-		var emblem: Label = _label(String(data.faction).to_upper(), 25, Palette.ACCENT)
+		var emblem: Label = _label(MenuUI.faction_name(data.faction).to_upper(), 25, Palette.ACCENT)
 		emblem.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		emblem.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		emblem.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -551,8 +551,8 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 	content.add_child(artwork)
 
 	var type_label: Label = _label("%s · %s" % [
-		String(data.faction).capitalize(),
-		CardData.Type.keys()[data.type].capitalize(),
+		MenuUI.faction_name(data.faction),
+		tr("UI_TYPE_%s" % CardView.type_id_of(data).to_upper()),
 	], 18, Palette.TEXT_MUTED)
 	content.add_child(type_label)
 	var rules: String = tr("CARD_%s_RULES" % String(data.id).to_upper())
@@ -1451,22 +1451,25 @@ func _event_message(event: GameEvent) -> String:
 				"player": _leader_name(event.player),
 			})
 		&"card_played":
-			return tr("UI_LOG_CARD_PLAYED").format({
-				"player": tr("UI_YOU") if event.player == HUMAN_PLAYER else _leader_name(event.player),
-			})
+			return _player_message("UI_LOG_CARD_PLAYED", event.player)
 		&"damage_dealt":
 			return tr("UI_LOG_DAMAGE").format({
 				"player": _leader_name(event.player),
 				"amount": event.amount,
 			})
 		&"ring_taken":
-			return tr("UI_LOG_RING").format({
-				"player": tr("UI_YOU") if event.player == HUMAN_PLAYER else _leader_name(event.player),
-			})
+			return _player_message("UI_LOG_RING", event.player)
 		&"match_ended":
 			return tr("UI_LOG_MATCH_ENDED")
 		_:
 			return ""
+
+
+## The human player's line has its own key ("You played…"): the verb agrees differently in each language.
+func _player_message(key: String, player: int) -> String:
+	if player == HUMAN_PLAYER:
+		return tr(key + "_YOU")
+	return tr(key).format({"player": _leader_name(player)})
 
 
 ## Units rows keep a card's height when empty so the layout never jumps; artifact rows only take room when used.

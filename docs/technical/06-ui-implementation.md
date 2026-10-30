@@ -85,12 +85,30 @@ sequenceDiagram
 
 ## Localisation
 
-- `localization/strings.csv` (keys + `en`, `de`, `es`, `fr` columns; `en` is the source language), imported as Godot translations (the generated `.translation` files are git-ignored and rebuilt on import). A test fails if any key lacks a language.
+- `localization/strings.csv` (keys + `en`, `de`, `es`, `fr` columns; `en` is the source language), imported as Godot translations (the generated `.translation` files are git-ignored and rebuilt on import). A test fails if any key lacks a language, or if a text (other than a name) is still the English copy in all three other languages — the converter writes that copy for new cards, so they must be translated by hand in the CSV.
 - Language: `Settings.language`; empty = the device language if supported, otherwise English.
 - The brand texts (*Nothung*, *The Ring Card Game*) stay in English in every language.
-- All visible text via `tr("KEY")`; card texts via keys built from the card ID.
+- All visible text via `tr("KEY")`; card texts via keys built from the card ID; card types via `UI_TYPE_<TYPE>`, factions via `UI_FACTION_<FACTION>` (never an ID shown as is).
+- A sentence about the player has its own key (`UI_LOG_CARD_PLAYED_YOU`: "You played a card.") instead of a "You" inserted in a template: the verb agrees differently in each language.
 - Rules text with numbers uses `tr(...).format({...})`.
 - Test long-text languages (German, then French and Spanish) for card text overflow; card text uses auto-shrinking `Label`/`RichTextLabel`.
+- Address the player informally (*du*, *tú*, *tu*). French puts a non-breaking space before `:` `?` `!`. Quotes: „…“ (de), «…» (es), « … » (fr).
+- Flavour quotes: the German column uses the **original libretto**; Spanish and French are our own translations.
+
+### Glossary
+
+Character and place names stay German ([Lore](../functional/02-lore-and-setting.md)). Game terms:
+
+| English | Deutsch | Español | Français |
+|---|---|---|---|
+| Leader | Anführer | líder | Meneur |
+| Energy | Energie | Energía | Énergie |
+| Unit · Spell · Artifact · Relic | Einheit · Zauber · Artefakt · Relikt | Unidad · Hechizo · Artefacto · Reliquia | Unité · Sort · Artefact · Relique |
+| Bearer | Träger | portador | porteur |
+| On play · On death · At the start of your turn | Beim Ausspielen · Beim Tod · Zu Beginn deines Zuges | Al jugarse · Al morir · Al inicio de tu turno | À la pose · À la mort · Au début de ton tour |
+| Flying · Guard · Charge · Invisible | Fliegend · Wache · Ansturm · Unsichtbar | Vuelo · Guardia · Carga · Invisible | Vol · Garde · Charge · Invisible |
+| Valhalla (keyword and place) | Walhall | Valhalla | Walhalla |
+| Redraw | neu ziehen | cambiar | repiocher |
 
 ## Performance targets
 

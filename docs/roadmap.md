@@ -41,6 +41,7 @@ flowchart LR
 - [x] Folder skeleton (`core/`, `ai/`, `autoload/`, `data/`, `tests/`…) ([project structure](technical/02-project-structure.md))
 - [x] Autoloads: `SceneRouter` (fade, history, back button), `SaveManager` (atomic JSON, backup, migrations), `Settings` (ConfigFile, language)
 - [x] Localisation setup: CSV with EN source + DE / ES / FR columns, language setting; splash texts translated
+- [x] Game translated into DE / ES / FR (menus, duel, all cards; German flavour from the original libretto); a test fails on untranslated texts. Native-speaker review still to do
 - [x] Split the export preset into `Android Debug` (`.apk`) and `Android Release` (`.aab`), as documented
 
 ## 1 — Rules engine (headless)
