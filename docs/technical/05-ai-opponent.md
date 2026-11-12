@@ -1,7 +1,7 @@
 # AI opponent
 
 > How the computer opponent chooses its moves. Supports [functional/05-game-modes.md](../functional/05-game-modes.md).
-> Status: In progress · Last updated: 2026-10-28
+> Status: In progress · Last updated: 2026-11-12
 
 ## Requirements
 
@@ -35,17 +35,19 @@ static func choose(job: Dictionary) -> Dictionary                               
 
 | Level | Strategy | Noise | Cost per action (desktop) |
 |-------|----------|-------|---------------------------|
-| Easy | Scores each legal action with a heuristic, plays the best one | None | < 1 ms |
+| Easy | Scores each legal action with a heuristic, plays the best one — or, 35 % of the time, another one at random (never instead of a winning one) | None | < 1 ms |
 | Normal | Simulates each legal action on the masked state and keeps the best evaluated result; ends its turn when nothing improves its position | 2 evaluation points (Gaussian) | ~2 ms |
 | Hard | Information-set MCTS over its own turn, with the opponent's reply played out | None | 700 ms time budget |
 
 All levels use the Easy heuristic for the opening-hand Redraw.
 
-Measured ladder (AI vs AI, Gods and Nibelungs starters, alternating decks and first player): Normal beats Easy 29 / 40, Hard (only 60 iterations per action) beats Normal 7 / 10; with 200 iterations Hard beats Normal 18 / 20 ([AI soak](09-testing.md#ai-soak)).
+Measured ladder (AI vs AI, Gods and Nibelungs starters, alternating decks and first player): Normal beats Easy 36 / 40 (29 / 40 before Easy made mistakes), Hard (only 60 iterations per action) beats Normal 7 / 10; with 200 iterations Hard beats Normal 18 / 20 ([AI soak](09-testing.md#ai-soak)).
 
 ### Easy — action heuristic
 
 Scores each legal action using own-card value, board trades, lethal attacks, play effects and Ring value; selects the highest score. Effects are scored only when their condition will be met, buffs on enemy units and damage to own units count as losses, Charge on a unit that could not attack is valued as an attack, and faction damage bonuses (Spear-breaker) are counted. *Resurrect* is worth something only when a Valhalla unit waits in the graveyard and the board has room; *return the Ring* and *take the Ring* only when the opponent holds it (taking never creates it). It plays every useful action and attacks with every ready unit.
+
+> **Decision (2026-11-12, playtest):** Easy was too strong for a beginner. As an opponent it now **blunders**: with `AIProfile.blunder_chance` (0.35 for Easy) it plays a random other action (End turn included, Concede never) instead of the best one — except when the best one wins the match (score ≥ 1000). The plain heuristic (`blunder_chance` 0) still serves Hard's playouts and Normal / Hard's opening redraw.
 
 ### Normal — greedy with full evaluation
 

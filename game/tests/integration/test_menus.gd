@@ -154,26 +154,15 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	assert_object(editor.find_child("Card_loge", true, false)).is_not_null()
 	assert_object(editor.find_child("Card_mime", true, false)).is_null()
 
-	var zone: Control = editor.find_child("DeckZone", true, false) as Control
-	await get_tree().process_frame
-	var on_zone: Vector2 = zone.get_global_rect().get_center()
-	var outside: Vector2 = zone.get_global_rect().position + Vector2(10, zone.size.y + 300)
-	var loge: CardData = CardDatabase.get_card(&"loge")
-	# Long-press a card and drop it on the deck zone: added.
-	editor.call("_begin_drag", loge, false)
-	editor.drop_at(on_zone)
+	# No drag and drop: a tap on a card adds a copy.
+	var loge_view: CardView = editor.find_child("Card_loge", true, false).get_child(0) as CardView
+	loge_view.pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
-	# Dropped elsewhere: nothing happens.
-	editor.call("_begin_drag", loge, false)
-	editor.drop_at(outside)
-	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
-	# A tap shows the card with Add.
-	(editor.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
-	(editor.find_child("AddButton", true, false) as Button).pressed.emit()
+	assert_object(editor.find_child("CardDetail", true, false)).is_null()
+	loge_view.pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
-	# Rare: at most 2 copies; a third drop shows why instead.
-	editor.call("_begin_drag", loge, false)
-	editor.drop_at(on_zone)
+	# Rare: at most 2 copies; a third tap shows the card with why instead.
+	loge_view.pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
 	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
 	# Saved at once.
@@ -182,12 +171,11 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	assert_int((saved_deck["cards"] as Array).count("loge")).is_equal(2)
 	assert_str((editor.find_child("DeckCount", true, false) as Label).text).contains("2")
 
-	# A deck card dragged out of the zone is taken out; a tap on its chip too.
-	editor.call("_begin_drag", loge, true)
-	editor.drop_at(outside)
-	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
+	assert_float((editor.find_child("DeckGauge", true, false) as ProgressBar).value).is_equal(2.0)
+
+	# A tap on its chip takes a copy out.
 	(editor.find_child("Chip_loge", true, false) as Button).pressed.emit()
-	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(0)
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
 	var name_edit: LineEdit = editor.find_child("DeckName", true, false) as LineEdit
 	name_edit.text_changed.emit("Valhalla rush")
 	assert_str(str(SaveManager.find_deck(str(entry["id"]))["name"])).is_equal("Valhalla rush")
@@ -198,8 +186,29 @@ func test_deck_editor_shows_ready_for_a_full_valid_deck() -> void:
 	DeckEditor.deck_id = "deck_1"
 	var editor: Control = await _open("res://scenes/screens/deck_editor.tscn")
 	assert_str((editor.find_child("DeckStatus", true, false) as Label).text).is_equal(tr("UI_DECK_READY"))
-	var curve: HBoxContainer = editor.find_child("EnergyCurve", true, false) as HBoxContainer
-	assert_int(curve.get_child_count()).is_equal(7)
+	assert_float((editor.find_child("DeckGauge", true, false) as ProgressBar).value).is_equal(20.0)
+	editor.queue_free()
+
+
+func test_deck_editor_auto_fills_and_restores_the_starter_deck() -> void:
+	var entry: Dictionary = SaveManager.create_deck("wotan")
+	DeckEditor.deck_id = str(entry["id"])
+	var editor: DeckEditor = await _open("res://scenes/screens/deck_editor.tscn") as DeckEditor
+	# Empty deck: no question asked.
+	(editor.find_child("AutoFillButton", true, false) as Button).pressed.emit()
+	assert_int((entry["cards"] as Array).size()).is_equal(20)
+	assert_array(DeckRules.problems(entry, CardDatabase, SaveManager.owned_count)).is_empty()
+	# Not empty: asks first; Cancel keeps the deck.
+	var before: Array = (entry["cards"] as Array).duplicate()
+	(editor.find_child("StarterDeckButton", true, false) as Button).pressed.emit()
+	(editor.find_child("CancelButton", true, false) as Button).pressed.emit()
+	assert_array(entry["cards"]).is_equal(before)
+	(editor.find_child("StarterDeckButton", true, false) as Button).pressed.emit()
+	(editor.find_child("ConfirmButton", true, false) as Button).pressed.emit()
+	var starter: Array[String] = []
+	for card: CardData in CardDatabase.get_deck(&"gods_starter").cards:
+		starter.append(String(card.id))
+	assert_array(entry["cards"]).contains_exactly_in_any_order(starter)
 	editor.queue_free()
 
 

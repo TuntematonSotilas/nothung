@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-10-30
+> Status: Draft · Last updated: 2026-11-12
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -81,7 +81,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 4 — AI & balancing
 
-- [x] Improve Easy AI action selection: evaluate card value, lethal attacks and favorable trades
+- [x] Improve Easy AI action selection: evaluate card value, lethal attacks and favorable trades; after playtest, Easy makes mistakes (35 %, never missing a win): Normal now beats it 36 / 40
 - [x] Normal (greedy over simulated actions) and Hard (information-set MCTS) difficulties; AI profiles with personalities; AI never sees the opponent's hand; non-blocking AI thread in the duel ([AI opponent](technical/05-ai-opponent.md))
 - [x] AI vs AI soak tests: no crash, no illegal move ([testing](technical/09-testing.md))
 - [x] Match-length and win-rate stats per starter deck ([AI soak baseline](technical/09-testing.md#ai-soak))
@@ -99,7 +99,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] Title and main menu around the current deck (Leader portrait, tap to change, My decks under it); Campaign / Quick match; Nibelheim with the Rhinegold and Settings (cog) in the top corners; Collection small at the bottom; Campaign greyed out until it exists ([UI implementation](technical/06-ui-implementation.md#menus))
 - [x] Quick match (your deck ready to play / opponent starter deck or Random / difficulty, last choices remembered)
 - [x] Collection screen: every card with the copies owned, faction chips + filters (cost, type, rarity, trait, owned / missing), card shown large; new profile owns the four starter decks
-- [x] Deck builder (decks from the collection, drag and drop onto the deck zone, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
+- [x] Deck builder (decks from the collection, tap to add / tap to remove (no drag and drop), count gauge, Auto-fill and Starter deck buttons, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
 - [x] Nibelheim (card crafting with Rhinegold) + Quick match rewards ([progression](functional/06-progression.md))
 - [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)): collection, Leaders, decks, Rhinegold
 - [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))

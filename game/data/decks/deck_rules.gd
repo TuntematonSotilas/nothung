@@ -78,6 +78,52 @@ static func to_deck_data(entry: Dictionary, database: Object) -> DeckData:
 	return deck
 
 
+## Auto-fill targets for 20 cards: units vs spells and artifacts, and copies per cost (0 counts as 1,
+## 6 and more as 6). A curve that peaks at 2–3 Energy, as the starter decks do.
+const FILL_UNITS: int = 13
+const FILL_CURVE: Dictionary = {1: 3, 2: 5, 3: 4, 4: 3, 5: 2, 6: 3}
+
+
+## A full deck from the cards owned: the rarest first (then the strongest units, then the cheapest),
+## within FILL_UNITS units and the FILL_CURVE; then without the curve, then without any target, so a
+## small collection still gives as many cards as it can. Returns card IDs, one per copy.
+static func auto_fill(leader: LeaderData, database: Object, owned: Callable) -> Array[String]:
+	var candidates: Array[CardData] = []
+	for card_id: StringName in database.call("card_ids"):
+		var card: CardData = database.call("get_card", card_id) as CardData
+		# A card that does nothing by itself (Nothung broken waits to be reforged) is not chosen.
+		var useful: bool = card.is_unit() or not card.abilities.is_empty() or card.is_relic()
+		if useful and eligible(card, leader):
+			for copy: int in mini(int(owned.call(card.id)), card.deck_limit()):
+				candidates.append(card)
+	candidates.sort_custom(func(a: CardData, b: CardData) -> bool:
+		if a.rarity != b.rarity:
+			return a.rarity > b.rarity
+		if a.attack + a.health != b.attack + b.health:
+			return a.attack + a.health > b.attack + b.health
+		if a.cost != b.cost:
+			return a.cost < b.cost
+		return String(a.id) < String(b.id))
+	var chosen: Array[String] = []
+	var units: int = 0
+	var buckets: Dictionary = {}
+	for pass_index: int in 3:
+		var index: int = 0
+		while index < candidates.size() and chosen.size() < DECK_SIZE:
+			var card: CardData = candidates[index]
+			var bucket: int = clampi(card.cost, 1, 6)
+			var type_room: bool = units < FILL_UNITS if card.is_unit() else chosen.size() - units < DECK_SIZE - FILL_UNITS
+			var curve_room: bool = int(buckets.get(bucket, 0)) < int(FILL_CURVE[bucket])
+			if pass_index == 2 or (type_room and (pass_index == 1 or curve_room)):
+				chosen.append(String(card.id))
+				units += 1 if card.is_unit() else 0
+				buckets[bucket] = int(buckets.get(bucket, 0)) + 1
+				candidates.remove_at(index)
+			else:
+				index += 1
+	return chosen
+
+
 ## Copies per cost (0 … 6+), and cards per type ("unit", "spell", "artifact" with relics).
 static func curve(cards: Array[CardData]) -> Array[int]:
 	var bars: Array[int] = [0, 0, 0, 0, 0, 0, 0]

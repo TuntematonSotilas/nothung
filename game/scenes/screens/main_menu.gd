@@ -1,9 +1,9 @@
 extends Control
 
 ## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left and Settings
-## (cog) on the right; the title; the current deck (Leader portrait, name, Leader — a tap chooses
-## another deck ready to play) with My decks under it; Campaign (greyed out until it exists) and Quick
-## match side by side; Collection, smaller, at the bottom.
+## (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader — a tap
+## chooses another deck ready to play) with My decks under it, then Campaign (greyed out until it
+## exists) and Quick match side by side; Collection, smaller, at the bottom.
 ## The Android back button quits from here (the menu is the root of the history).
 ## An interrupted match (SaveManager) is offered first: Resume or Abandon.
 
@@ -74,9 +74,13 @@ func _build() -> void:
 	decks.pressed.connect(func() -> void: SceneRouter.go_to(DECKS_SCENE))
 	middle.add_child(decks)
 
+	# The game modes sit with the deck, in the middle of the screen.
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 36
+	middle.add_child(gap)
 	var modes := HBoxContainer.new()
 	modes.add_theme_constant_override("separation", 20)
-	column.add_child(modes)
+	middle.add_child(modes)
 	var campaign: Button = MenuUI.button("UI_CAMPAIGN", 120, 32)
 	campaign.name = "CampaignButton"
 	campaign.disabled = true
@@ -91,7 +95,7 @@ func _build() -> void:
 	modes.add_child(quick_match)
 	var soon: Label = MenuUI.label("UI_COMING_SOON_HINT", 22, Palette.TEXT_MUTED)
 	soon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(soon)
+	middle.add_child(soon)
 
 	var collection: Button = MenuUI.button("UI_COLLECTION", 72, 24)
 	collection.name = "CollectionButton"

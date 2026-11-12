@@ -39,6 +39,31 @@ func test_easy_jobs_carry_no_state_copy() -> void:
 	assert_bool(hard["state"] == state).is_false()
 
 
+func test_easy_blunders_but_never_misses_a_win() -> void:
+	var records: Array[Dictionary] = [
+		{"type": "play_card", "player": 1, "card_uid": 1, "ai_score": 150.0},
+		{"type": "attack", "player": 1, "attacker_uid": 2, "ai_score": 80.0},
+		{"type": "end_turn", "player": 1, "ai_score": 0.0},
+		{"type": "concede", "player": 1, "ai_score": -1000.0},
+	]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 3
+	for attempt: int in 20:
+		var always: Dictionary = EasyAI.choose_action(records, rng, 1.0)
+		assert_float(float(always["ai_score"])).is_not_equal(150.0)
+		assert_str(String(always["type"])).is_not_equal("concede")
+	# Without blunders: the best action, as before (Hard's playouts and every redraw rely on it).
+	assert_float(float(EasyAI.choose_action(records, rng, 0.0)["ai_score"])).is_equal(150.0)
+	assert_float(float(EasyAI.choose_action(records)["ai_score"])).is_equal(150.0)
+	# A winning action is never replaced.
+	var lethal: Array[Dictionary] = records.duplicate()
+	lethal.append({"type": "attack", "player": 1, "attacker_uid": 3, "target_player": 0, "ai_score": 1080.0})
+	for attempt: int in 20:
+		assert_float(float(EasyAI.choose_action(lethal, rng, 1.0)["ai_score"])).is_equal(1080.0)
+	assert_float(AIProfile.preset(AIProfile.Difficulty.EASY).blunder_chance).is_greater(0.0)
+	assert_float(AIProfile.preset(AIProfile.Difficulty.NORMAL).blunder_chance).is_equal(0.0)
+
+
 func test_normal_and_hard_take_a_lethal_attack() -> void:
 	for level: AIProfile.Difficulty in [AIProfile.Difficulty.NORMAL, AIProfile.Difficulty.HARD]:
 		var engine: Match = _main_phase_match(903)

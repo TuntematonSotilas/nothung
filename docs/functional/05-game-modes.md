@@ -1,7 +1,7 @@
 # Game modes
 
 > Every way the player can play, and how modes connect.
-> Status: Draft · Last updated: 2026-10-30
+> Status: Draft · Last updated: 2026-11-12
 
 ## Overview
 
@@ -68,15 +68,19 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 
 - Browse collection with filters (faction, cost, type, rarity, trait, owned/not owned).
 - Create, rename, duplicate, delete decks; live validation of deck rules.
-- Mana-curve chart and card-type breakdown.
+- A gauge for the number of cards (n / 20) and the card-type breakdown.
 - Number of deck slots: 12.
 - A new deck starts from its **Leader** (one of the Leaders owned) and is empty; the Leader cannot be changed afterwards (duplicate the deck or start a new one).
 - Only cards of the Leader's faction and Neutral cards can be added, up to the copy limit and the copies owned. A deck can be saved unfinished; only decks **ready to play** (20 cards, every rule met) are offered in Quick match.
 - The four starter decks are copied into the player's decks once (they can then be edited like any deck).
 - Every change is saved at once; there is no Save button.
-- Cards are added by **drag and drop** onto the deck zone (hold a moment to pick a card up, so the grid still scrolls with a swipe), and taken out by dragging them out of it or tapping them.
+- Cards are added by **tapping** them in the grid and taken out by tapping them in the deck zone — no drag and drop. A swipe scrolls the grid and never adds a card.
+- **Auto-fill** empties the deck, then builds one from the cards owned: the rarest first (then the strongest units, then the cheapest), 13 units and 7 spells / artifacts, and an Energy curve peaking at 2–3 (1: 3 · 2: 5 · 3: 4 · 4: 3 · 5: 2 · 6+: 3); with too few cards for that, it relaxes the curve, then the ratio. Cards that do nothing alone (*Nothung (broken)*) are left out.
+- **Starter deck** puts back the starter deck of the deck's Leader (the copies owned) — the way to start a new deck from it, or to get the starter deck back.
 
-> **Decision (2026-10-30):** the deck editor is **one screen with drag and drop** (deck zone above the cards), not two tabs.
+> **Decision (2026-10-30):** the deck editor is **one screen** (deck zone above the cards), not two tabs.
+
+> **Decision (2026-11-12, playtest):** **no drag and drop** in the deck editor: a tap adds a card, a tap on its chip takes it out; the Energy chart is replaced by a count gauge; Auto-fill and Starter deck buttons are added.
 
 > **Decision (2026-10-30):** the starter decks are **editable copies** in the player's 12 slots (not fixed decks next to them). A deck without a name shows its faction's name.
 

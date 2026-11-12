@@ -11,6 +11,8 @@ enum Personality { BALANCED, AGGRESSIVE, DEFENSIVE }
 @export var personality: Personality = Personality.BALANCED
 ## Random spread added to each action's evaluation (Normal), in evaluation points.
 @export var noise: float = 0.0
+## Easy: chance of playing another action than the best one (never instead of a winning one).
+@export_range(0.0, 1.0) var blunder_chance: float = 0.0
 ## Hard: thinking time per action, and a cap on search iterations (0 = time only).
 @export var time_budget_msec: int = 700
 @export var max_iterations: int = 0
@@ -32,6 +34,9 @@ static func preset(level: Difficulty, style: Personality = Personality.BALANCED)
 	profile.difficulty = level
 	profile.personality = style
 	match level:
+		Difficulty.EASY:
+			# Toned down after playtest: the plain heuristic was too strong for a beginner level.
+			profile.blunder_chance = 0.35
 		Difficulty.NORMAL:
 			profile.noise = 2.0
 		Difficulty.HARD:

@@ -27,7 +27,9 @@ static func prepare(engine: Match, player_id: int, profile: AIProfile, seed: int
 static func choose(job: Dictionary) -> Dictionary:
 	var profile: AIProfile = job["profile"]
 	if not job.has("state"):
-		return EasyAI.choose_action(job["records"])
+		var rng := RandomNumberGenerator.new()
+		rng.seed = int(job["seed"])
+		return EasyAI.choose_action(job["records"], rng, profile.blunder_chance)
 	if profile.difficulty == AIProfile.Difficulty.HARD:
 		return MctsAI.choose(job["state"], int(job["player"]), profile, int(job["seed"]))
 	return GreedyAI.choose(job["state"], int(job["player"]), profile, int(job["seed"]))

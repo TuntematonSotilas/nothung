@@ -1,7 +1,7 @@
 # UI implementation
 
 > How screens and interactions from [functional/07-ui-ux.md](../functional/07-ui-ux.md) are built in Godot.
-> Status: In progress · Last updated: 2026-10-30
+> Status: In progress · Last updated: 2026-11-12
 
 ## Display settings (`project.godot`)
 
@@ -39,10 +39,10 @@
 - Card screens share three components:
   - `CardGrid` (`scenes/components/card_grid.gd`): scrolling 3-column grid of `CardView`s (zoom gesture off) scaled to the screen width, a caption under each card (`set_caption()`, faded card when not available), `card_tapped` — a press that scrolled the grid by more than a few pixels is not a tap; `show_only()` hides the cells that do not match; `sorted_cards()` sorts by faction, cost, name.
   - `CardFilterBar` (`card_filter_bar.gd`): faction chips + Filters button (with the number of active filters) + count label, unfolding the captioned chip rows (`MenuUI.chip()`, one `ButtonGroup` per row); `matches()` is static and unit-tested; presets (e.g. Owned in the deck editor).
-  - `PressPick` (`press_pick.gd`): on a button inside a `ScrollContainer`, tells a tap (`tapped`) from a pick-up (`picked`): with a finger, a hold of 0.25 s (moving first is a scroll); with a real mouse (not touch-emulated, `device != DEVICE_ID_EMULATION`), as soon as it moves, since a mouse does not drag-scroll. While carried, the button stops the pointer events (`MOUSE_FILTER_STOP`) so the `ScrollContainer` does not scroll; lifting emits `released` with `PressPick.pointer`, the pointer position tracked from the input events (not `get_mouse_position()`, which is not updated by injected events). `CardGrid` uses it for taps and, with `pick_enabled`, for picking cards up.
+  - `PressPick` (`press_pick.gd`): on a button inside a `ScrollContainer`, emits `tapped` only when the press did not scroll the container, so a swipe over a card scrolls instead of opening or adding it. Used by `CardGrid` and the deck chips.
   - `CardDetail` (`card_detail.gd`): the card large with its flavour, lines given by the screen and optional buttons; tapping outside the buttons closes it.
 - `scenes/screens/collection.tscn`: every card, captions "× n" / "Not owned"; **My decks** and **Nibelheim** buttons.
-- `scenes/screens/deck_list.tscn` and `deck_editor.tscn` (`DeckEditor`, `DeckEditor.deck_id` set before opening; drag and drop: a picked card is drawn under the finger on its own canvas layer, `drop_at(position)` adds it when it lands on `DeckZone` or takes a deck chip out when it lands elsewhere): player decks from `SaveManager`, rules in `DeckRules` (`data/decks/deck_rules.gd`: eligibility, `can_add()`, `problems()` as translation keys, `to_deck_data()` for the engine, curve and type counts).
+- `scenes/screens/deck_list.tscn` and `deck_editor.tscn` (`DeckEditor`, `DeckEditor.deck_id` set before opening; no drag and drop: a tap on a grid card adds a copy or opens `CardDetail` with the reason, a tap on a deck chip takes a copy out; Auto-fill uses `DeckRules.auto_fill()`, Starter deck `DeckEditor.starter_cards()`): player decks from `SaveManager`, rules in `DeckRules` (`data/decks/deck_rules.gd`: eligibility, `can_add()`, `problems()` as translation keys, `to_deck_data()` for the engine, curve and type counts).
 - `scenes/screens/nibelheim.tscn`: the cards still missing copies, `SaveManager.craft()`; prices and rewards in `Progression` (`data/progression.gd`).
 - `DuelSetup` carries `DeckData` (a player deck through `DeckRules.to_deck_data()`, or a starter deck) and `rewards` (Quick match: a win pays `Progression.quick_match_reward(difficulty)`; the duel pays when the match is over and takes it back if the winning play is undone).
 - `scenes/screens/settings_menu.tscn`: music and sound-effect sliders (0–100 %, steps of 10), language tiles (device language, then each language under its own name). Each change goes through a `Settings.set_*()` setter, which applies it (locale, audio bus volume) and saves `settings.cfg` at once; the screen rebuilds itself after a language change. *Progress* section: **Reset progress** swaps in a confirmation (Cancel highlighted, Erase in red), then calls `SaveManager.reset_profile()` and shows "Progress reset."

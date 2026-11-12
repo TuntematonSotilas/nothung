@@ -4,8 +4,13 @@ extends RefCounted
 ## Selects a simple legal action without touching the live match state.
 
 
-## Picks a legal action record on a worker thread.
-static func choose_action(records: Array[Dictionary]) -> Dictionary:
+## A winning action (it ends the match) scores at least this much.
+const LETHAL_SCORE: float = 1000.0
+
+
+## Picks a legal action record on a worker thread: the best-scored one, or — with `blunder_chance`
+## (Easy) — another one at random, never instead of a winning action and never Concede.
+static func choose_action(records: Array[Dictionary], rng: RandomNumberGenerator = null, blunder_chance: float = 0.0) -> Dictionary:
 	var selected: Dictionary = {}
 	var best_score: float = -INF
 	for record: Dictionary in records:
@@ -13,7 +18,13 @@ static func choose_action(records: Array[Dictionary]) -> Dictionary:
 		if score > best_score:
 			best_score = score
 			selected = record
-	return selected
+	if rng == null or blunder_chance <= 0.0 or best_score >= LETHAL_SCORE or rng.randf() >= blunder_chance:
+		return selected
+	var others: Array[Dictionary] = []
+	for record: Dictionary in records:
+		if record != selected and String(record.get("type", "")) != "concede":
+			others.append(record)
+	return others[rng.randi_range(0, others.size() - 1)] if not others.is_empty() else selected
 
 
 ## Adds public-board and own-hand evaluation scores before records leave the main thread.
