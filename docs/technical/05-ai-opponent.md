@@ -39,7 +39,7 @@ static func choose(job: Dictionary) -> Dictionary                               
 | Normal | Simulates each legal action on the masked state and keeps the best evaluated result; ends its turn when nothing improves its position | 2 evaluation points (Gaussian) | ~2 ms |
 | Hard | Information-set MCTS over its own turn, with the opponent's reply played out | None | 700 ms time budget |
 
-All levels use the Easy heuristic for the opening-hand Redraw.
+All levels use the Easy heuristic for the opening-hand Redraw (a one-time partial redraw; the AI never asks for a new hand — `RefreshHandAction` is not among its legal actions).
 
 Measured ladder (AI vs AI, Gods and Nibelungs starters, alternating decks and first player): Normal beats Easy 36 / 40 (29 / 40 before Easy made mistakes), Hard (only 60 iterations per action) beats Normal 7 / 10; with 200 iterations Hard beats Normal 18 / 20 ([AI soak](09-testing.md#ai-soak)).
 

@@ -37,6 +37,8 @@ func to_record() -> Dictionary:
 		record["type"] = "end_turn"
 	elif self is ConcedeAction:
 		record["type"] = "concede"
+	elif self is RefreshHandAction:
+		record["type"] = "refresh_hand"
 	else:
 		push_error("Cannot serialize unsupported action type: %s" % get_class())
 	return record
@@ -64,6 +66,8 @@ static func from_record(record: Dictionary) -> Action:
 			return EndTurnAction.new(player_id)
 		"concede":
 			return ConcedeAction.new(player_id)
+		"refresh_hand":
+			return RefreshHandAction.new(player_id)
 		_:
 			push_error("Replay contains an unknown action type: %s" % String(record["type"]))
 			return null

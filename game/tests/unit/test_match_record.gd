@@ -46,6 +46,19 @@ func test_replay_includes_undone_plays() -> void:
 	assert_str(replayed.state_hash()).is_equal(engine.state_hash())
 
 
+func test_replay_includes_refreshed_opening_hands() -> void:
+	var deck_a: DeckData = CardDatabase.get_deck(&"walsungs_starter")
+	var deck_b: DeckData = CardDatabase.get_deck(&"nibelungs_starter")
+	var engine := Match.new(deck_a, deck_b, 77)
+	var record: MatchRecord = MatchRecord.create(deck_a, deck_b, 77)
+	var empty: Array[int] = []
+	for action: Action in [RefreshHandAction.new(0), RefreshHandAction.new(0), RedrawAction.new(0, empty)]:
+		assert_bool(engine.apply(action)).is_true()
+		record.add_action(action)
+	var saved: Dictionary = JSON.parse_string(JSON.stringify(record.to_dict()))
+	assert_str(MatchRecord.from_dict(saved).replay(CardDatabase).state_hash()).is_equal(engine.state_hash())
+
+
 func test_changed_card_data_is_not_replayed() -> void:
 	var record: MatchRecord = _play(10)[1]
 	record.content_hash = "changed"

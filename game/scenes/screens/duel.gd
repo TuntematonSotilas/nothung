@@ -26,7 +26,6 @@ var _ai_thread: Thread
 var _selected_hand_uid: int = -1
 var _selected_attacker_uid: int = -1
 var _selected_ability: bool = false
-var _redraw_selected: Array[int] = []
 var _log_lines: Array[String] = []
 var _turn_label: Label
 var _status_label: Label
@@ -439,7 +438,8 @@ func _current_targets() -> Dictionary:
 	return targets
 
 
-## Gold border on units ready to attack, red border on valid targets, dimmed units that cannot attack.
+## Gold border on units ready to attack, red on valid enemy targets, green on valid own targets (a buff
+## on your units, your Leader to heal), dimmed units that cannot attack.
 func _apply_highlights() -> void:
 	var state: GameState = _match.get_state()
 	var my_main_phase: bool = state.phase == GameState.Phase.MAIN and state.active_player == HUMAN_PLAYER
@@ -454,7 +454,7 @@ func _apply_highlights() -> void:
 			var is_own: bool = row == _own_board
 			var ready: bool = is_own and my_main_phase and _match.attack_block_reason(HUMAN_PLAYER, uid) == &""
 			if (targets["units"] as Dictionary).has(uid):
-				view.set_highlight(&"target")
+				view.set_highlight(&"friendly_target" if is_own else &"target")
 			elif ready and not choosing:
 				view.set_highlight(&"ready")
 			else:
@@ -468,7 +468,7 @@ func _apply_highlights() -> void:
 			if view.card_instance.is_hidden():
 				view.modulate.a = HIDDEN_ALPHA
 	_set_panel_border(_enemy_leader_panel, Palette.LIFE if targets["enemy_leader"] else Palette.BORDER, targets["enemy_leader"])
-	_set_panel_border(_own_leader_panel, Palette.LIFE if targets["own_leader"] else Palette.ACCENT, targets["own_leader"])
+	_set_panel_border(_own_leader_panel, Palette.HEAL if targets["own_leader"] else Palette.ACCENT, targets["own_leader"])
 
 
 func _set_panel_border(panel: PanelContainer, color: Color, emphasised: bool) -> void:
@@ -668,7 +668,9 @@ func _close_card_zoom() -> void:
 			(node as CardView).set_zoom_blocked(false)
 
 
-func _show_redraw_overlay() -> void:
+## Opening hand: the cards drawn, New hand (redraws the whole hand) and Keep this hand.
+## `fade_in`: the cards of a new hand appear with a short fade.
+func _show_redraw_overlay(fade_in: bool = false) -> void:
 	if _overlay != null and is_instance_valid(_overlay):
 		return
 	_overlay = ColorRect.new()
@@ -711,43 +713,52 @@ func _show_redraw_overlay() -> void:
 	cards.add_theme_constant_override("h_separation", roundi(separation))
 	cards.add_theme_constant_override("v_separation", roundi(separation))
 	grid_center.add_child(cards)
+	# The hand is only shown (long press still zooms): New hand redraws all of it, as often as wanted.
 	for instance: CardInstance in hand:
 		var view: CardView = _card_view(instance)
-		var marked: bool = _redraw_selected.has(instance.uid)
-		# Marked cards: gold border and dimmed.
-		view.set_selected(marked)
-		if marked:
-			view.modulate = Color(0.75, 0.75, 0.75)
-		view.pressed.connect(_toggle_redraw_card.bind(instance.uid, view))
 		cards.add_child(view)
-	var confirm: Button = _button("UI_REDRAW_CONFIRM", 360)
-	confirm.theme_type_variation = &"ButtonPrimary"
-	confirm.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	confirm.pressed.connect(_confirm_redraw)
-	content.add_child(confirm)
+		if fade_in and Settings.animation_speed > 0.0:
+			view.modulate.a = 0.0
+			create_tween().tween_property(view, "modulate:a", 1.0, 0.3 / Settings.animation_speed)
+	var buttons: HBoxContainer = HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	buttons.add_theme_constant_override("separation", roundi(20 * _ui_scale))
+	content.add_child(buttons)
+	var refresh: Button = _button("UI_REDRAW_REFRESH", 320)
+	refresh.name = "RefreshHandButton"
+	_set_button_icon(refresh, "refresh", Palette.TEXT)
+	refresh.pressed.connect(_refresh_hand)
+	buttons.add_child(refresh)
+	var keep: Button = _button("UI_REDRAW_CONFIRM", 360)
+	keep.name = "KeepHandButton"
+	keep.theme_type_variation = &"ButtonPrimary"
+	keep.pressed.connect(_confirm_redraw)
+	buttons.add_child(keep)
 
 
-func _toggle_redraw_card(uid: int, view: CardView) -> void:
-	if view.consume_drag():
+## New hand: the whole hand goes back and is drawn again (as many times as wanted), shown at once.
+func _refresh_hand() -> void:
+	var action := RefreshHandAction.new(HUMAN_PLAYER)
+	_pending_events.clear()
+	if not _match.apply(action):
 		return
-	if view.consume_long_press():
-		return
-	if _redraw_selected.has(uid):
-		_redraw_selected.erase(uid)
-	else:
-		_redraw_selected.append(uid)
-	if _overlay != null:
+	_record_action(action)
+	_pending_events.clear()
+	if _overlay != null and is_instance_valid(_overlay):
 		_overlay.queue_free()
 		_overlay = null
-	call_deferred("_show_redraw_overlay")
+	_show_redraw_overlay(true)
+	# The hand behind the overlay follows.
+	_refresh()
 
 
+## Keeps the hand shown: the player's redraw ends.
 func _confirm_redraw() -> void:
-	var action: RedrawAction = RedrawAction.new(HUMAN_PLAYER, _redraw_selected)
+	var empty: Array[int] = []
+	var action: RedrawAction = RedrawAction.new(HUMAN_PLAYER, empty)
 	_pending_events.clear()
 	if _match.apply(action):
 		_record_action(action)
-		_redraw_selected.clear()
 		_play_fx(action)
 		_continue_ai()
 
@@ -1471,7 +1482,10 @@ func _show_results() -> void:
 	var content: VBoxContainer = VBoxContainer.new()
 	content.add_theme_constant_override("separation", 20)
 	center.add_child(content)
-	content.add_child(_label(_status_text(_match.get_state()), 42, Palette.ACCENT))
+	content.add_child(_result_icon(_match.get_state().winner))
+	var status: Label = _label(_status_text(_match.get_state()), 42, Palette.ACCENT)
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(status)
 	if _reward > 0:
 		var reward: Label = _label("", 28, Palette.ACCENT)
 		reward.name = "RewardLabel"
@@ -1496,6 +1510,67 @@ func _show_results() -> void:
 		_go_to_main_menu()
 	)
 	content.add_child(home)
+
+
+## The result's icon, animated: a laurel crown that pops up then glows (victory), a broken shield that
+## falls, shakes and dims (defeat), crossed swords that pop up (draw). The tweens belong to the icon, so
+## they end with the results overlay; at animation speed 0 the icon is simply shown.
+func _result_icon(winner: int) -> Control:
+	var won: bool = winner == HUMAN_PLAYER
+	var drawn: bool = winner < 0
+	var color: Color = Palette.ACCENT if won else (Palette.TEXT_MUTED if drawn else Palette.LIFE)
+	var size: Vector2 = Vector2.ONE * roundf(190 * _ui_scale)
+	var holder: Control = Control.new()
+	holder.name = "ResultIcon"
+	holder.custom_minimum_size = size
+	holder.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var halo: TextureRect = null
+	if won:
+		halo = _result_picture("victory", color, size)
+		halo.name = "Halo"
+		halo.modulate.a = 0.0
+		holder.add_child(halo)
+	var icon: TextureRect = _result_picture("victory" if won else ("attack" if drawn else "defeat"), color, size)
+	icon.name = "Icon"
+	holder.add_child(icon)
+	var speed: float = Settings.animation_speed
+	if speed <= 0.0:
+		return holder
+	if won:
+		icon.scale = Vector2.ONE * 0.2
+		var pop: Tween = icon.create_tween()
+		pop.tween_property(icon, "scale", Vector2.ONE, 0.5 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		pop.tween_callback(func() -> void:
+			var pulse: Tween = icon.create_tween().set_loops()
+			pulse.tween_property(icon, "scale", Vector2.ONE * 1.08, 0.8 / speed).set_trans(Tween.TRANS_SINE)
+			pulse.tween_property(icon, "scale", Vector2.ONE, 0.8 / speed).set_trans(Tween.TRANS_SINE)
+			var glow: Tween = halo.create_tween().set_loops()
+			glow.tween_property(halo, "modulate:a", 0.35, 0.8 / speed).set_trans(Tween.TRANS_SINE)
+			glow.tween_property(halo, "modulate:a", 0.0, 0.8 / speed).set_trans(Tween.TRANS_SINE)
+			halo.scale = Vector2.ONE * 1.25)
+	elif drawn:
+		icon.scale = Vector2.ONE * 0.2
+		icon.create_tween().tween_property(icon, "scale", Vector2.ONE, 0.4 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	else:
+		icon.position.y = -size.y
+		var fall: Tween = icon.create_tween()
+		fall.tween_property(icon, "position:y", 0.0, 0.7 / speed).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		for angle: float in [0.12, -0.1, 0.06, 0.0]:
+			fall.tween_property(icon, "rotation", angle, 0.07 / speed)
+		fall.tween_property(icon, "modulate", Color(0.7, 0.7, 0.7), 1.2 / speed)
+	return holder
+
+
+func _result_picture(icon_name: String, color: Color, size: Vector2) -> TextureRect:
+	var picture: TextureRect = TextureRect.new()
+	picture.texture = _icon(icon_name)
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	picture.size = size
+	picture.pivot_offset = size / 2.0
+	picture.self_modulate = color
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return picture
 
 
 func _on_match_event(event: GameEvent) -> void:

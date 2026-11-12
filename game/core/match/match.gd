@@ -205,6 +205,8 @@ func is_legal(action: Action) -> bool:
 			return action.player == _state.redraw_player
 		return action.player == _state.active_player
 	if _state.phase == GameState.Phase.REDRAW:
+		if action is RefreshHandAction:
+			return action.player == _state.redraw_player and not _state.player(action.player).redraw_done
 		return _is_legal_redraw(action)
 	if action.player != _state.active_player:
 		return false
@@ -229,6 +231,8 @@ func apply(action: Action) -> bool:
 		_finish_match(1 - action.player)
 	elif action is RedrawAction:
 		_apply_redraw(action as RedrawAction)
+	elif action is RefreshHandAction:
+		_refresh_hand(action.player)
 	elif action is PlayCardAction:
 		_play_card(action as PlayCardAction)
 	elif action is AttackAction:
@@ -367,6 +371,18 @@ func _is_legal_redraw(action: Action) -> bool:
 			return false
 		seen[uid] = true
 	return true
+
+
+## Opening hand: puts the whole hand back, shuffles, draws as many again; the redraw goes on.
+func _refresh_hand(player_id: int) -> void:
+	var player := _state.player(player_id)
+	var count: int = player.hand.size()
+	for card: CardInstance in player.hand.cards.duplicate():
+		player.deck.add(player.hand.remove_uid(card.uid))
+	_shuffle(player.deck.cards)
+	for _index: int in count:
+		_draw_card(player_id)
+	_emit(&"hand_refreshed", player_id)
 
 
 func _apply_redraw(action: RedrawAction) -> void:

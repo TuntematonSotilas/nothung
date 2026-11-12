@@ -1,7 +1,7 @@
 # Persistence
 
 > What is saved on the device, in which format, and how saves evolve across versions.
-> Status: Draft · Last updated: 2026-10-30
+> Status: Draft · Last updated: 2026-11-12
 
 ## What is saved
 
@@ -82,7 +82,8 @@ Because the engine is deterministic, a match is saved as **seed + decks + list o
     { "leader": "alberich", "cards": ["nibelung_miner", "..."] }
   ],
   "actions": [
-    { "type": "redraw", "player": 0, "card_uids": [3, 7] },
+    { "type": "refresh_hand", "player": 0 },
+    { "type": "redraw", "player": 0, "card_uids": [] },
     { "type": "play_card", "player": 0, "card_uid": 12, "target_uid": -1, "target_player": -1 },
     { "type": "undo_play", "card_uid": 12 }
   ]

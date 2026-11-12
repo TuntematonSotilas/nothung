@@ -96,6 +96,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 5 — Menus & meta
 
+- [x] Duel polish after playtest: opening hand with **New hand** (as often as wanted) and **Keep**, green targets on the player's side, animated victory / defeat icon
 - [x] Title and main menu around the current deck (Leader portrait, tap to change, My decks under it); Campaign / Quick match; Nibelheim with the Rhinegold and Settings (cog) in the top corners; Collection small at the bottom; Campaign greyed out until it exists ([UI implementation](technical/06-ui-implementation.md#menus))
 - [x] Quick match (your deck ready to play / opponent starter deck or Random / difficulty, last choices remembered)
 - [x] Collection screen: every card with the copies owned, faction chips + filters (cost, type, rarity, trait, owned / missing), card shown large; new profile owns the four starter decks

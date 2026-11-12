@@ -1,7 +1,7 @@
 # Art & audio
 
 > Visual and sound direction, and rights constraints on assets.
-> Status: Draft · Last updated: 2026-10-30
+> Status: Draft · Last updated: 2026-11-12
 
 ## Art direction
 
@@ -124,7 +124,7 @@ Frames follow the [card colour system](#card-colour-system): 4 frames (thin bord
 
 ### Icons
 
-> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, pause, end turn, undo, close, settings cog, Nibelheim forge…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). Card-type icons are hand-drawn by the author, like the rest of the artwork.
+> **Decision (2026-10-21):** **Standard UI icons** (Life, Energy, attack, pause, end turn, undo, close, settings cog, Nibelheim forge, refresh, victory laurel crown, defeat broken shield…) come from the [game-icons.net](https://game-icons.net) library (CC BY 3.0, credited in [CREDITS.md](../../CREDITS.md)). Card-type icons are hand-drawn by the author, like the rest of the artwork.
 
 > **Decision (2026-10-23):** **Faction icons** come from game-icons.net too (the author no longer draws them), all by Lorc: Gods — *Barbed spear*, Nibelungs — *Anvil*, Wälsungs — *Broadsword*, Valkyries — *Winged emblem*, Neutral — *Waves*. Shown in the top-right corner of every card, tinted with the faction frame colour.
 

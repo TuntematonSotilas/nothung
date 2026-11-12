@@ -1,7 +1,7 @@
 # Game rules
 
 > Complete rules of a duel. This is the reference the rules engine implements ([technical/04-game-engine.md](../technical/04-game-engine.md)).
-> Status: Draft · Last updated: 2026-10-28
+> Status: Draft · Last updated: 2026-11-12
 
 All numbers below are **initial proposals** to be tuned in playtests.
 
@@ -27,7 +27,9 @@ Match length is measured with AI vs AI simulations ([technical/09-testing.md](..
 1. Each player chooses a deck (20 cards) and its Leader.
 2. Decks are shuffled. A coin flip decides who goes first.
 3. Each player draws **4 cards**; the second player draws **5** and gets one **Energy token** (catch-up resource: +1 Energy once, on their first turn).
-4. **Redraw (opening hand):** each player may put back any number of cards once and redraw that many.
+4. **Redraw (opening hand):** each player may redraw their **whole hand** as many times as they like — the hand goes back into the deck, which is shuffled, and as many cards are drawn — then keeps it.
+
+> **Decision (2026-11-12, playtest):** the opening redraw is "new hand, as often as wanted, then keep", instead of "put back any number of cards once". The AI keeps using the one-time partial redraw (it never asks for a new hand).
 
 ## Zones
 

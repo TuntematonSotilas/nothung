@@ -85,6 +85,39 @@ func test_easy_ai_prefers_a_better_unit_over_the_first_playable_card() -> void:
 	assert_int(int(selected["card_uid"])).is_equal(602)
 
 
+func test_refresh_hand_redraws_the_whole_hand_as_often_as_wanted() -> void:
+	var engine := Match.new(_deck(&"gods"), _deck(&"nibelungs"), 418)
+	var state: GameState = engine.get_state()
+	var player: PlayerState = state.player(0)
+	var size: int = player.hand.size()
+	var all_cards: int = player.hand.size() + player.deck.size()
+	var first: Array[int] = []
+	for card: CardInstance in player.hand.cards:
+		first.append(card.uid)
+	# Only the player whose redraw it is.
+	assert_bool(engine.is_legal(RefreshHandAction.new(1))).is_false()
+	var changed: bool = false
+	for attempt: int in 3:
+		assert_bool(engine.apply(RefreshHandAction.new(0))).is_true()
+		assert_int(player.hand.size()).is_equal(size)
+		assert_int(player.hand.size() + player.deck.size()).is_equal(all_cards)
+		assert_bool(player.redraw_done).is_false()
+		var now: Array[int] = []
+		for card: CardInstance in player.hand.cards:
+			now.append(card.uid)
+		if now != first:
+			changed = true
+	assert_bool(changed).is_true()
+	# The player's choice only: never offered to the AI.
+	for action: Action in engine.get_legal_actions(0):
+		assert_bool(action is RefreshHandAction).is_false()
+	# Keep ends the redraw; no refresh afterwards.
+	assert_bool(engine.apply(RedrawAction.new(0))).is_true()
+	assert_bool(engine.apply(RefreshHandAction.new(0))).is_false()
+	assert_str(String(Action.from_record(RefreshHandAction.new(0).to_record()).get_class())).is_equal("RefCounted")
+	assert_bool(Action.from_record({"type": "refresh_hand", "player": 1}) is RefreshHandAction).is_true()
+
+
 func test_easy_ai_redraws_expensive_cards_and_keeps_cheap_units() -> void:
 	var engine := Match.new(CardDatabase.get_deck(&"gods_starter"), CardDatabase.get_deck(&"nibelungs_starter"), 503)
 	var state: GameState = engine.get_state()

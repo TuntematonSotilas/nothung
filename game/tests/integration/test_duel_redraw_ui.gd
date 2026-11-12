@@ -58,6 +58,86 @@ func test_opening_redraw_overlay_is_visible_after_initial_layout() -> void:
 	await get_tree().process_frame
 
 
+func test_redraw_shows_the_hand_with_new_hand_and_keep() -> void:
+	var duel: Control = await _create_duel()
+	var current_match: Match = duel.get("_match") as Match
+	var player: PlayerState = current_match.get_state().player(0)
+	var before: Array[int] = _uids(player.hand.cards)
+	var cards: GridContainer = duel.find_child("RedrawCards", true, false) as GridContainer
+	assert_int(cards.get_child_count()).is_equal(before.size())
+	assert_object(duel.find_child("RefreshHandButton", true, false)).is_not_null()
+
+	# New hand, as many times as wanted: the whole hand changes, its size does not.
+	for attempt: int in 3:
+		(duel.find_child("RefreshHandButton", true, false) as Button).pressed.emit()
+		await get_tree().process_frame
+	assert_int(player.hand.size()).is_equal(before.size())
+	assert_array(_uids(player.hand.cards)).is_not_equal(before)
+	assert_bool(player.redraw_done).is_false()
+	cards = duel.find_child("RedrawCards", true, false) as GridContainer
+	assert_int((cards.get_child(0) as CardView).card_instance.uid).is_equal(player.hand.cards[0].uid)
+	var record: MatchRecord = duel.get("_record") as MatchRecord
+	assert_int(record.entries.filter(func(e: Dictionary) -> bool: return e["type"] == "refresh_hand").size()).is_equal(3)
+
+	# Keep: the redraw ends with this hand.
+	var kept: Array[int] = _uids(player.hand.cards)
+	(duel.find_child("KeepHandButton", true, false) as Button).pressed.emit()
+	assert_bool(player.redraw_done).is_true()
+	assert_array(_uids(player.hand.cards)).is_equal(kept)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_spell_targets_are_green_on_own_units_and_red_on_enemies() -> void:
+	# Freia's Golden Apples buffs one of your units; Donner's Hammer hits an enemy unit.
+	var duel: Control = await _main_phase_duel_with_hand([&"freias_golden_apples", &"donners_hammer"], 6)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	state.player(0).board.add(CardInstance.new(CardDatabase.get_card(&"wotans_ravens"), 0, 960))
+	state.player(1).board.add(CardInstance.new(CardDatabase.get_card(&"nibelung_miner"), 1, 961))
+	duel.call("_refresh")
+	await get_tree().process_frame
+	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer
+	duel.call("_on_hand_card_pressed", 700, hand.get_child(0))
+	var own_view: CardView = (duel.get("_own_board") as HFlowContainer).get_child(0) as CardView
+	assert_str(String(own_view.get("_highlight"))).is_equal("friendly_target")
+	var glow: StyleBoxFlat = own_view.get_theme_stylebox("normal") as StyleBoxFlat
+	assert_str(glow.shadow_color.to_html(false)).is_equal(Palette.HEAL.to_html(false))
+
+	hand = duel.get("_own_hand") as HBoxContainer
+	duel.call("_on_hand_card_pressed", 701, hand.get_child(1))
+	var enemy_view: CardView = (duel.get("_enemy_board") as HFlowContainer).get_child(0) as CardView
+	assert_str(String(enemy_view.get("_highlight"))).is_equal("target")
+	glow = enemy_view.get_theme_stylebox("normal") as StyleBoxFlat
+	assert_str(glow.shadow_color.to_html(false)).is_equal(Palette.LIFE.to_html(false))
+	duel.queue_free()
+	await get_tree().process_frame
+
+
+func test_results_show_the_icon_of_the_outcome() -> void:
+	for winner: int in [0, 1, -1]:
+		var duel: Control = await _create_duel()
+		var state: GameState = (duel.get("_match") as Match).get_state()
+		state.phase = GameState.Phase.GAME_OVER
+		state.winner = winner
+		duel.call("_show_results")
+		var holder: Control = duel.find_child("ResultIcon", true, false) as Control
+		assert_object(holder).is_not_null()
+		var icon: TextureRect = holder.get_node("Icon") as TextureRect
+		var expected: String = ["victory", "defeat", "attack"][[0, 1, -1].find(winner)]
+		assert_str(icon.texture.resource_path).ends_with("%s.svg" % expected)
+		# Animation speed 0 in these tests: the icon is shown as is.
+		assert_float(icon.scale.x).is_equal(1.0)
+		duel.queue_free()
+		await get_tree().process_frame
+
+
+func _uids(cards: Array[CardInstance]) -> Array[int]:
+	var uids: Array[int] = []
+	for card: CardInstance in cards:
+		uids.append(card.uid)
+	return uids
+
+
 func test_tap_then_target_plays_a_targeted_card() -> void:
 	var duel: Control = await _create_duel()
 	var current_match: Match = duel.get("_match") as Match

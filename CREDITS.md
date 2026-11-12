@@ -17,6 +17,9 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 | `close.svg` | Cross mark | Lorc |
 | `settings.svg` | Cog | Lorc |
 | `nibelheim.svg` | Anvil impact | Lorc |
+| `refresh.svg` | Cycle | Lorc |
+| `victory.svg` | Laurel crown | Lorc |
+| `defeat.svg` | Broken shield | Lorc |
 | `faction_gods.svg` | Barbed spear | Lorc |
 | `faction_nibelungs.svg` | Anvil | Lorc |
 | `faction_walsungs.svg` | Broadsword | Lorc |

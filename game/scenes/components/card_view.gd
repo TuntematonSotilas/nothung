@@ -21,7 +21,8 @@ const BAND_FACE_GAP: float = 4.0
 var card_data: CardData
 var card_instance: CardInstance
 var _selected: bool = false
-## &"ready" (can attack now), &"target" (valid target of the current selection) or &"".
+## &"ready" (can attack now), &"target" (valid enemy target of the current selection),
+## &"friendly_target" (valid target among the player's own cards) or &"".
 var _highlight: StringName = &""
 var _draggable: bool = false
 var _drop_player: int = -1
@@ -127,7 +128,8 @@ func set_selected(value: bool) -> void:
 		_apply_styles()
 
 
-## Highlights a unit ready to attack (&"ready") or a valid target (&"target"); &"" clears it.
+## Highlights a unit ready to attack (&"ready"), a valid enemy target (&"target", red) or a valid own
+## target (&"friendly_target", green); &"" clears it.
 func set_highlight(kind: StringName) -> void:
 	_highlight = kind
 	if is_inside_tree():
@@ -573,16 +575,16 @@ func _card_style(hovered: bool = false) -> StyleBoxFlat:
 	style.border_color = colors["frame"]
 	style.set_border_width_all(_frame_width())
 	var glow: Color = Color.TRANSPARENT
-	if _highlight == &"target":
-		glow = Palette.LIFE
-		style.bg_color = style.bg_color.lerp(Palette.LIFE, 0.15)
+	if _highlight == &"target" or _highlight == &"friendly_target":
+		glow = Palette.LIFE if _highlight == &"target" else Palette.HEAL
+		style.bg_color = style.bg_color.lerp(glow, 0.15)
 	elif _selected:
 		glow = Palette.ACCENT
 	elif _highlight == &"ready":
 		glow = Color(Palette.ACCENT, 0.75)
 	if glow.a > 0.0:
 		style.shadow_color = glow
-		style.shadow_size = roundi((12 if _selected or _highlight == &"target" else 7) * _face_k)
+		style.shadow_size = roundi((12 if _selected or _highlight in [&"target", &"friendly_target"] else 7) * _face_k)
 	for side: int in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 		style.set_content_margin(side, 12.0)
 	return style

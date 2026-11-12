@@ -30,7 +30,7 @@ func test_translations_are_loaded() -> void:
 	assert_str(tr("UI_DROP_TO_PLAY")).is_equal("DÉPOSER ICI POUR JOUER")
 	assert_str(tr("CARD_LOGE_NAME")).is_equal("Loge")
 	assert_str(tr("LEADER_WOTAN_RULES")).is_equal("Capacité (3 Énergie) : Inflige 2 dégâts à une unité.")
-	assert_str(tr("UI_REDRAW_CONFIRM")).is_equal("REPIOCHER LA SÉLECTION")
+	assert_str(tr("UI_REDRAW_CONFIRM")).is_equal("GARDER CETTE MAIN")
 	assert_str(tr("UI_TYPE_ARTIFACT")).is_equal("Artefact")
 	TranslationServer.set_locale(previous)
 

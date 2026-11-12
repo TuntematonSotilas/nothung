@@ -1,7 +1,7 @@
 # Game engine
 
 > The rules engine: state, turn flow, actions, effect resolution. Implements [functional/03-game-rules.md](../functional/03-game-rules.md).
-> Status: Implemented · Last updated: 2026-10-30
+> Status: Implemented · Last updated: 2026-11-12
 
 ## Responsibilities
 
@@ -58,7 +58,8 @@ stateDiagram-v2
 
 | Action | Payload |
 |--------|---------|
-| `RedrawAction` | card uids to replace |
+| `RedrawAction` | card uids to replace; ends the player's redraw (the player's screen sends an empty list: "keep this hand") |
+| `RefreshHandAction` | none: the whole hand goes back, the deck is shuffled and as many cards are drawn; repeatable; legal only for the player whose redraw it is; **not** in `get_legal_actions()` (the player's choice only, never the AI's) |
 | `PlayCardAction` | card uid, optional target (for a Relic: the bearer unit — required) |
 | `AttackAction` | attacker uid, target uid (unit or leader) |
 | `UseLeaderAbilityAction` | optional target |
