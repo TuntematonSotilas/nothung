@@ -129,20 +129,6 @@ func update_deck(_entry: Dictionary) -> void:
 	save_profile()
 
 
-func delete_deck(deck_id: String) -> void:
-	var entry: Dictionary = find_deck(deck_id)
-	if not entry.is_empty():
-		(profile["decks"] as Array).erase(entry)
-		save_profile()
-
-
-func duplicate_deck(deck_id: String, copy_name: String) -> Dictionary:
-	var source: Dictionary = find_deck(deck_id)
-	if source.is_empty():
-		return {}
-	return create_deck(str(source["leader"]), (source["cards"] as Array).duplicate(), copy_name)
-
-
 ## Appends a deck with a new ID; {} when every slot is used.
 static func add_deck(data: Dictionary, leader_id: String, cards: Array = [], deck_name: String = "") -> Dictionary:
 	var deck_list: Array = data["decks"]

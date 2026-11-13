@@ -1,7 +1,7 @@
 # UI implementation
 
 > How screens and interactions from [functional/07-ui-ux.md](../functional/07-ui-ux.md) are built in Godot.
-> Status: In progress · Last updated: 2026-11-12
+> Status: In progress · Last updated: 2026-11-13
 
 ## Display settings (`project.godot`)
 
@@ -34,13 +34,14 @@
 
 ## Menus
 
-- `scenes/screens/main_menu.tscn`: Nibelheim (`nibelheim.svg`) with the Rhinegold and Settings (`settings.svg`, icon only) in the top bar; the title; the current deck (`MenuUI.current_deck()`: `Settings.quick_match_deck` if it can be played, else the first deck ready to play; `MenuUI.playable_decks()` is shared with Quick match) as a button with the Leader portrait — a tap opens the `DeckPicker` modal and saves the choice in Settings —, My decks under it; Campaign (disabled) and Quick match side by side; Collection, smaller, at the bottom. When `SaveManager.has_match()`, it first replays the saved match: if it replays, a modal offers **Resume** (highlighted; opens the duel with `DuelSetup.resume`) or **Abandon**; otherwise the file is set aside and a short message explains it.
+- `scenes/screens/main_menu.tscn`: Nibelheim (`nibelheim.svg`) with the Rhinegold and Settings (`settings.svg`, icon only) in the top bar; the title; the current deck (`MenuUI.current_deck()`: `Settings.quick_match_deck` if it can be played, else the first deck ready to play; `MenuUI.playable_decks()` is shared with Quick match) with the Leader portrait (not a button), then Change deck — `DeckPicker` (`scenes/components/deck_picker.gd`, shared with Quick match: decks ready to play, the choice saved in Settings) — and My decks; Campaign (disabled) and Quick match side by side; Collection, smaller, at the bottom. When `SaveManager.has_match()`, it first replays the saved match: if it replays, a modal offers **Resume** (highlighted; opens the duel with `DuelSetup.resume`) or **Abandon**; otherwise the file is set aside and a short message explains it.
 - `scenes/screens/quick_match.tscn`: your deck (2 × 2 tiles: faction icon, faction, Leader, border in the faction colour, gold when selected), opponent (**Random** or a deck), difficulty (Easy / Normal / Hard with a one-line description), **Play**. Random is drawn among the other factions' decks when Play is pressed. The choices are saved in `Settings` (`quick_match` section) and offered again next time.
 - Card screens share three components:
   - `CardGrid` (`scenes/components/card_grid.gd`): scrolling 3-column grid of `CardView`s (zoom gesture off) scaled to the screen width, a caption under each card (`set_caption()`, faded card when not available), `card_tapped` — a press that scrolled the grid by more than a few pixels is not a tap; `show_only()` hides the cells that do not match; `sorted_cards()` sorts by faction, cost, name.
   - `CardFilterBar` (`card_filter_bar.gd`): faction chips + Filters button (with the number of active filters) + count label, unfolding the captioned chip rows (`MenuUI.chip()`, one `ButtonGroup` per row); `matches()` is static and unit-tested; presets (e.g. Owned in the deck editor).
   - `PressPick` (`press_pick.gd`): on a button inside a `ScrollContainer`, emits `tapped` only when the press did not scroll the container, so a swipe over a card scrolls instead of opening or adding it. Used by `CardGrid` and the deck chips.
   - `CardDetail` (`card_detail.gd`): the card large with its flavour, lines given by the screen and optional buttons; tapping outside the buttons closes it.
+- `scenes/screens/quick_match.tscn`: the current deck only (`CurrentDeckTile`) and Change deck (`DeckPicker`, then the screen rebuilds keeping the opponent and difficulty); Play right after the difficulty.
 - `scenes/screens/collection.tscn`: every card, captions "× n" / "Not owned"; **My decks** and **Nibelheim** buttons.
 - `scenes/screens/deck_list.tscn` and `deck_editor.tscn` (`DeckEditor`, `DeckEditor.deck_id` set before opening; no drag and drop: a tap on a grid card adds a copy or opens `CardDetail` with the reason, a tap on a deck chip takes a copy out; Auto-fill uses `DeckRules.auto_fill()`, Starter deck `DeckEditor.starter_cards()`): player decks from `SaveManager`, rules in `DeckRules` (`data/decks/deck_rules.gd`: eligibility, `can_add()`, `problems()` as translation keys, `to_deck_data()` for the engine, curve and type counts).
 - `scenes/screens/nibelheim.tscn`: the cards still missing copies, `SaveManager.craft()`; prices and rewards in `Progression` (`data/progression.gd`).

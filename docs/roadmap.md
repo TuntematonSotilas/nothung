@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-11-12
+> Status: Draft · Last updated: 2026-11-13
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -100,7 +100,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] Title and main menu around the current deck (Leader portrait, tap to change, My decks under it); Campaign / Quick match; Nibelheim with the Rhinegold and Settings (cog) in the top corners; Collection small at the bottom; Campaign greyed out until it exists ([UI implementation](technical/06-ui-implementation.md#menus))
 - [x] Quick match (your deck ready to play / opponent starter deck or Random / difficulty, last choices remembered)
 - [x] Collection screen: every card with the copies owned, faction chips + filters (cost, type, rarity, trait, owned / missing), card shown large; new profile owns the four starter decks
-- [x] Deck builder (decks from the collection, tap to add / tap to remove (no drag and drop), count gauge, Auto-fill and Starter deck buttons, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
+- [x] Deck builder (one deck per faction — the starter copies, fixed name, no create / duplicate / delete —, tap to add / tap to remove (no drag and drop), count gauge, Auto-fill and Starter deck buttons, starter decks copied as editable decks, 12 slots), Quick match with the player's decks ([game modes](functional/05-game-modes.md#deck-builder))
 - [x] Nibelheim (card crafting with Rhinegold) + Quick match rewards ([progression](functional/06-progression.md))
 - [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)): collection, Leaders, decks, Rhinegold
 - [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))

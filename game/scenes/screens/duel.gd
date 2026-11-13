@@ -9,6 +9,8 @@ const UI_SCALE_REFERENCE_HEIGHT: float = 2300.0
 const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
 ## Opacity of Invisible units that have not attacked yet.
 const HIDDEN_ALPHA: float = 0.45
+## The result icon's animation plays this many times, then stops.
+const RESULT_PLAYS: int = 2
 
 ## Board art to show behind the duel (campaign duels will set it; see assets/art/boards/).
 @export var board_id: String = "default"
@@ -1512,9 +1514,10 @@ func _show_results() -> void:
 	content.add_child(home)
 
 
-## The result's icon, animated: a laurel crown that pops up then glows (victory), a broken shield that
-## falls, shakes and dims (defeat), crossed swords that pop up (draw). The tweens belong to the icon, so
-## they end with the results overlay; at animation speed 0 the icon is simply shown.
+## The result's icon, animated twice, then still: a laurel crown that pops up then glows twice (victory),
+## a broken shield that falls and shakes twice, then dims (defeat), crossed swords that pop up twice
+## (draw). The tweens belong to the icon, so they end with the results overlay; at animation speed 0 the
+## icon is simply shown.
 func _result_icon(winner: int) -> Control:
 	var won: bool = winner == HUMAN_PLAYER
 	var drawn: bool = winner < 0
@@ -1541,22 +1544,25 @@ func _result_icon(winner: int) -> Control:
 		var pop: Tween = icon.create_tween()
 		pop.tween_property(icon, "scale", Vector2.ONE, 0.5 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		pop.tween_callback(func() -> void:
-			var pulse: Tween = icon.create_tween().set_loops()
+			var pulse: Tween = icon.create_tween().set_loops(RESULT_PLAYS)
 			pulse.tween_property(icon, "scale", Vector2.ONE * 1.08, 0.8 / speed).set_trans(Tween.TRANS_SINE)
 			pulse.tween_property(icon, "scale", Vector2.ONE, 0.8 / speed).set_trans(Tween.TRANS_SINE)
-			var glow: Tween = halo.create_tween().set_loops()
+			var glow: Tween = halo.create_tween().set_loops(RESULT_PLAYS)
 			glow.tween_property(halo, "modulate:a", 0.35, 0.8 / speed).set_trans(Tween.TRANS_SINE)
 			glow.tween_property(halo, "modulate:a", 0.0, 0.8 / speed).set_trans(Tween.TRANS_SINE)
 			halo.scale = Vector2.ONE * 1.25)
 	elif drawn:
-		icon.scale = Vector2.ONE * 0.2
-		icon.create_tween().tween_property(icon, "scale", Vector2.ONE, 0.4 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		var pops: Tween = icon.create_tween()
+		for play: int in RESULT_PLAYS:
+			pops.tween_property(icon, "scale", Vector2.ONE * 0.2, 0.0)
+			pops.tween_property(icon, "scale", Vector2.ONE, 0.4 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	else:
-		icon.position.y = -size.y
 		var fall: Tween = icon.create_tween()
-		fall.tween_property(icon, "position:y", 0.0, 0.7 / speed).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-		for angle: float in [0.12, -0.1, 0.06, 0.0]:
-			fall.tween_property(icon, "rotation", angle, 0.07 / speed)
+		for play: int in RESULT_PLAYS:
+			fall.tween_property(icon, "position:y", -size.y, 0.0)
+			fall.tween_property(icon, "position:y", 0.0, 0.7 / speed).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+			for angle: float in [0.12, -0.1, 0.06, 0.0]:
+				fall.tween_property(icon, "rotation", angle, 0.07 / speed)
 		fall.tween_property(icon, "modulate", Color(0.7, 0.7, 0.7), 1.2 / speed)
 	return holder
 

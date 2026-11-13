@@ -86,16 +86,20 @@ const FILL_CURVE: Dictionary = {1: 3, 2: 5, 3: 4, 4: 3, 5: 2, 6: 3}
 
 ## A full deck from the cards owned: the rarest first (then the strongest units, then the cheapest),
 ## within FILL_UNITS units and the FILL_CURVE; then without the curve, then without any target, so a
-## small collection still gives as many cards as it can. Returns card IDs, one per copy.
+## small collection still gives as many cards as it can. Cards that do nothing by themselves (Nothung
+## broken, waiting to be reforged) come only after all the others. Returns card IDs, one per copy.
 static func auto_fill(leader: LeaderData, database: Object, owned: Callable) -> Array[String]:
 	var candidates: Array[CardData] = []
+	var last_resort: Array[CardData] = []
 	for card_id: StringName in database.call("card_ids"):
 		var card: CardData = database.call("get_card", card_id) as CardData
-		# A card that does nothing by itself (Nothung broken waits to be reforged) is not chosen.
 		var useful: bool = card.is_unit() or not card.abilities.is_empty() or card.is_relic()
-		if useful and eligible(card, leader):
+		if eligible(card, leader):
 			for copy: int in mini(int(owned.call(card.id)), card.deck_limit()):
-				candidates.append(card)
+				if useful:
+					candidates.append(card)
+				else:
+					last_resort.append(card)
 	candidates.sort_custom(func(a: CardData, b: CardData) -> bool:
 		if a.rarity != b.rarity:
 			return a.rarity > b.rarity
@@ -121,6 +125,9 @@ static func auto_fill(leader: LeaderData, database: Object, owned: Callable) -> 
 				candidates.remove_at(index)
 			else:
 				index += 1
+	for card: CardData in last_resort:
+		if chosen.size() < DECK_SIZE:
+			chosen.append(String(card.id))
 	return chosen
 
 

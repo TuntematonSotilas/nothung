@@ -1,9 +1,9 @@
 extends Control
 
 ## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left and Settings
-## (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader — a tap
-## chooses another deck ready to play) with My decks under it, then Campaign (greyed out until it
-## exists) and Quick match side by side; Collection, smaller, at the bottom.
+## (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader) with
+## Change deck and My decks under it, then Campaign (greyed out until it exists) and Quick match side by
+## side; Collection, smaller, at the bottom.
 ## The Android back button quits from here (the menu is the root of the history).
 ## An interrupted match (SaveManager) is offered first: Resume or Abandon.
 
@@ -67,12 +67,21 @@ func _build() -> void:
 	middle.add_theme_constant_override("separation", 20)
 	column.add_child(middle)
 	middle.add_child(_current_deck())
-	var decks: Button = MenuUI.button("UI_MY_DECKS", 88, 28)
+	var deck_buttons := HBoxContainer.new()
+	deck_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	deck_buttons.add_theme_constant_override("separation", 16)
+	middle.add_child(deck_buttons)
+	var change: Button = MenuUI.button("UI_CHANGE_DECK", 88, 26)
+	change.name = "ChangeDeckButton"
+	change.custom_minimum_size.x = 340
+	change.disabled = MenuUI.playable_decks().is_empty()
+	change.pressed.connect(func() -> void: DeckPicker.open(self, _rebuild))
+	deck_buttons.add_child(change)
+	var decks: Button = MenuUI.button("UI_MY_DECKS", 88, 26)
 	decks.name = "MyDecksButton"
-	decks.custom_minimum_size.x = 420
-	decks.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	decks.custom_minimum_size.x = 340
 	decks.pressed.connect(func() -> void: SceneRouter.go_to(DECKS_SCENE))
-	middle.add_child(decks)
+	deck_buttons.add_child(decks)
 
 	# The game modes sit with the deck, in the middle of the screen.
 	var gap := Control.new()
@@ -120,53 +129,34 @@ func _icon_button(text_key: String, icon_name: String, tint: Color) -> Button:
 
 
 ## The deck Quick match will play: the Leader portrait framed in the faction colour, then — unframed —
-## deck name, Leader and "Tap to change". A tap anywhere on it opens the choice among the decks ready to
-## play. Without one, says where to complete a deck.
+## deck name and Leader. Change deck (under it) picks another one. Without a deck ready to play, says
+## where to complete one.
 func _current_deck() -> Control:
 	var entry: Dictionary = MenuUI.current_deck()
-	var panel := Button.new()
-	panel.name = "CurrentDeck"
-	panel.custom_minimum_size = PORTRAIT_SIZE + Vector2(0, 130)
-	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	panel.focus_mode = Control.FOCUS_NONE
+	var content := VBoxContainer.new()
+	content.name = "CurrentDeck"
+	content.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	content.add_theme_constant_override("separation", 8)
 	var leader: LeaderData = CardDatabase.get_leader(StringName(str(entry.get("leader", ""))))
 	var faction: StringName = leader.faction if leader != null else &"neutral"
-	var colors: Dictionary = CardPalette.FACTIONS[faction]
-	# The button draws nothing itself: only the portrait has a frame.
-	for state: String in ["normal", "hover", "pressed", "hover_pressed", "focus"]:
-		panel.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	var content := VBoxContainer.new()
-	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	content.add_theme_constant_override("separation", 8)
-	panel.add_child(content)
-	content.add_child(_portrait(leader, colors))
+	content.add_child(_portrait(leader, CardPalette.FACTIONS[faction]))
 	if entry.is_empty():
 		var none: Label = MenuUI.label("UI_NO_PLAYABLE_DECK", 22, Palette.LIFE)
 		none.name = "NoPlayableDeck"
 		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		none.custom_minimum_size.x = PORTRAIT_SIZE.x - 20
+		none.custom_minimum_size.x = PORTRAIT_SIZE.x
 		content.add_child(none)
-		panel.pressed.connect(func() -> void: SceneRouter.go_to(DECKS_SCENE))
-		return panel
+		return content
 	var deck_name: Label = MenuUI.label(MenuUI.deck_name(entry), 30, Palette.TEXT)
 	deck_name.name = "CurrentDeckName"
 	deck_name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	deck_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	deck_name.clip_text = true
 	content.add_child(deck_name)
 	var leader_name: Label = MenuUI.label("LEADER_%s_NAME" % String(leader.id).to_upper(), 24, Palette.TEXT_MUTED)
 	leader_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(leader_name)
-	var change: Label = MenuUI.label("UI_CHANGE_DECK", 20, Palette.ACCENT)
-	change.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	# Wraps instead of widening the panel past the portrait (long languages).
-	change.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	change.custom_minimum_size.x = PORTRAIT_SIZE.x - 16
-	content.add_child(change)
-	panel.pressed.connect(_choose_deck)
-	return panel
+	return content
 
 
 ## The Leader's art, or the faction icon on the faction colour until the art exists; framed in the
@@ -219,52 +209,6 @@ func _portrait(leader: LeaderData, colors: Dictionary) -> Control:
 	border.add_theme_stylebox_override("panel", line)
 	frame.add_child(border)
 	return frame
-
-
-## Modal: one tile per deck ready to play; the choice becomes the current deck (Quick match's).
-func _choose_deck() -> void:
-	var overlay := ColorRect.new()
-	overlay.name = "DeckPicker"
-	overlay.color = Color(Palette.BG, 0.98)
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(overlay)
-	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	overlay.add_child(margin)
-	SafeArea.pad(margin, {"left": MenuUI.SCREEN_MARGIN, "top": MenuUI.SCREEN_MARGIN, "right": MenuUI.SCREEN_MARGIN, "bottom": MenuUI.SCREEN_MARGIN})
-	var content := VBoxContainer.new()
-	content.add_theme_constant_override("separation", 20)
-	margin.add_child(content)
-	var title: Label = MenuUI.label("UI_CHOOSE_DECK", 36, Palette.ACCENT)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	content.add_child(title)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content.add_child(scroll)
-	var list := VBoxContainer.new()
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation", 16)
-	scroll.add_child(list)
-	var current: String = str(MenuUI.current_deck().get("id", ""))
-	for entry: Dictionary in MenuUI.playable_decks():
-		var leader: LeaderData = CardDatabase.get_leader(StringName(str(entry["leader"])))
-		var text: String = "%s\n%s" % [MenuUI.deck_name(entry), tr("LEADER_%s_NAME" % String(leader.id).to_upper())]
-		var tile: Button = MenuUI.choice_tile(text, CardPalette.FACTIONS[leader.faction]["frame"], 130, "res://ui/icons/faction_%s.svg" % leader.faction)
-		tile.name = "Pick_%s" % entry["id"]
-		tile.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-		tile.button_pressed = str(entry["id"]) == current
-		tile.pressed.connect(func() -> void:
-			Settings.quick_match_deck = str(entry["id"])
-			Settings.save_settings()
-			overlay.queue_free()
-			_rebuild())
-		list.add_child(tile)
-	var cancel: Button = MenuUI.button("UI_CANCEL")
-	cancel.name = "CancelDeckButton"
-	cancel.pressed.connect(overlay.queue_free)
-	content.add_child(cancel)
 
 
 func _rebuild() -> void:

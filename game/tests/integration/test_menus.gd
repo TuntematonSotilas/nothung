@@ -50,7 +50,7 @@ func after_test() -> void:
 func test_main_menu_offers_quick_match_collection_and_settings_and_greys_out_the_campaign() -> void:
 	SaveManager.profile["rhinegold"] = 320
 	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
-	for button_name: String in ["NibelheimButton", "SettingsButton", "CurrentDeck", "MyDecksButton", "QuickMatchButton", "CollectionButton"]:
+	for button_name: String in ["NibelheimButton", "SettingsButton", "ChangeDeckButton", "MyDecksButton", "QuickMatchButton", "CollectionButton"]:
 		assert_bool((menu.find_child(button_name, true, false) as Button).disabled).is_false()
 	assert_bool((menu.find_child("CampaignButton", true, false) as Button).disabled).is_true()
 	assert_str((menu.find_child("RhinegoldLabel", true, false) as Label).text).starts_with("320 ")
@@ -63,7 +63,9 @@ func test_main_menu_shows_the_current_deck_and_lets_choose_another() -> void:
 	assert_str((menu.find_child("CurrentDeckName", true, false) as Label).text).is_equal(MenuUI.deck_name(SaveManager.find_deck("deck_1")))
 	# Wotan has his art; the others show their faction icon until theirs exists.
 	assert_object((menu.find_child("LeaderPortrait", true, false) as TextureRect).texture).is_same(CardDatabase.get_leader(&"wotan").art)
-	(menu.find_child("CurrentDeck", true, false) as Button).pressed.emit()
+	# The portrait is not a button: Change deck picks another one.
+	assert_bool(menu.find_child("CurrentDeck", true, false) is BaseButton).is_false()
+	(menu.find_child("ChangeDeckButton", true, false) as Button).pressed.emit()
 	(menu.find_child("Pick_deck_3", true, false) as Button).pressed.emit()
 	assert_str(Settings.quick_match_deck).is_equal("deck_3")
 	await get_tree().process_frame
@@ -131,16 +133,11 @@ func test_new_profile_owns_the_four_starter_decks() -> void:
 	assert_int(SaveManager.rhinegold()).is_equal(0)
 
 
-func test_my_decks_lists_the_starter_copies_and_creates_a_deck() -> void:
+func test_my_decks_lists_one_deck_per_faction_and_creates_none() -> void:
 	var screen: Control = await _open("res://scenes/screens/deck_list.tscn")
 	for index: int in range(1, 5):
 		assert_object(screen.find_child("Deck_deck_%d" % index, true, false)).is_not_null()
-	(screen.find_child("NewDeckButton", true, false) as Button).pressed.emit()
-	assert_object(screen.find_child("LeaderPicker", true, false)).is_not_null()
-	# Choosing a Leader opens the editor (scene change): create the deck the same way here.
-	var entry: Dictionary = SaveManager.create_deck("wotan")
-	assert_str(str(entry["id"])).is_equal("deck_5")
-	assert_int(SaveManager.decks().size()).is_equal(5)
+	assert_object(screen.find_child("NewDeckButton", true, false)).is_null()
 	screen.queue_free()
 
 
@@ -176,9 +173,12 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	# A tap on its chip takes a copy out.
 	(editor.find_child("Chip_loge", true, false) as Button).pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
-	var name_edit: LineEdit = editor.find_child("DeckName", true, false) as LineEdit
-	name_edit.text_changed.emit("Valhalla rush")
-	assert_str(str(SaveManager.find_deck(str(entry["id"]))["name"])).is_equal("Valhalla rush")
+	# The name is the faction's, fixed; no Duplicate or Delete.
+	var deck_name: Node = editor.find_child("DeckName", true, false)
+	assert_bool(deck_name is Label).is_true()
+	assert_str((deck_name as Label).text).is_equal(MenuUI.faction_name(&"gods"))
+	assert_object(editor.find_child("DuplicateButton", true, false)).is_null()
+	assert_object(editor.find_child("DeleteButton", true, false)).is_null()
 	editor.queue_free()
 
 
@@ -276,7 +276,10 @@ func test_quick_match_starts_from_the_remembered_choices() -> void:
 	Settings.quick_match_opponent = "walsungs_starter"
 	Settings.quick_match_difficulty = AIProfile.Difficulty.HARD
 	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
-	assert_bool(_tile(screen, "Player_deck_4").button_pressed).is_true()
+	# Only the current deck, and a button to change it.
+	assert_str((screen.find_child("CurrentDeckTile", true, false) as Button).text).contains(MenuUI.deck_name(SaveManager.find_deck("deck_4")))
+	assert_object(screen.find_child("ChangeDeckButton", true, false)).is_not_null()
+	assert_object(_tile(screen, "Player_deck_1")).is_null()
 	assert_bool(_tile(screen, "Opponent_walsungs_starter").button_pressed).is_true()
 	assert_bool(_tile(screen, "Difficulty2").button_pressed).is_true()
 	var setup: DuelSetup = screen.call("build_setup")
@@ -287,11 +290,18 @@ func test_quick_match_starts_from_the_remembered_choices() -> void:
 	screen.queue_free()
 
 
-func test_quick_match_offers_only_the_decks_ready_to_play() -> void:
+func test_quick_match_changes_the_current_deck_among_those_ready_to_play() -> void:
+	Settings.quick_match_deck = "deck_1"
 	(SaveManager.find_deck("deck_2")["cards"] as Array).pop_back()
 	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
-	assert_object(_tile(screen, "Player_deck_1")).is_not_null()
-	assert_object(_tile(screen, "Player_deck_2")).is_null()
+	(screen.find_child("ChangeDeckButton", true, false) as Button).pressed.emit()
+	# Not ready: not offered.
+	assert_object(screen.find_child("Pick_deck_2", true, false)).is_null()
+	(screen.find_child("Pick_deck_3", true, false) as Button).pressed.emit()
+	await get_tree().process_frame
+	assert_str(Settings.quick_match_deck).is_equal("deck_3")
+	assert_str((screen.find_child("CurrentDeckTile", true, false) as Button).text).contains(MenuUI.deck_name(SaveManager.find_deck("deck_3")))
+	assert_str(String((screen.call("build_setup") as DuelSetup).player_deck.leader.id)).is_equal("siegfried")
 	screen.queue_free()
 
 
@@ -305,19 +315,13 @@ func test_quick_match_without_a_playable_deck_cannot_start() -> void:
 
 
 func test_quick_match_choices_stay_single_and_build_the_setup() -> void:
-	Settings.quick_match_deck = "deck_1"
+	Settings.quick_match_deck = "deck_2"
 	Settings.quick_match_opponent = "random"
 	Settings.quick_match_difficulty = AIProfile.Difficulty.NORMAL
 	var screen: Control = await _open("res://scenes/screens/quick_match.tscn")
-	_tile(screen, "Player_deck_2").pressed.emit()
 	_tile(screen, "Opponent_valkyries_starter").pressed.emit()
 	_tile(screen, "Difficulty0").pressed.emit()
 
-	var pressed_players: int = 0
-	for deck_id: String in ["deck_1", "deck_2", "deck_3", "deck_4"]:
-		if _tile(screen, "Player_" + deck_id).button_pressed:
-			pressed_players += 1
-	assert_int(pressed_players).is_equal(1)
 	assert_bool(_tile(screen, "OpponentRandom").button_pressed).is_false()
 	assert_bool(_tile(screen, "Difficulty1").button_pressed).is_false()
 	var setup: DuelSetup = screen.call("build_setup")

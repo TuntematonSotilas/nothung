@@ -1,7 +1,7 @@
 # Persistence
 
 > What is saved on the device, in which format, and how saves evolve across versions.
-> Status: Draft · Last updated: 2026-11-12
+> Status: Draft · Last updated: 2026-11-13
 
 ## What is saved
 
@@ -53,7 +53,7 @@ On Android `user://` maps to the app's private internal storage.
 - `version` field at the root. `SaveManager` runs migrations `v1 → v2 → …` sequentially on load.
 - The `v1 → v2` migration renames the progression balance from `hoard` to `rhinegold` without changing its value.
 - The `v2 → v3` migration adds the owned `leaders`, `starter_collection_granted: false` and `starter_decks_copied: false`.
-- **Decks:** `id` (`deck_<n>`, never reused while the deck exists; Quick match remembers it), `name` (empty = the faction's name), `leader`, `cards` (one ID per copy). At most 12 (`DeckRules.MAX_DECKS`). `SaveManager.create_deck()` / `update_deck()` / `delete_deck()` / `duplicate_deck()` save at once.
+- **Decks:** `id` (`deck_<n>`, never reused while the deck exists; Quick match remembers it), `name` (empty = the faction's name), `leader`, `cards` (one ID per copy). At most 12 (`DeckRules.MAX_DECKS`). Only the starter copies are created (`SaveManager.add_deck()`); the player edits them (`update_deck()` saves at once) and cannot create, duplicate or delete decks.
 - **Rhinegold:** `SaveManager.add_rhinegold()` (never below 0) and `craft()` (price from `Progression`, up to a deck's worth of copies) save at once.
 - **Starter collection:** while `starter_collection_granted` is false, loading (or resetting) the profile adds the starter decks' Leaders and cards (`SaveManager.add_starter_decks()`: each card up to the copies a deck uses, not the sum); while `starter_decks_copied` is false, it copies each starter deck into `decks` (Gods, Nibelungs, Wälsungs, Valkyries). Then it saves. See [progression](../functional/06-progression.md#starting-collection).
 - Every change to the save schema requires a migration function + a unit test with a sample old save.

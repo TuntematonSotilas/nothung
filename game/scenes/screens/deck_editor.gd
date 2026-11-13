@@ -1,11 +1,12 @@
 class_name DeckEditor
 extends Control
 
-## Deck editor, one screen. Top: the name (editable), the Leader and the deck's state (Ready, or what is
-## missing). Then the deck zone: "Deck n / 20" with a gauge, the types and one chip per card. Below: the
-## Leader's faction and Neutral cards, filtered. No drag and drop: a tap on a card adds a copy (or shows
-## the card with why it cannot be added); a tap on a chip takes a copy out. At the bottom: Auto-fill and Starter deck (both replace the
-## deck, asking first when it is not empty), Duplicate and Delete. Every change is saved at once.
+## Deck editor, one screen. Top: the deck's name (its faction's, fixed), the Leader and the deck's state
+## (Ready, or what is missing). Then the deck zone: "Deck n / 20" with a gauge, the types and one chip
+## per card. Below: the Leader's faction and Neutral cards, filtered. No drag and drop: a tap on a card
+## adds a copy (or shows the card with why it cannot be added); a tap on a chip takes a copy out. At the
+## bottom: Auto-fill and Starter deck (both replace the deck, asking first when it is not empty). Every
+## change is saved at once.
 ## See docs/functional/05-game-modes.md#deck-builder.
 
 ## The deck to edit (a player deck ID), set before opening the screen.
@@ -15,7 +16,6 @@ const CHIPS_HEIGHT: int = 250
 
 var _entry: Dictionary
 var _leader: LeaderData
-var _name_edit: LineEdit
 var _status: Label
 var _zone: PanelContainer
 var _zone_title: Label
@@ -76,21 +76,13 @@ func _identity_row() -> HBoxContainer:
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.modulate = (CardPalette.FACTIONS[_leader.faction]["frame"] as Color).lightened(0.3)
 	identity.add_child(icon)
-	_name_edit = LineEdit.new()
-	_name_edit.name = "DeckName"
-	_name_edit.text = str(_entry.get("name", ""))
-	_name_edit.placeholder_text = MenuUI.deck_name({"leader": _entry["leader"]})
-	_name_edit.max_length = 32
-	_name_edit.custom_minimum_size.y = 76
-	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_name_edit.add_theme_font_size_override("font_size", 30)
-	# Framed, so it reads as a field to type in.
-	_name_edit.add_theme_stylebox_override("normal", MenuUI._tile_style(Palette.SURFACE, Palette.BORDER, 3))
-	_name_edit.add_theme_stylebox_override("focus", MenuUI._tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 3))
-	_name_edit.text_changed.connect(func(text: String) -> void:
-		_entry["name"] = text.strip_edges()
-		SaveManager.update_deck(_entry))
-	identity.add_child(_name_edit)
+	var deck_name: Label = MenuUI.label(MenuUI.deck_name(_entry), 32, Palette.TEXT)
+	deck_name.name = "DeckName"
+	deck_name.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	deck_name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	deck_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	deck_name.clip_text = true
+	identity.add_child(deck_name)
 	var leader_name: Label = MenuUI.label("LEADER_%s_NAME" % String(_leader.id).to_upper(), 28, Palette.TEXT_MUTED)
 	leader_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	identity.add_child(leader_name)
@@ -256,7 +248,7 @@ func _apply_filters() -> void:
 	_filter_bar.count_label.text = tr("UI_SHOWN_COUNT").format({"count": shown})
 
 
-## Auto-fill and Starter deck, then Duplicate and Delete. Replacing a non-empty deck and deleting ask first.
+## Auto-fill and Starter deck; replacing a non-empty deck asks first.
 func _show_actions() -> void:
 	_clear(_actions)
 	var fill_row := HBoxContainer.new()
@@ -274,23 +266,6 @@ func _show_actions() -> void:
 		starter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		starter.pressed.connect(_replace_cards.bind(starter_cards))
 		fill_row.add_child(starter)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 16)
-	_actions.add_child(row)
-	var duplicate: Button = MenuUI.button("UI_DUPLICATE", 72, 26)
-	duplicate.name = "DuplicateButton"
-	duplicate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	duplicate.disabled = SaveManager.decks().size() >= DeckRules.MAX_DECKS
-	duplicate.pressed.connect(_duplicate)
-	row.add_child(duplicate)
-	var delete: Button = MenuUI.button("UI_DELETE", 72, 26)
-	delete.name = "DeleteButton"
-	delete.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	delete.add_theme_color_override("font_color", Palette.LIFE)
-	delete.pressed.connect(_confirm.bind("UI_DELETE_DECK_CONFIRM", "UI_DELETE", func() -> void:
-		SaveManager.delete_deck(str(_entry["id"]))
-		SceneRouter.go_back()))
-	row.add_child(delete)
 
 
 ## Replaces the deck with `cards_source.call()`; asks first when the deck already has cards.
@@ -348,12 +323,3 @@ func _clear(box: Node) -> void:
 	for child: Node in box.get_children():
 		box.remove_child(child)
 		child.queue_free()
-
-
-## The copy opens in place of this deck (Back still returns to the deck list).
-func _duplicate() -> void:
-	var copy: Dictionary = SaveManager.duplicate_deck(str(_entry["id"]), tr("UI_DECK_COPY_NAME").format({"name": MenuUI.deck_name(_entry)}))
-	if copy.is_empty():
-		return
-	deck_id = str(copy["id"])
-	SceneRouter.go_to("res://scenes/screens/deck_editor.tscn", false)
