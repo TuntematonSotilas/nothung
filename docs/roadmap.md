@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-11-13
+> Status: Draft · Last updated: 2026-11-18
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -96,7 +96,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 5 — Menus & meta
 
-- [x] Duel polish after playtest: opening hand with **New hand** (as often as wanted) and **Keep**, green targets on the player's side, animated victory / defeat icon
+- [x] Duel polish after playtest: opening hand with **New hand** (as often as wanted) and **Keep**, green targets on the player's side, animated victory / defeat icon (twice, then still), artifacts in their own column on the right of each play area
 - [x] Title and main menu around the current deck (Leader portrait, tap to change, My decks under it); Campaign / Quick match; Nibelheim with the Rhinegold and Settings (cog) in the top corners; Collection small at the bottom; Campaign greyed out until it exists ([UI implementation](technical/06-ui-implementation.md#menus))
 - [x] Quick match (your deck ready to play / opponent starter deck or Random / difficulty, last choices remembered)
 - [x] Collection screen: every card with the copies owned, faction chips + filters (cost, type, rarity, trait, owned / missing), card shown large; new profile owns the four starter decks

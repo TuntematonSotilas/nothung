@@ -1,7 +1,7 @@
 # UI implementation
 
 > How screens and interactions from [functional/07-ui-ux.md](../functional/07-ui-ux.md) are built in Godot.
-> Status: In progress · Last updated: 2026-11-13
+> Status: In progress · Last updated: 2026-11-18
 
 ## Display settings (`project.godot`)
 
@@ -67,7 +67,7 @@
 
 ## Duel and AI
 
-- `scenes/screens/duel.tscn` uses portrait containers for both boards, artifacts, Leaders, Energy, deck/graveyard counts, battle log and the scrollable hand.
+- `scenes/screens/duel.tscn` uses portrait containers for both boards, artifacts, Leaders, Energy, deck/graveyard counts, battle log and the scrollable hand. Each play area (`_zone_frame` + `_zone_body`) holds the units `HFlowContainer` on the left and the `ArtifactColumn` on the right (`ARTIFACT_SLOTS` = 3 `Panel` slots, cards at `ARTIFACT_CARD_SCALE` = 0.6); `_fill_artifacts()` puts each artifact in a slot and adds or removes slots beyond 3; `_find_view()` searches the slots too.
 - The duel plays the `DuelSetup` set by Quick match (`DuelSetup.next`: both decks and the AI difficulty), or Gods vs Nibelungs on Normal without one (tests). Rematches keep the setup. Redraw, action validation, turn updates, match results and rematches are wired to `Match`.
 - The AI (`ai/ai_player.gd`, difficulty from the setup) runs on a `Thread` from a job of copies; the duel polls the thread each frame instead of blocking, and the main thread alone applies the returned action ([AI opponent](05-ai-opponent.md#threading)).
 - A headless smoke test loads and starts the duel scene. The Android device play-through is still required before this milestone is complete.

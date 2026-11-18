@@ -11,6 +11,10 @@ const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
 const HIDDEN_ALPHA: float = 0.45
 ## The result icon's animation plays this many times, then stops.
 const RESULT_PLAYS: int = 2
+## Artifact column on the right of each play area: slots shown even when empty, cards at this share of
+## a board card's size. The Ring and limit-exempt artifacts can make a 4th slot appear.
+const ARTIFACT_SLOTS: int = 3
+const ARTIFACT_CARD_SCALE: float = 0.6
 
 ## Board art to show behind the duel (campaign duels will set it; see assets/art/boards/).
 @export var board_id: String = "default"
@@ -44,9 +48,9 @@ var _own_zone_frame: PanelContainer
 var _own_life_label: Label
 var _own_portrait_initial: Label
 var _enemy_board: HFlowContainer
-var _enemy_artifacts: HFlowContainer
+var _enemy_artifacts: VBoxContainer
 var _own_board: HFlowContainer
-var _own_artifacts: HFlowContainer
+var _own_artifacts: VBoxContainer
 var _own_hand: HBoxContainer
 var _own_leader_portrait_frame: Panel
 var _own_leader_artwork: TextureRect
@@ -196,21 +200,19 @@ func _build_ui() -> void:
 
 	_enemy_zone_frame = _zone_frame("UI_ENEMY_UNITS")
 	_main_layout.add_child(_enemy_zone_frame)
-	_enemy_artifacts = _board_row(false)
-	_enemy_zone_frame.get_child(0).add_child(_enemy_artifacts)
 	_enemy_board = _board_row(true)
-	_enemy_zone_frame.get_child(0).add_child(_enemy_board)
+	_enemy_artifacts = _artifact_column()
+	_zone_body(_enemy_zone_frame, _enemy_board, _enemy_artifacts)
 
 	# Player: play area, then leader panel.
 	_own_zone_frame = _zone_frame("UI_YOUR_UNITS")
 	_own_zone_frame.set_drag_forwarding(Callable(), _can_drop_on_own_board, _drop_on_own_board)
 	_own_zone_frame.gui_input.connect(_on_own_zone_input)
 	_main_layout.add_child(_own_zone_frame)
-	_own_artifacts = _board_row(false)
-	_own_zone_frame.get_child(0).add_child(_own_artifacts)
 	_own_board = _board_row(true)
 	_own_board.set_drag_forwarding(Callable(), _can_drop_on_own_board, _drop_on_own_board)
-	_own_zone_frame.get_child(0).add_child(_own_board)
+	_own_artifacts = _artifact_column()
+	_zone_body(_own_zone_frame, _own_board, _own_artifacts)
 
 	var own: Dictionary = _leader_panel(HUMAN_PLAYER)
 	_main_layout.add_child(own["panel"])
@@ -370,8 +372,8 @@ func _refresh() -> void:
 	_status_label.text = _status_text(state)
 	_fill_board(_enemy_board, opponent.board, false, &"board")
 	_fill_board(_own_board, human.board, true, &"board")
-	_fill_board(_enemy_artifacts, opponent.artifacts, false, &"artifact")
-	_fill_board(_own_artifacts, human.artifacts, true, &"artifact")
+	_fill_artifacts(_enemy_artifacts, opponent.artifacts, false)
+	_fill_artifacts(_own_artifacts, human.artifacts, true)
 	_fill_hand(human.hand)
 	_update_selection_feedback()
 	_apply_highlights()
@@ -486,17 +488,46 @@ func _fill_board(row: HFlowContainer, zone: Zone, is_human: bool, zone_name: Str
 		row.remove_child(child)
 		child.queue_free()
 	for instance: CardInstance in zone.cards:
-		# Board cards are never dragged: attacks are tap-tap only (unit, then target).
-		var view: CardView = _card_view(
-			instance,
-			false,
-			HUMAN_PLAYER if is_human else AI_PLAYER,
-			"board",
-			_match.get_state().phase != GameState.Phase.GAME_OVER
-		)
-		view.custom_minimum_size = Vector2(170, 200) * _board_card_scale
-		view.pressed.connect(_on_board_card_pressed.bind(instance.uid, is_human, zone_name, view))
-		row.add_child(view)
+		row.add_child(_board_card(instance, is_human, zone_name, Vector2(170, 200) * _board_card_scale))
+
+
+## Artifacts in the column's slots, in play order; a slot is added beyond ARTIFACT_SLOTS when the Ring
+## or a limit-exempt artifact makes more, and removed again when they leave.
+func _fill_artifacts(column: VBoxContainer, zone: Zone, is_human: bool) -> void:
+	var slots: Array[Panel] = []
+	for child: Node in column.get_children():
+		if child is Panel:
+			slots.append(child as Panel)
+	var wanted: int = maxi(ARTIFACT_SLOTS, zone.size())
+	while slots.size() < wanted:
+		var slot: Panel = _artifact_slot(slots.size())
+		column.add_child(slot)
+		slots.append(slot)
+	while slots.size() > wanted:
+		var extra: Panel = slots.pop_back()
+		column.remove_child(extra)
+		extra.queue_free()
+	for slot: Panel in slots:
+		for child: Node in slot.get_children():
+			slot.remove_child(child)
+			child.queue_free()
+	for index: int in zone.cards.size():
+		var view: CardView = _board_card(zone.cards[index], is_human, &"artifact", _artifact_card_size())
+		slots[index].add_child(view)
+
+
+## A board or artifact card: never dragged (attacks are tap-tap only, unit then target); a tap selects it.
+func _board_card(instance: CardInstance, is_human: bool, zone_name: StringName, card_size: Vector2) -> CardView:
+	var view: CardView = _card_view(
+		instance,
+		false,
+		HUMAN_PLAYER if is_human else AI_PLAYER,
+		"board",
+		_match.get_state().phase != GameState.Phase.GAME_OVER
+	)
+	view.custom_minimum_size = card_size
+	view.pressed.connect(_on_board_card_pressed.bind(instance.uid, is_human, zone_name, view))
+	return view
 
 
 func _fill_hand(hand: Zone) -> void:
@@ -1444,12 +1475,12 @@ func _fx_idle() -> void:
 		await _fx.idle
 
 
-## Card view showing this card uid (hand, boards, artifacts), or null.
+## Card view showing this card uid (hand, boards, artifacts — those sit in the column's slots), or null.
 func _find_view(uid: int) -> CardView:
 	for row: Control in [_own_hand, _own_board, _enemy_board, _own_artifacts, _enemy_artifacts]:
-		for child: Node in row.get_children():
+		for child: Node in row.find_children("*", "CardView", true, false):
 			var view: CardView = child as CardView
-			if view != null and view.card_instance != null and view.card_instance.uid == uid:
+			if view.card_instance != null and view.card_instance.uid == uid:
 				return view
 	return null
 
@@ -1617,16 +1648,64 @@ func _player_message(key: String, player: int) -> String:
 	return tr(key).format({"player": _leader_name(player)})
 
 
-## Units rows keep a card's height when empty so the layout never jumps; artifact rows only take room when used.
+## Units rows keep a card's height when empty so the layout never jumps.
 ## Flow rows wrap onto a second line instead of growing wider than the screen (which widened the whole layout).
 func _board_row(is_units_row: bool) -> HFlowContainer:
 	var row: HFlowContainer = HFlowContainer.new()
 	row.alignment = FlowContainer.ALIGNMENT_CENTER
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_theme_constant_override("h_separation", roundi(8 * _board_card_scale))
 	row.add_theme_constant_override("v_separation", roundi(8 * _board_card_scale))
 	if is_units_row:
 		row.custom_minimum_size.y = roundi(200 * _board_card_scale)
 	return row
+
+
+## Under the zone's title: the units on the left, a thin line, the artifact column on the right.
+func _zone_body(frame: PanelContainer, units: HFlowContainer, artifacts: VBoxContainer) -> void:
+	var body: HBoxContainer = HBoxContainer.new()
+	body.name = "ZoneBody"
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation", roundi(8 * _ui_scale))
+	frame.get_child(0).add_child(body)
+	body.add_child(units)
+	var line: ColorRect = ColorRect.new()
+	line.color = Color(Palette.BORDER, 0.8)
+	line.custom_minimum_size.x = maxf(1.0, roundf(2 * _ui_scale))
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	body.add_child(line)
+	body.add_child(artifacts)
+
+
+## The artifact column: a small title, then ARTIFACT_SLOTS empty slots (filled by _fill_artifacts).
+func _artifact_column() -> VBoxContainer:
+	var column: VBoxContainer = VBoxContainer.new()
+	column.name = "ArtifactColumn"
+	column.add_theme_constant_override("separation", roundi(6 * _board_card_scale))
+	var title: Label = _section_label("UI_ARTIFACTS")
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+	for index: int in ARTIFACT_SLOTS:
+		column.add_child(_artifact_slot(index))
+	return column
+
+
+func _artifact_slot(index: int) -> Panel:
+	var slot: Panel = Panel.new()
+	slot.name = "Slot%d" % index
+	slot.custom_minimum_size = _artifact_card_size()
+	slot.mouse_filter = Control.MOUSE_FILTER_PASS
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color.TRANSPARENT
+	style.border_color = Color(Palette.BORDER, 0.6)
+	style.set_border_width_all(maxi(1, roundi(2 * _ui_scale)))
+	style.set_corner_radius_all(roundi(8 * _ui_scale))
+	slot.add_theme_stylebox_override("panel", style)
+	return slot
+
+
+func _artifact_card_size() -> Vector2:
+	return (Vector2(170, 200) * ARTIFACT_CARD_SCALE * _board_card_scale).round()
 
 
 func _framed_panel(background_color: Color, border_color: Color) -> PanelContainer:

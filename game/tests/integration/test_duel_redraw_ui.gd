@@ -245,6 +245,48 @@ func test_undoing_a_play_restores_effects_and_returns_card_to_deck() -> void:
 	await get_tree().process_frame
 
 
+func test_artifacts_have_their_own_column_on_the_right_with_three_slots() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 0)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	for is_own: bool in [true, false]:
+		var column: VBoxContainer = duel.get("_own_artifacts" if is_own else "_enemy_artifacts") as VBoxContainer
+		var units: HFlowContainer = duel.get("_own_board" if is_own else "_enemy_board") as HFlowContainer
+		assert_str(column.name).is_equal("ArtifactColumn")
+		assert_float(column.get_global_rect().position.x).is_greater(units.get_global_rect().end.x - 1.0)
+		assert_int(column.find_children("Slot*", "Panel", false, false).size()).is_equal(3)
+	# One artifact: in the first slot, at the reduced size.
+	var spear := CardInstance.new(CardDatabase.get_card(&"wotans_spear"), 0, 980)
+	state.player(0).artifacts.add(spear)
+	duel.call("_refresh")
+	await get_tree().process_frame
+	var own: VBoxContainer = duel.get("_own_artifacts") as VBoxContainer
+	var view: CardView = own.get_node("Slot0").get_child(0) as CardView
+	assert_int(view.card_instance.uid).is_equal(980)
+	assert_vector(view.custom_minimum_size).is_less(Vector2(170, 200) * float(duel.get("_board_card_scale")))
+	assert_int(own.get_node("Slot1").get_child_count()).is_equal(0)
+	assert_object(duel.call("_find_view", 980)).is_same(view)
+	# The Ring does not count towards the limit: a 4th slot appears, and goes again.
+	for uid: int in [981, 982]:
+		state.player(0).artifacts.add(CardInstance.new(CardDatabase.get_card(&"wotans_spear"), 0, uid))
+	var ring_data: CardData = null
+	for card_id: StringName in CardDatabase.card_ids():
+		if CardDatabase.get_card(card_id).is_ring:
+			ring_data = CardDatabase.get_card(card_id)
+	if ring_data == null:
+		ring_data = CardDatabase.get_card(&"tarnhelm")
+	state.player(0).artifacts.add(CardInstance.new(ring_data, 0, 983))
+	duel.call("_refresh")
+	await get_tree().process_frame
+	assert_int(own.find_children("Slot*", "Panel", false, false).size()).is_equal(4)
+	state.player(0).artifacts.cards.clear()
+	duel.call("_refresh")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(own.find_children("Slot*", "Panel", false, false).size()).is_equal(3)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
 func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	var duel: Control = await _create_duel()
 	var current_match: Match = duel.get("_match") as Match
@@ -262,7 +304,7 @@ func test_drop_zone_covers_artifacts_and_board_and_is_highlighted() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 
-	var artifacts: HFlowContainer = duel.get("_own_artifacts") as HFlowContainer
+	var artifacts: VBoxContainer = duel.get("_own_artifacts") as VBoxContainer
 	var board: HFlowContainer = duel.get("_own_board") as HFlowContainer
 	duel.call("_on_card_drag_started", {"kind": "hand", "uid": card.uid})
 	var hand: HBoxContainer = duel.get("_own_hand") as HBoxContainer

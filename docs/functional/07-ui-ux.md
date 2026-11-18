@@ -1,7 +1,7 @@
 # UI / UX
 
 > Screens, navigation and interaction design for an Android phone.
-> Status: Draft · Last updated: 2026-11-13
+> Status: Draft · Last updated: 2026-11-18
 
 > **Decision (2026-10-30):** the main menu is built around the **current deck** (Leader portrait in the centre, deck builder under it); the game modes sit below it, Nibelheim and Settings in the top corners, Collection — the least used — small at the bottom.
 
@@ -71,10 +71,12 @@ flowchart TD
 │ │                              Nibelungs ◆2]│ │  named ability (read-only)
 │ └────────────────────────────────────┘ │
 │ ┌ ENEMY UNITS ───────────────────────┐ │
-│ │ artifacts (when any) / ▢ ▢ ▢ units   │ │  framed play area
+│ │ ▢ ▢ ▢ ▢ units          │ ARTIFACTS │ │  framed play area:
+│ │ ▢ ▢ (wraps)             │ ▫ ▫ ▫     │ │  units left, artifacts right
 │ └────────────────────────────────────┘ │
 │ ┌ YOUR UNITS ────────────────────────┐ │
-│ │ artifacts (when any) / ▢ ▢ ▢ units   │ │  whole frame = drop zone
+│ │ ▢ ▢ ▢ units             │ ARTIFACTS │ │  whole frame = drop zone
+│ │                         │ ▫ ▫ ▫     │ │  3 slots, reduced cards
 │ └────────────────────────────────────┘ │
 │ ┌ Your Leader (gold border) ─────────┐ │
 │ │ (portrait) Wotan ♥20 ◆1/1 [Spear of │ │  same panel, ability is the button
@@ -88,6 +90,9 @@ flowchart TD
 - **Leader panel** (both players): portrait (or the Leader's initial while there is no art), name, Life, Energy, and the ability as a button showing its **name**, cost and effect. The opponent's ability button is read-only. Tapping the panel targets that Leader.
 - Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*, Siegfried — *Spear-breaker*, Brünnhilde — *Chooser of the Slain*.
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
+- **Artifacts** have their own column on the **right** of each play area, after a thin line: a small "Artifacts" title, then **3 slots** shown even when empty, the cards at ~60 % of a unit card (long press shows them large). The Ring and limit-exempt artifacts can add a 4th slot, which goes again when they leave. Units take the rest of the width and wrap onto a second row.
+
+> **Decision (2026-11-18, playtest):** artifacts get a **dedicated column on the right** of each play area (3 slots, reduced cards), instead of a row above the units.
 - **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.
 - **Play areas wrap**: when units do not fit on one line (up to 6 per side), they continue on a second line instead of widening the screen.
 - Icons (Life, Energy, pause, end turn, undo, close, settings, Nibelheim forge) come from game-icons.net ([CREDITS](../../CREDITS.md)); faction and card-type icons will be hand-drawn ([art & audio](08-art-and-audio.md#icons)).
