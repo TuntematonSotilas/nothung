@@ -1,7 +1,7 @@
 # Art tools
 
 > Recommended software and workflow for card artwork, icons and UI mockups. Direction: [functional/08-art-and-audio.md](../functional/08-art-and-audio.md).
-> Status: Draft · Last updated: 2026-10-30
+> Status: Draft · Last updated: 2026-11-15
 
 Prices and licences change — check them before buying.
 
@@ -37,9 +37,9 @@ Frames are not drawn: the game draws them ([card frames](../functional/08-art-an
 
 ## Hand-drawn art-to-digital workflow
 
-**Draw and paint by hand → import the original → use AI-assisted cleanup → review and export.**
+**Draw and paint by hand → import the original → crop the photo only → review and export.**
 The artist creates every character and illustration by hand, on paper or digitally. AI is a
-post-processing assistant for preparing that authored work, not an image generator or co-artist.
+post-processing assistant for framing that authored work, not an image generator or co-artist.
 
 ### Draw and paint by hand
 
@@ -49,17 +49,17 @@ post-processing assistant for preparing that authored work, not an image generat
   with even lighting and minimal perspective distortion.
 - Preserve the original scan, photo, or layered digital file unchanged as the master.
 
-### Import and AI-assisted cleanup
+### Import and crop (no AI-assisted cleanup)
 
 1. Import a high-resolution scan, photo, or flattened export into the image-editing workflow.
-2. Use AI-assisted cleanup only to remove paper specks, pencil marks, capture artefacts, and
-   unwanted background; adjust crop, perspective, or colour balance where needed.
-3. Do not generate, extend, or repaint the subject. Keep the hand-painted strokes, shapes, and
+2. Crop the photo to frame the artwork. Cropping is the only permitted image processing for
+   hand-made illustrations; keep the source scan or photo unchanged as the master.
+3. Do not clean the image: retain paper texture, pencil marks, specks, capture artefacts, and any
+   background inside the crop. Do not adjust perspective or colour balance.
+4. Do not generate, extend, or repaint the subject. Keep the hand-painted strokes, shapes, and
    colour choices authored by the artist.
-4. Compare the cleaned result with the untouched master at full size and at phone size. Correct
-   any cleanup that removes or changes painted detail; the artist approves the final image.
-5. Export the approved crop as PNG for Godot and retain both the untouched master and the approved
-   cleaned export.
+5. Review the crop at full size and at phone size; the artist approves the final framing.
+6. Export the approved crop as PNG for Godot and retain both the untouched master and the crop.
 
 **Consistency across the set:** use a Krita template and a fixed palette: muted tones plus the
 [faction colours](../functional/08-art-and-audio.md#faction-palette-draft) as accents.
@@ -72,12 +72,12 @@ post-processing assistant for preparing that authored work, not an image generat
 
 ## Artwork policy
 
-**Decision (2026-10-09, updated 2026-10-18): all final subject artwork is drawn and painted by
-the project author; AI-assisted cleanup is allowed as described in the workflow above.**
+**Decision (2026-10-09, updated 2026-11-15): all final subject artwork is drawn and painted by
+the project author; only photo cropping is allowed as image processing, with no AI-assisted cleanup.**
 
 - No AI-generated or AI-extended subject artwork in the game.
-- AI may clean the imported hand-made image but must not invent or repaint its subject; the artist
-  reviews and approves every final export.
+- Do not use AI to clean or otherwise alter imported hand-made artwork; crop the photo only, and
+  have the artist review and approve every final export.
 - Public-domain works (Rackham, etc.) are used only as **reference** and **temporary placeholders**
   during prototyping; every placeholder is replaced before release.
 - **Card frames** are not artwork: Godot draws them (shapes and colours, no image) — [card frames](../functional/08-art-and-audio.md#card-frames).
