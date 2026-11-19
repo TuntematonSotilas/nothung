@@ -105,7 +105,7 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 			continue
 		var reforged: CardData = _reforge_bearer_needed(player_id, card.data)
 		if reforged != null:
-			# Notung! Notung!: the player chooses which unit carries the reforged relic.
+			# A reforge spell: the player chooses which unit carries the reforged relic.
 			for bearer: CardInstance in current.board.cards:
 				if _can_bear(bearer, reforged):
 					actions.append(PlayCardAction.new(player_id, card.uid, bearer.uid))
@@ -869,7 +869,7 @@ func _resurrect(player_id: int, requested_card: CardData) -> void:
 				return
 
 
-## `selected`: the unit chosen to carry a reforged relic (Notung! Notung!). A unit that reforges carries it
+## `selected`: the unit chosen to carry a reforged relic (a reforge spell). A unit that reforges carries it
 ## itself (Siegmund); without a valid choice, the first unit that can carry it does.
 func _reforge(source: CardInstance, player_id: int, forged_data: CardData, selected: CardInstance = null) -> void:
 	if source == null or forged_data == null:
@@ -993,7 +993,7 @@ func _unique_key(data: CardData) -> StringName:
 
 
 ## A spell or artifact whose reforge would happen now but finds no unit to carry the relic
-## (Notung! Notung! with no Wälsung on the board): it cannot be played. A unit that reforges carries the
+## (no unit meeting its Bearer requirement on the board): it cannot be played. A unit that reforges carries the
 ## relic itself (Siegmund), so units are not concerned.
 func _reforge_without_bearer(player_id: int, data: CardData) -> bool:
 	var relic: CardData = _reforge_bearer_needed(player_id, data)

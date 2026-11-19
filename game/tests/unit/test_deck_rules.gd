@@ -45,7 +45,7 @@ func test_a_card_that_does_nothing_alone_comes_last() -> void:
 	var siegfried: LeaderData = CardDatabase.get_leader(&"siegfried")
 	var cards: Array[String] = DeckRules.auto_fill(siegfried, CardDatabase, func(_id: StringName) -> int: return 2)
 	assert_bool(cards.has("nothung_broken")).is_false()
-	# With only the Wälsung starter cards, it is the 20th card (Siegmund and Notung! reforge it).
+	# With only the Wälsung starter cards, it is the 20th card (Siegmund reforges it).
 	var starter: Dictionary = {}
 	for card: CardData in CardDatabase.get_deck(&"walsungs_starter").cards:
 		starter[card.id] = int(starter.get(card.id, 0)) + 1

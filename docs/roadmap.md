@@ -113,7 +113,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 Real matches on the phone, once the deck choice of milestone 5 exists.
 
-- [ ] Test a match with artifacts: play *Wotan's Spear* and *The Valkyrie Rock*, attach the *Tarnhelm* (Invisible) and *Nothung*, check that Nothung shatters and is reforged (Siegmund, *Notung! Notung!*)
+- [ ] Test a match with artifacts: play *Wotan's Spear* and *The Valkyrie Rock*, attach the *Tarnhelm* (Invisible) and *Nothung*, check that Nothung shatters and is reforged (Siegmund)
 - [ ] Test a match with the Ring: forge it with *Renunciation of Love* (Nibelungs), check the holder's bonus (+2 Energy and 1 card with Alberich, +1 Energy otherwise), the curse at the end of each of the holder's turns (1, 2, 3, then 3 Life) and *Waltraute* sending it back to the Rhine; then tune the curse from these matches and the AI soak
 
 ## 7 — Campaign

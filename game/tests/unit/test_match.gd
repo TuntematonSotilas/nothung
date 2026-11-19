@@ -563,9 +563,7 @@ func test_nothung_is_brought_drawn_shattered_and_reforged() -> void:
 	var player := state.player(0)
 	var brunnhilde := CardInstance.new(CardDatabase.get_card(&"brunnhilde_protector"), 0, 141)
 	var siegmund := CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 142)
-	var sieglinde := CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 143)
-	var notung := CardInstance.new(CardDatabase.get_card(&"notung"), 0, 144)
-	for card: CardInstance in [brunnhilde, siegmund, sieglinde, notung]:
+	for card: CardInstance in [brunnhilde, siegmund]:
 		player.hand.add(card)
 
 	# Brünnhilde brings the fragments.
@@ -581,12 +579,6 @@ func test_nothung_is_brought_drawn_shattered_and_reforged() -> void:
 	siegmund.health = 0
 	engine.call("_check_deaths")
 	assert_str(String(player.artifacts.cards[0].data.id)).is_equal("nothung_broken")
-	# Notung! Notung! reforges it onto another Wälsung.
-	player.energy = 10
-	assert_bool(engine.apply(PlayCardAction.new(0, sieglinde.uid))).is_true()
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid, sieglinde.uid))).is_true()
-	assert_str(String(sieglinde.relic.data.id)).is_equal("nothung")
-	assert_int(sieglinde.attack).is_equal(6)
 
 
 func test_only_one_nothung_at_a_time() -> void:
@@ -611,54 +603,6 @@ func test_only_one_nothung_at_a_time() -> void:
 	assert_bool(engine.apply(PlayCardAction.new(0, siegmund.uid))).is_true()
 	assert_int(player.artifacts.size()).is_equal(0)
 	assert_str(String(engine.play_block_reason(0, second.uid))).is_equal("unique_artifact")
-
-
-func test_notung_cannot_be_played_without_a_bearer() -> void:
-	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 170)
-	_prepare_main_phase(engine)
-	var player := engine.get_state().player(0)
-	player.energy = 10
-	player.board.cards.clear()
-	player.artifacts.add(CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 171))
-	var notung := CardInstance.new(CardDatabase.get_card(&"notung"), 0, 172)
-	var sieglinde := CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 173)
-	player.hand.add(notung)
-	player.hand.add(sieglinde)
-	assert_str(String(engine.play_block_reason(0, notung.uid))).is_equal("no_bearer")
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_false()
-	# With a Wälsung on the board, it reforges and Nothung (broken) leaves the artifacts.
-	assert_bool(engine.apply(PlayCardAction.new(0, sieglinde.uid))).is_true()
-	assert_str(String(engine.play_block_reason(0, notung.uid))).is_equal("")
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid, sieglinde.uid))).is_true()
-	assert_int(player.artifacts.size()).is_equal(0)
-	assert_str(String(sieglinde.relic.data.id)).is_equal("nothung")
-
-
-func test_notung_lets_the_player_choose_the_bearer() -> void:
-	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 180)
-	_prepare_main_phase(engine)
-	var player := engine.get_state().player(0)
-	player.energy = 10
-	player.board.cards.clear()
-	player.artifacts.add(CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 181))
-	var sieglinde := CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 182)
-	var siegmund := CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 183)
-	player.board.add(sieglinde)
-	player.board.add(siegmund)
-	var notung := CardInstance.new(CardDatabase.get_card(&"notung"), 0, 184)
-	player.hand.add(notung)
-	# One play per Wälsung that can carry it; none without a chosen bearer.
-	var bearers: Array[int] = []
-	for action: Action in engine.get_legal_actions(0):
-		if action is PlayCardAction and (action as PlayCardAction).card_uid == notung.uid:
-			bearers.append((action as PlayCardAction).target_uid)
-	bearers.sort()
-	assert_array(bearers).is_equal([182, 183])
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_false()
-	# The second Wälsung on the board, not the first, carries it.
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid, siegmund.uid))).is_true()
-	assert_object(sieglinde.relic).is_null()
-	assert_str(String(siegmund.relic.data.id)).is_equal("nothung")
 
 
 func test_horn_call_lets_a_unit_played_this_turn_attack() -> void:

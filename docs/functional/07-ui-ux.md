@@ -91,7 +91,7 @@ flowchart TD
 - Ability names come from `cards/leaders.md` (`ability_name`): Wotan — *Spear of Treaties*, Alberich — *Lord of the Nibelungs*, Siegfried — *Spear-breaker*, Brünnhilde — *Chooser of the Slain*.
 - The two play areas share the free height, so the hand stays at the bottom whatever the screen ratio.
 - **Artifacts** have their own column on the **right** of each play area, after a thin line: a small "Artifacts" title, then **3 slots** shown even when empty, the cards at ~60 % of a unit card (long press shows them large). The Ring and limit-exempt artifacts can add a 4th slot, which goes again when they leave. Units take the rest of the width and wrap onto a second row.
-- A unit carrying a **Relic** (Nothung, Tarnhelm…) shows it as a **badge** above its stats (the Relic's name in a pill bordered in its faction colour): a Relic is not in the artifact column. Its long press adds "Carries: Nothung (+3/+0)" and the Relic's text. *Notung! Notung!* asks which Wälsung carries the sword (the valid ones glow green, as for any card played on one of your units).
+- A unit carrying a **Relic** (Nothung, Tarnhelm…) shows it as a **badge** above its stats (the Relic's name in a pill bordered in its faction colour): a Relic is not in the artifact column. Its long press adds "Carries: Nothung (+3/+0)" and the Relic's text. A spell that reforges a Relic asks which unit carries it (the valid ones glow green, as for any card played on one of your units).
 
 > **Decision (2026-11-18, playtest):** artifacts get a **dedicated column on the right** of each play area (3 slots, reduced cards), instead of a row above the units.
 - **The hand never scrolls**: all cards fit the width and overlap when there are more than five; the selected card is drawn on top.

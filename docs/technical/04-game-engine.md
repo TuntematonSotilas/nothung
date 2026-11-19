@@ -60,7 +60,7 @@ stateDiagram-v2
 |--------|---------|
 | `RedrawAction` | card uids to replace; ends the player's redraw (the player's screen sends an empty list: "keep this hand") |
 | `RefreshHandAction` | none: the whole hand goes back, the deck is shuffled and as many cards are drawn; repeatable; legal only for the player whose redraw it is; **not** in `get_legal_actions()` (the player's choice only, never the AI's) |
-| `PlayCardAction` | card uid, optional target (for a Relic, or a spell that reforges one now — *Notung! Notung!* —: the bearer unit, required) |
+| `PlayCardAction` | card uid, optional target (for a Relic, or a spell / artifact that reforges one now: the bearer unit, required) |
 | `AttackAction` | attacker uid, target uid (unit or leader) |
 | `UseLeaderAbilityAction` | optional target |
 | `EndTurnAction` | – |

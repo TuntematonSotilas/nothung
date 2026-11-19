@@ -1,6 +1,6 @@
 # Wälsungs
 
-Led by Siegfried. Siegmund and Sieglinde, the wolf tribe of their childhood (Siegmund grew up a "Wölfing" in the forest with Wälse, Wotan in a wolf's pelt), and the sword Nothung: brought in pieces by Brünnhilde, drawn by Siegmund, reforged.
+Led by Siegfried. Siegmund and Sieglinde, the wolf tribe of their childhood (Siegmund grew up a "Wölfing" in the forest with Wälse, Wotan in a wolf's pelt), and the sword Nothung: brought in pieces by Brünnhilde, drawn and reforged by Siegmund; and Neidhöhle, where Siegfried slays the dragon Fafner.
 
 | id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
 |----|------|------|----------|--------|------|-----|----|----------|--------|-----------|------------|---------|
@@ -16,6 +16,6 @@ Led by Siegfried. Siegmund and Sieglinde, the wolf tribe of their childhood (Sie
 | winterstuerme | Winterstürme | spell | | common | 2 | | | | | on_play: buff(selected_unit, 2, 2) | love | "Winter storms have yielded to the month of May." — Siegmund, Die Walküre |
 | dragons_blood | Dragon's Blood | spell | | common | 2 | | | | | on_play: draw(2) | | |
 | sword_in_the_ash_tree | The Sword in the Ash Tree | spell | | rare | 2 | | | | | on_play: draw(1); on_play[controls(siegmund)]: buff(all_friendly_units, 1, 0) | sword | "My father promised me a sword." — Siegmund, Die Walküre |
-| notung | Notung! Notung! | spell | | rare | 3 | | | | | on_play[controls(nothung_broken)]: reforge(nothung) | sword | "Nothung! Nothung! Coveted sword!" — Siegfried, Siegfried |
+| neidhoehle | Neidhöhle | spell | | rare | 3 | | | | | on_play: damage(selected_unit, 4) | sword | "There lie, envious fellow: Nothung you bear in your heart!" — Siegfried, Siegfried |
 | nothung_broken | Nothung (broken) | artifact | weapon | legendary | 1 | | | | | | sword | |
 | nothung | Nothung | artifact | relic, weapon | legendary | 0 | 3 | 0 | shatters_into(nothung_broken) | walsung | | sword | |

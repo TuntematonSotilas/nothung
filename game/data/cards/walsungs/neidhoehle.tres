@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CardData" format=3]
+
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="1_jxpns"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="2_nml35"]
+[ext_resource type="Script" path="res://data/cards/card_data.gd" id="3_iqlne"]
+
+[sub_resource type="Resource" id="Resource_httj5"]
+script = ExtResource("2_nml35")
+amount = 4
+
+[sub_resource type="Resource" id="Resource_vyy6m"]
+script = ExtResource("1_jxpns")
+effects = Array[ExtResource("2_nml35")]([SubResource("Resource_httj5")])
+
+[resource]
+script = ExtResource("3_iqlne")
+id = &"neidhoehle"
+faction = &"walsungs"
+type = 1
+rarity = 1
+cost = 3
+abilities = Array[ExtResource("1_jxpns")]([SubResource("Resource_vyy6m")])
+leitmotifs = Array[StringName]([&"sword"])

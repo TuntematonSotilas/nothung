@@ -88,10 +88,12 @@ A **Relic** is an artifact that is attached to a unit instead of going to the ar
 - A unit can carry **at most 1 Relic**. Attached Relics do not count toward the 3-artifact limit.
 - The Relic's bonus applies to its bearer only.
 - When the bearer leaves the board, the Relic goes to the graveyard, unless its text says otherwise (e.g. *Nothung* shatters back into *Nothung (broken)*).
-- **Reforging**: some effects turn an artifact into another (e.g. *Siegmund* or *Notung! Notung!* reforge *Nothung (broken)* in your artifacts into *Nothung*, attached to a unit **you choose** that meets its Bearer requirement — Siegmund carries it himself when he reforges it). Nothing happens without that artifact. A spell that would reforge a Relic with **no valid bearer** on your board **cannot be played** (*Notung! Notung!* needs a Wälsung there; Siegmund carries it himself, so he is always fine).
+- **Reforging**: some effects turn an artifact into another (e.g. *Siegmund* reforges *Nothung (broken)* in your artifacts into *Nothung* and carries it himself; a spell that reforges a Relic attaches it to a unit **you choose** that meets its Bearer requirement). Nothing happens without that artifact. A spell that would reforge a Relic with **no valid bearer** on your board **cannot be played** (a unit that reforges carries the Relic itself, so it is always fine).
 - **Unique Legendary artifacts**: you control at most **one** of each Legendary artifact, a reforged Relic counting as its broken form — one *Nothung* at a time, whether broken among your artifacts or carried by a unit. A second copy cannot be played, and an effect that would create one (*Brünnhilde, Protector*) creates nothing.
 
 > **Decision (2026-11-18, playtest):** a second *Nothung (broken)* was useless and *Notung! Notung!* could be played for nothing without a bearer: Legendary artifacts are unique per player, and a reforge spell needs a bearer to be played.
+
+> **Decision (2026-11-19, playtest):** *Notung! Notung!* is dropped: with only Sieglinde to carry the sword, it was greyed out almost every match. It is replaced by *Neidhöhle* (removal). Siegmund remains the way to reforge Nothung.
 
 ## Leader
 

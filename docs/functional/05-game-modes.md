@@ -73,7 +73,7 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 - The four starter decks are copied into the player's decks once; those are the decks the player edits.
 - Every change is saved at once; there is no Save button.
 - Cards are added by **tapping** them in the grid and taken out by tapping them in the deck zone — no drag and drop. A swipe scrolls the grid and never adds a card.
-- **Auto-fill** empties the deck, then builds one from the cards owned: the rarest first (then the strongest units, then the cheapest), 13 units and 7 spells / artifacts, and an Energy curve peaking at 2–3 (1: 3 · 2: 5 · 3: 4 · 4: 3 · 5: 2 · 6+: 3); with too few cards for that, it relaxes the curve, then the ratio. Cards that do nothing alone (*Nothung (broken)*) come only after every other card: a full collection leaves them out, the Wälsung starter cards need it as the 20th (Siegmund and *Notung! Notung!* reforge it).
+- **Auto-fill** empties the deck, then builds one from the cards owned: the rarest first (then the strongest units, then the cheapest), 13 units and 7 spells / artifacts, and an Energy curve peaking at 2–3 (1: 3 · 2: 5 · 3: 4 · 4: 3 · 5: 2 · 6+: 3); with too few cards for that, it relaxes the curve, then the ratio. Cards that do nothing alone (*Nothung (broken)*) come only after every other card: a full collection leaves them out, the Wälsung starter cards need it as the 20th (Siegmund reforges it).
 - **Starter deck** puts back the starter deck of the deck's Leader (the copies owned) — the way to start a new deck from it, or to get the starter deck back.
 
 > **Decision (2026-10-30):** the deck editor is **one screen** (deck zone above the cards), not two tabs.

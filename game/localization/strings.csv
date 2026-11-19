@@ -244,8 +244,6 @@ Al morir: Gana 1 de Energía.","Garde.
 "CARD_DRAGONS_BLOOD_NAME","Dragon's Blood","Drachenblut","Sangre de dragón","Sang du dragon"
 "CARD_SWORD_IN_THE_ASH_TREE_NAME","The Sword in the Ash Tree","Das Schwert im Eschenstamm","La espada en el fresno","L’Épée dans le frêne"
 "CARD_SWORD_IN_THE_ASH_TREE_FLAVOUR","""My father promised me a sword."" — Siegmund, Die Walküre","„Ein Schwert verhieß mir der Vater.“ — Siegmund, Die Walküre","«Mi padre me prometió una espada.» — Siegmund, Die Walküre","« Mon père m’a promis une épée. » — Siegmund, Die Walküre"
-"CARD_NOTUNG_NAME","Notung! Notung!","Notung! Notung!","Notung! Notung!","Notung! Notung!"
-"CARD_NOTUNG_FLAVOUR","""Nothung! Nothung! Coveted sword!"" — Siegfried, Siegfried","„Nothung! Nothung! Neidliches Schwert!“ — Siegfried, Siegfried","«¡Nothung! ¡Nothung! ¡Codiciada espada!» — Siegfried, Siegfried","« Nothung ! Nothung ! Épée enviée ! » — Siegfried, Siegfried"
 "CARD_NOTHUNG_BROKEN_NAME","Nothung (broken)","Nothung (zerbrochen)","Nothung (rota)","Nothung (brisée)"
 "CARD_NOTHUNG_NAME","Nothung","Nothung","Nothung","Nothung"
 "LEADER_SIEGFRIED_NAME","Siegfried","Siegfried","Siegfried","Siegfried"
@@ -273,7 +271,6 @@ On play, if you control Siegmund: Give all your units +1/+0.","Beim Ausspielen: 
 Beim Ausspielen, wenn du Siegmund kontrollierst: Gib allen deinen Einheiten +1/+0.","Al jugarse: Roba 1 carta.
 Al jugarse, si controlas Siegmund: Da +1/+0 a todas tus unidades.","À la pose : Pioche 1 carte.
 À la pose, si tu contrôles Siegmund : Donne +1/+0 à toutes tes unités."
-"CARD_NOTUNG_RULES","On play, if you control Nothung (broken): Reforge Nothung.","Beim Ausspielen, wenn du Nothung (zerbrochen) kontrollierst: Schmiede Nothung neu.","Al jugarse, si controlas Nothung (rota): Reforja Nothung.","À la pose, si tu contrôles Nothung (brisée) : Reforge Nothung."
 "CARD_NOTHUNG_RULES","Bearer: Wälsung.
 Bearer gets +3/+0.
 When its bearer dies, it shatters into Nothung (broken).","Träger: Wälsung.
@@ -417,3 +414,6 @@ Al jugarse: Roba 1 carta.","À la pose : Prend l’Anneau.
 "CARD_POTION_OF_FORGETFULNESS_RULES","On play: Take control of an enemy unit costing 4 or less.","Beim Ausspielen: Übernimm die Kontrolle über eine gegnerische Einheit mit Kosten 4 oder weniger.","Al jugarse: Toma el control de una unidad enemiga que cueste 4 o menos.","À la pose : Prend le contrôle d’une unité ennemie coûtant 4 ou moins."
 "CARD_MIMES_CAVE_NAME","Mime's Cave","Mimes Höhle","Cueva de Mime","Grotte de Mime"
 "CARD_MIMES_CAVE_RULES","At the start of your turn: Restore 1 to your Leader.","Zu Beginn deines Zuges: Heile deinen Anführer um 1.","Al inicio de tu turno: Cura 1 a tu líder.","Au début de ton tour : Soigne ton Meneur de 1."
+"CARD_NEIDHOEHLE_NAME","Neidhöhle","Neidhöhle","Neidhöhle","Neidhöhle"
+"CARD_NEIDHOEHLE_FLAVOUR","""There lie, envious fellow: Nothung you bear in your heart!"" — Siegfried, Siegfried","„Da lieg’, neidischer Kerl: Nothung trägst du im Herzen!“ — Siegfried, Siegfried","«¡Ahí yaces, envidioso: llevas a Nothung en el corazón!» — Siegfried, Siegfried","« Gis là, envieux : tu portes Nothung dans le cœur ! » — Siegfried, Siegfried"
+"CARD_NEIDHOEHLE_RULES","On play: Deal 4 damage to a unit.","Beim Ausspielen: Füge einer Einheit 4 Schaden zu.","Al jugarse: Inflige 4 de daño a una unidad.","À la pose : Inflige 4 dégâts à une unité."

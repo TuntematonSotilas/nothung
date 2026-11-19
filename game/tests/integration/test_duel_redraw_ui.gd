@@ -113,30 +113,25 @@ func test_spell_targets_are_green_on_own_units_and_red_on_enemies() -> void:
 	await get_tree().process_frame
 
 
-func test_notung_asks_for_the_bearer_who_then_shows_the_relic() -> void:
-	var duel: Control = await _main_phase_duel_with_hand([&"notung"], 5)
-	var state: GameState = (duel.get("_match") as Match).get_state()
-	var player: PlayerState = state.player(0)
+func test_the_bearer_of_a_relic_shows_it_on_a_badge_and_in_its_zoom() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"siegmund"], 5)
+	var player: PlayerState = (duel.get("_match") as Match).get_state().player(0)
 	player.artifacts.add(CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 990))
 	player.board.add(CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 991))
-	player.board.add(CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 992))
 	duel.call("_refresh")
 	await get_tree().process_frame
-	# No Relic yet: no badge.
-	var first: CardView = duel.call("_find_view", 991) as CardView
-	assert_bool((first.find_child("RelicBadge", true, false) as Control).visible).is_false()
-	# Selecting the spell lights both Wälsungs in green; tapping the second one gives it the sword.
+	var other: CardView = duel.call("_find_view", 991) as CardView
+	assert_bool((other.find_child("RelicBadge", true, false) as Control).visible).is_false()
+	# Siegmund reforges Nothung and carries it: it leaves the artifact column for a badge on him.
+	var release: InputEventMouseButton = InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
 	duel.call("_on_hand_card_pressed", 700, (duel.get("_own_hand") as HBoxContainer).get_child(0))
-	for uid: int in [991, 992]:
-		assert_str(String((duel.call("_find_view", uid) as CardView).get("_highlight"))).is_equal("friendly_target")
-	var second: CardView = duel.call("_find_view", 992) as CardView
-	duel.call("_on_board_card_pressed", 992, true, &"board", second)
+	duel.call("_on_own_zone_input", release)
 	await get_tree().process_frame
-	assert_object(player.board.find(992).relic).is_not_null()
-	assert_object(player.board.find(991).relic).is_null()
+	assert_object(player.board.find(700).relic).is_not_null()
 	assert_int(player.artifacts.size()).is_equal(0)
-	# The bearer shows the Relic's name on a badge, and its zoom tells what it carries.
-	var bearer: CardView = duel.call("_find_view", 992) as CardView
+	var bearer: CardView = duel.call("_find_view", 700) as CardView
 	var badge: Control = bearer.find_child("RelicBadge", true, false) as Control
 	assert_bool(badge.visible).is_true()
 	assert_str((badge.find_child("RelicName", true, false) as Label).text).is_equal(tr("CARD_NOTHUNG_NAME"))
