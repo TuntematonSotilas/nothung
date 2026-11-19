@@ -587,6 +587,51 @@ func test_nothung_is_brought_drawn_shattered_and_reforged() -> void:
 	assert_int(sieglinde.attack).is_equal(6)
 
 
+func test_only_one_nothung_at_a_time() -> void:
+	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 160)
+	_prepare_main_phase(engine)
+	var player := engine.get_state().player(0)
+	player.energy = 10
+	var broken := CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 161)
+	var second := CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 162)
+	var brunnhilde := CardInstance.new(CardDatabase.get_card(&"brunnhilde_protector"), 0, 163)
+	for card: CardInstance in [broken, second, brunnhilde]:
+		player.hand.add(card)
+	assert_bool(engine.apply(PlayCardAction.new(0, broken.uid))).is_true()
+	# A second one is not playable, and Brünnhilde, Protector brings none.
+	assert_str(String(engine.play_block_reason(0, second.uid))).is_equal("unique_artifact")
+	assert_bool(engine.apply(PlayCardAction.new(0, second.uid))).is_false()
+	assert_bool(engine.apply(PlayCardAction.new(0, brunnhilde.uid))).is_true()
+	assert_int(player.artifacts.size()).is_equal(1)
+	# Reforged on a unit, it still counts: no broken one can be played either.
+	var siegmund := CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 164)
+	player.hand.add(siegmund)
+	assert_bool(engine.apply(PlayCardAction.new(0, siegmund.uid))).is_true()
+	assert_int(player.artifacts.size()).is_equal(0)
+	assert_str(String(engine.play_block_reason(0, second.uid))).is_equal("unique_artifact")
+
+
+func test_notung_cannot_be_played_without_a_bearer() -> void:
+	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 170)
+	_prepare_main_phase(engine)
+	var player := engine.get_state().player(0)
+	player.energy = 10
+	player.board.cards.clear()
+	player.artifacts.add(CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 171))
+	var notung := CardInstance.new(CardDatabase.get_card(&"notung"), 0, 172)
+	var sieglinde := CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 173)
+	player.hand.add(notung)
+	player.hand.add(sieglinde)
+	assert_str(String(engine.play_block_reason(0, notung.uid))).is_equal("no_bearer")
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_false()
+	# With a Wälsung on the board, it reforges and Nothung (broken) leaves the artifacts.
+	assert_bool(engine.apply(PlayCardAction.new(0, sieglinde.uid))).is_true()
+	assert_str(String(engine.play_block_reason(0, notung.uid))).is_equal("")
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_true()
+	assert_int(player.artifacts.size()).is_equal(0)
+	assert_str(String(sieglinde.relic.data.id)).is_equal("nothung")
+
+
 func test_horn_call_lets_a_unit_played_this_turn_attack() -> void:
 	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 150)
 	_prepare_main_phase(engine)

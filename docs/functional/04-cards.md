@@ -1,7 +1,7 @@
 # Cards
 
 > Card anatomy, types, traits, rarities and deckbuilding rules. Card list lives in data files (see [technical/03-data-model.md](../technical/03-data-model.md)).
-> Status: Draft · Last updated: 2026-10-30
+> Status: Draft · Last updated: 2026-11-18
 
 ## Card anatomy
 
@@ -126,11 +126,11 @@ These cards follow the [canon notes](02-lore-and-setting.md#canon-notes-libretto
 
 | Name | Cost | Type | Faction | Stats | Text |
 |------|------|------|---------|-------|------|
-| Nothung (broken) | 1 | Artifact — Weapon | Wälsungs | – | Stays in your artifacts; reforged into *Nothung* by Siegmund or *Notung! Notung!*. Also brought by *Brünnhilde, Protector*. |
+| Nothung (broken) | 1 | Artifact — Weapon | Wälsungs | – | Stays in your artifacts; reforged into *Nothung* by Siegmund or *Notung! Notung!*. Also brought by *Brünnhilde, Protector*. **Unique**: one Nothung at a time (broken or carried). |
 | Nothung | – | Artifact — Relic, Weapon | Wälsungs | – | Created by reforging only. **Bearer (Wälsung).** Bearer gets +3/+0. When its bearer dies, it shatters into *Nothung (broken)* in your artifacts (as with Siegmund). |
 | Tarnhelm | 2 | Artifact — Relic | Nibelungs | – | Bearer gets +2/+2 and **Invisible** (cannot be attacked or targeted by the opponent until it attacks). |
 | Wotan's Spear | 5 | Artifact — Weapon | Gods | – | At the start of your turn: deal 1 damage to the enemy Leader (the treaties carved on it bind his foes). |
 | Siegmund | 4 | Unit — Wälsung, Hero | Wälsungs | 5/4 | **Valhalla.** On play: if you control *Nothung (broken)*, reforge *Nothung* — he carries it. |
-| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, reforge *Nothung* onto a Wälsung. |
+| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, reforge *Nothung* onto a Wälsung. Cannot be played then without a Wälsung on your board to carry it. |
 | The Ring | 0 | Artifact | Neutral | – | Created by Nibelung cards only. Held by a player. Start of your turn: +1 Energy — or, if you control **Alberich**, +2 Energy and draw 1. **Cursed** (see [The Ring](03-game-rules.md#the-ring-signature-mechanic)). |
 

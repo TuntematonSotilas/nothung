@@ -1545,9 +1545,8 @@ func _show_results() -> void:
 	content.add_child(home)
 
 
-## The result's icon, animated twice, then still: a laurel crown that pops up then glows twice (victory),
-## a broken shield that falls and shakes twice, then dims (defeat), crossed swords that pop up twice
-## (draw). The tweens belong to the icon, so they end with the results overlay; at animation speed 0 the
+## The result's icon, animated, then still: a laurel crown that pops up then glows twice (victory), a
+## broken shield that falls once, wiggles and dims (defeat), crossed swords that pop up twice (draw). The tweens belong to the icon, so they end with the results overlay; at animation speed 0 the
 ## icon is simply shown.
 func _result_icon(winner: int) -> Control:
 	var won: bool = winner == HUMAN_PLAYER
@@ -1588,12 +1587,12 @@ func _result_icon(winner: int) -> Control:
 			pops.tween_property(icon, "scale", Vector2.ONE * 0.2, 0.0)
 			pops.tween_property(icon, "scale", Vector2.ONE, 0.4 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	else:
+		# One fall from the top, then a wiggle that dies down, then it dims.
+		icon.position.y = -size.y
 		var fall: Tween = icon.create_tween()
-		for play: int in RESULT_PLAYS:
-			fall.tween_property(icon, "position:y", -size.y, 0.0)
-			fall.tween_property(icon, "position:y", 0.0, 0.7 / speed).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
-			for angle: float in [0.12, -0.1, 0.06, 0.0]:
-				fall.tween_property(icon, "rotation", angle, 0.07 / speed)
+		fall.tween_property(icon, "position:y", 0.0, 0.7 / speed).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		for angle: float in [0.16, -0.14, 0.11, -0.08, 0.05, -0.02, 0.0]:
+			fall.tween_property(icon, "rotation", angle, 0.08 / speed).set_trans(Tween.TRANS_SINE)
 		fall.tween_property(icon, "modulate", Color(0.7, 0.7, 0.7), 1.2 / speed)
 	return holder
 

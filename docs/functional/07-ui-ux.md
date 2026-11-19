@@ -50,7 +50,7 @@ flowchart TD
 | Götterdämmerung | Popup opened automatically at the first Götterdämmerung damage of the match (red frame): what it does; closed by **Understood** or a tap outside the panel. Once per match ([rules](03-game-rules.md#götterdämmerung-turn-limit)) |
 | Pause | Themed panel: **Resume** (primary), **Leave**; leaving asks for confirmation inside the panel. The Android back button opens / closes it during a match |
 | **Duel** | Top bar: whose turn (no how-to instructions: the gold, red and green borders show what to tap, greyed cards and buttons what cannot be used), turn number (each player counts their own turns), Götterdämmerung countdown (from turn 7, then "Valhalla burns" once it is active), pause. One identical panel per Leader (portrait, name, Life, Energy, named ability). Framed enemy and own play areas. Battle log + Undo + End turn just above the hand (bottom) |
-| Results | Animated icon, **played twice, then still** — victory: laurel crown that pops up then glows in gold; defeat: broken shield that falls and shakes, then dims; draw: crossed swords that pop up — then win/lose, rewards ("+20 Rhinegold" after a Quick match win), continue |
+| Results | Animated icon, **played twice, then still** — victory: laurel crown that pops up then glows in gold; defeat: broken shield that falls once, wiggles, then dims; draw: crossed swords that pop up — then win/lose, rewards ("+20 Rhinegold" after a Quick match win), continue |
 | Collection | Rhinegold counter. Faction chips (All + one icon per faction) always shown; **Filters** (with the number of active filters) unfolds chip rows for cost (0–5, 6+), type, rarity, trait and owned / missing — one chip per row, "All" first; each row has its caption on the left (Energy, with the Energy icon; Type; Rarity; Trait; Copies) so the chips line up. Count "owned / shown". Grid of 3 cards per row, by faction, cost, then name; under each card "× n" or "Not owned" (card faded). Tapping a card opens it large with its flavour and "Owned: n (up to m per deck)"; tapping anywhere closes it |
 | Collection links | **My decks** (highlighted) and **Nibelheim**, side by side under the header |
 | My decks | One tile per deck — one per faction, the starter decks' copies —: faction icon and colour, name, Leader · "Ready to play" or the first problem ("17 / 20 cards"); a tap opens the editor. No New deck, Duplicate or Delete |
@@ -111,7 +111,7 @@ flowchart TD
 | Cancel drag | Release outside a valid target; the card stays where it was |
 | Undo last play | Tap **Undo play** before taking another action; the card returns to the top of the deck and the match state is restored to before it was played |
 | Tap-tap (no drag) | **1st tap selects** the card (gold border, own play area highlighted); **2nd tap** on the play area — or on a target for targeted cards — plays it. Tapping the selected card again cancels. A single tap never plays a card. |
-| Unplayable card | Greyed out in the hand, cannot be selected or dragged; tapping it does nothing. Its details (long press) show why (not enough Energy: X needed / Y available, board full, artifact limit, no valid target, not your turn) |
+| Unplayable card | Greyed out in the hand, cannot be selected or dragged; tapping it does nothing. Its details (long press) show why (not enough Energy: X needed / Y available, board full, artifact limit, Legendary artifact already yours, no unit to carry the Relic, no valid target, not your turn) |
 
 ## Feedback
 

@@ -101,6 +101,8 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 			continue
 		if card.data.type == CardData.Type.UNIT and current.board.size() >= MAX_BOARD_SIZE:
 			continue
+		if _controls_unique(current, card.data) or _reforge_without_bearer(player_id, card.data):
+			continue
 		if card.data.type == CardData.Type.ARTIFACT and not card.data.is_ring:
 			if card.data.is_relic():
 				for bearer: CardInstance in current.board.cards:
@@ -150,7 +152,9 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 
 
 ## Why a card in hand cannot be played right now (&"" when it can). Order follows what the player can act on first.
-## Values: &"not_your_turn", &"energy", &"board_full", &"artifact_limit", &"no_target", &"unplayable".
+## Values: &"not_your_turn", &"energy", &"board_full", &"artifact_limit", &"unique_artifact" (that
+## Legendary artifact is already yours), &"no_bearer" (a reforge spell with no unit to carry the relic),
+## &"no_target", &"unplayable".
 func play_block_reason(player_id: int, card_uid: int) -> StringName:
 	if _state.phase != GameState.Phase.MAIN or player_id != _state.active_player:
 		return &"not_your_turn"
@@ -169,6 +173,10 @@ func play_block_reason(player_id: int, card_uid: int) -> StringName:
 		and player.artifacts.size() >= MAX_ARTIFACTS
 	):
 		return &"artifact_limit"
+	if _controls_unique(player, card.data):
+		return &"unique_artifact"
+	if _reforge_without_bearer(player_id, card.data):
+		return &"no_bearer"
 	for action: Action in get_legal_actions(player_id):
 		if action is PlayCardAction and (action as PlayCardAction).card_uid == card_uid:
 			return &""
@@ -416,6 +424,8 @@ func _is_legal_play(action: PlayCardAction) -> bool:
 	if card.data.type == CardData.Type.UNIT and player.board.size() >= MAX_BOARD_SIZE:
 		return false
 	if card.data.is_ring:
+		return false
+	if _controls_unique(player, card.data) or _reforge_without_bearer(action.player, card.data):
 		return false
 	if card.data.type == CardData.Type.ARTIFACT:
 		if card.data.is_relic():
@@ -749,7 +759,8 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 		EffectData.Kind.CREATE_ARTIFACT:
 			if effect.card != null and effect.card.type == CardData.Type.ARTIFACT:
 				var owner := _state.player(player_id)
-				if owner.artifacts.size() < MAX_ARTIFACTS:
+				# Brünnhilde, Protector brings no second Nothung.
+				if owner.artifacts.size() < MAX_ARTIFACTS and not _controls_unique(owner, effect.card):
 					var created := _new_instance(effect.card, player_id)
 					owner.artifacts.add(created)
 					_emit(&"artifact_created", player_id, created.uid)
@@ -944,6 +955,45 @@ static func controls_alberich(player: PlayerState) -> bool:
 		return true
 	for unit: CardInstance in player.board.cards:
 		if unit.data.id == &"alberich" or unit.data.id == &"alberich_lord":
+			return true
+	return false
+
+
+## Legendary artifacts are unique: a player controls at most one of each, a reforged relic counting as
+## its broken form (Nothung on a unit and Nothung (broken) among the artifacts are the same sword).
+func _controls_unique(player: PlayerState, data: CardData) -> bool:
+	if data.type != CardData.Type.ARTIFACT or data.rarity != CardData.Rarity.LEGENDARY:
+		return false
+	var key: StringName = _unique_key(data)
+	for artifact: CardInstance in player.artifacts.cards:
+		if _unique_key(artifact.data) == key:
+			return true
+	for unit: CardInstance in player.board.cards:
+		if unit.relic != null and _unique_key(unit.relic.data) == key:
+			return true
+	return false
+
+
+func _unique_key(data: CardData) -> StringName:
+	return data.shatters_into.id if data.shatters_into != null else data.id
+
+
+## A spell or artifact whose reforge would happen now but finds no unit to carry the relic
+## (Notung! Notung! with no Wälsung on the board): it cannot be played. A unit that reforges carries the
+## relic itself (Siegmund), so units are not concerned.
+func _reforge_without_bearer(player_id: int, data: CardData) -> bool:
+	if data.is_unit():
+		return false
+	var player := _state.player(player_id)
+	for ability: AbilityData in data.abilities:
+		if ability.trigger != &"on_play" or not _condition_is_met(ability.condition, player_id):
+			continue
+		for effect: EffectData in ability.effects:
+			if effect.kind != EffectData.Kind.REFORGE or effect.card == null or not effect.card.is_relic():
+				continue
+			for unit: CardInstance in player.board.cards:
+				if _can_bear(unit, effect.card):
+					return false
 			return true
 	return false
 
