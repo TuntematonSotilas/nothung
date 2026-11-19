@@ -60,7 +60,7 @@ stateDiagram-v2
 |--------|---------|
 | `RedrawAction` | card uids to replace; ends the player's redraw (the player's screen sends an empty list: "keep this hand") |
 | `RefreshHandAction` | none: the whole hand goes back, the deck is shuffled and as many cards are drawn; repeatable; legal only for the player whose redraw it is; **not** in `get_legal_actions()` (the player's choice only, never the AI's) |
-| `PlayCardAction` | card uid, optional target (for a Relic: the bearer unit — required) |
+| `PlayCardAction` | card uid, optional target (for a Relic, or a spell that reforges one now — *Notung! Notung!* —: the bearer unit, required) |
 | `AttackAction` | attacker uid, target uid (unit or leader) |
 | `UseLeaderAbilityAction` | optional target |
 | `EndTurnAction` | – |
@@ -71,7 +71,7 @@ Each action is a small `RefCounted` value object. Its JSON-compatible record ena
 ### Validation rules worth noting
 
 - **Relics** ([rules](../functional/03-game-rules.md#relics-equipment)): the target must be a unit controlled by the player, without a Relic, matching `CardData.bearer` (subtype or card id). `get_legal_actions()` only offers valid bearers, so the UI highlights them and the AI never tries an illegal one.
-- **Conditional reforging** (e.g. Siegmund reforges Nothung only if *Nothung (broken)* is among your artifacts): expressed as an ability condition (`[controls(nothung_broken)]`; `controls` checks your units, artifacts and Leader), checked like any other condition.
+- **Conditional reforging** (e.g. Siegmund reforges Nothung only if *Nothung (broken)* is among your artifacts): expressed as an ability condition (`[controls(nothung_broken)]`; `controls` checks your units, artifacts and Leader), checked like any other condition. When a spell or artifact would reforge a Relic now (`_reforge_bearer_needed()`), the play targets the bearer: `get_legal_actions()` offers one play per own unit that can carry it, and `_reforge()` attaches the Relic to that unit (a unit that reforges carries it itself — Siegmund).
 - **Ring bonus**: full vs reduced bonus is a condition on the holder (`[controls(alberich)]`), evaluated at the start of the holder's turn.
 
 ## Effect resolution

@@ -675,10 +675,43 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 		content.add_child(stats_row)
 		_icon_stat(stats_row, "attack", Palette.TEXT, 26).text = str(attack)
 		_icon_stat(stats_row, "life", Palette.LIFE, 26).text = str(health)
+	if instance != null and instance.relic != null:
+		content.add_child(_relic_info(instance.relic.data))
 	var close: Button = _button("UI_CLOSE", 300)
 	_set_button_icon(close, "close", Palette.TEXT)
 	close.pressed.connect(_close_card_zoom)
 	content.add_child(close)
+
+
+## In a bearer's zoom: "Carries: Nothung (+3/+0)" with the Relic icon, then the Relic's rules text.
+func _relic_info(relic: CardData) -> VBoxContainer:
+	var box: VBoxContainer = VBoxContainer.new()
+	box.name = "RelicInfo"
+	box.add_theme_constant_override("separation", 6)
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	box.add_child(row)
+	const RELIC_ICON: String = "res://ui/icons/type_relic.svg"
+	if ResourceLoader.exists(RELIC_ICON):
+		var icon: TextureRect = TextureRect.new()
+		icon.texture = load(RELIC_ICON) as Texture2D
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.custom_minimum_size = Vector2(30, 30)
+		icon.modulate = Palette.ACCENT
+		row.add_child(icon)
+	var bonus: String = "%+d/%+d" % [relic.relic_attack_bonus, relic.relic_health_bonus]
+	var title: Label = _label(tr("UI_CARRIES_RELIC") % [tr("CARD_%s_NAME" % String(relic.id).to_upper()), bonus], 22, Palette.ACCENT)
+	title.name = "RelicTitle"
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(title)
+	var rules: String = tr("CARD_%s_RULES" % String(relic.id).to_upper())
+	if not rules.begins_with("CARD_"):
+		var rules_label: Label = _label(rules, 18, Palette.TEXT_MUTED)
+		rules_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(rules_label)
+	return box
 
 
 func _on_zoom_overlay_input(event: InputEvent) -> void:

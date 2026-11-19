@@ -52,6 +52,9 @@ var _rarity_label: Label
 var _name_label: Label
 var _art: TextureRect
 var _rules_label: Label
+var _relic_badge: PanelContainer
+var _relic_icon: TextureRect
+var _relic_label: Label
 var _stats_row: HBoxContainer
 var _attack_stone: PanelContainer
 var _attack_icon: TextureRect
@@ -277,10 +280,16 @@ func _refresh_text() -> void:
 	_art.texture = card_data.art
 	_art.visible = card_data.art != null
 	_set_icon(_faction_icon, "res://ui/icons/faction_%s.svg" % card_data.faction)
+	var relic: CardInstance = card_instance.relic if card_instance != null else null
+	_relic_badge.visible = relic != null
+	if relic != null:
+		_relic_label.text = tr("CARD_%s_NAME" % String(relic.data.id).to_upper())
 	_apply_face_colors()
 	# The face margin depends on the type (double border or not).
 	_apply_face_scale()
 	tooltip_text = "%s\n%s" % [card_name, rules]
+	if relic != null:
+		tooltip_text += "\n" + _relic_label.text
 
 
 ## Card face: cost, faction icon and rarity badge; name banner; illustration (when drawn); rules text;
@@ -362,6 +371,26 @@ func _ensure_content() -> void:
 	_rules_label.clip_text = true
 	_rules_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_content.add_child(_rules_label)
+
+	# The Relic carried by a unit (Nothung, Tarnhelm…), just above its stats: it is not in the artifact column.
+	_relic_badge = PanelContainer.new()
+	_relic_badge.name = "RelicBadge"
+	_relic_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_relic_badge.visible = false
+	_content.add_child(_relic_badge)
+	var relic_row: HBoxContainer = HBoxContainer.new()
+	relic_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	relic_row.add_theme_constant_override("separation", 3)
+	_relic_badge.add_child(relic_row)
+	# The Relic type icon once drawn (ui/icons/type_relic.svg), hidden until then like the type icons.
+	_relic_icon = _make_icon_slot("RelicIcon")
+	_set_icon(_relic_icon, "res://ui/icons/type_relic.svg")
+	relic_row.add_child(_relic_icon)
+	_relic_label = _make_label("RelicName", CardPalette.TEXT_LIGHT)
+	_relic_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_relic_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	_relic_label.clip_text = true
+	relic_row.add_child(_relic_label)
 
 	# Attack and health side by side at bottom-left (still visible when hand cards overlap), type at bottom-right.
 	_stats_row = HBoxContainer.new()
@@ -488,6 +517,8 @@ func _apply_face_scale() -> void:
 	_type_icon.custom_minimum_size = Vector2.ONE * roundi(18 * k)
 	_rarity_label.add_theme_font_size_override("font_size", roundi(14 * k))
 	_rarity_badge.custom_minimum_size = Vector2.ONE * roundi(20 * k)
+	_relic_label.add_theme_font_size_override("font_size", roundi(14 * k))
+	_relic_icon.custom_minimum_size = Vector2.ONE * roundi(15 * k)
 	_apply_styles()
 
 
@@ -534,6 +565,20 @@ func _apply_styles() -> void:
 	badge.content_margin_right = 3.0 * k
 	_rarity_badge.add_theme_stylebox_override("panel", badge)
 	_rarity_label.add_theme_color_override("font_color", CardPalette.ink_on(rarity_color))
+	# Relic badge: dark pill, bordered in the Relic's faction colour.
+	if card_instance != null and card_instance.relic != null:
+		var relic_color: Color = CardPalette.colors_for(card_instance.relic.data)["frame"]
+		var pill: StyleBoxFlat = StyleBoxFlat.new()
+		pill.bg_color = Color(0.0, 0.0, 0.0, 0.55)
+		pill.border_color = relic_color
+		pill.set_border_width_all(maxi(1, roundi(2 * k)))
+		pill.set_corner_radius_all(roundi(8 * k))
+		pill.content_margin_left = 5.0 * k
+		pill.content_margin_right = 5.0 * k
+		pill.content_margin_top = 1.0 * k
+		pill.content_margin_bottom = 1.0 * k
+		_relic_badge.add_theme_stylebox_override("panel", pill)
+		_relic_icon.modulate = relic_color.lightened(0.3)
 	# Cost, attack and health are bare icon + number (no pill around them).
 	for stone: PanelContainer in [_cost_stone, _attack_stone, _health_stone]:
 		stone.add_theme_stylebox_override("panel", StyleBoxEmpty.new())

@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-11-18
+> Status: Draft · Last updated: 2026-11-19
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -15,7 +15,7 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 1 | [Rules engine](#1--rules-engine-headless) | A scripted match runs to the end in a test | Done |
 | 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | Done |
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
-| 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | In progress |
+| 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | Done |
 | 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | In progress (achievements and phone checks left) |
 | 6 | [Test matches](#6--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
 | 7 | [Campaign](#7--campaign) | Prologue + chapter 1 playable | To do |
@@ -93,6 +93,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
   - [x] Neutral: 20 cards (Rhinemaidens, Woodbird, Norns, Erda, Giants, Gibichungs, Hunding), Legendary *Hagen*; Fafner, Hagen and *The Giants' Wage* can take the Ring. Covered by the AI soak with a test deck (Alberich + each Neutral card once)
   - [x] Gods and Nibelungs up to 15 cards each: Froh, Fricka's Rams, The Wanderer, Rainbow Bridge; Alberich the Toad, Mime's Cave, The Anvils of Nibelheim — 80 cards in all, every starter matchup within 43–57 %
   - [x] *Potion of Forgetfulness* (Neutral spell, Epic, 5): take control of an enemy unit costing 4 or less — new `take_control` effect; 81 cards
+- [x] Match length checked on the phone: 5–7 min on average (2026-11-19)
 
 ## 5 — Menus & meta
 

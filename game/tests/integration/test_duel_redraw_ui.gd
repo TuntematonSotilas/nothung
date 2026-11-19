@@ -113,6 +113,43 @@ func test_spell_targets_are_green_on_own_units_and_red_on_enemies() -> void:
 	await get_tree().process_frame
 
 
+func test_notung_asks_for_the_bearer_who_then_shows_the_relic() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([&"notung"], 5)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var player: PlayerState = state.player(0)
+	player.artifacts.add(CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 990))
+	player.board.add(CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 991))
+	player.board.add(CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 992))
+	duel.call("_refresh")
+	await get_tree().process_frame
+	# No Relic yet: no badge.
+	var first: CardView = duel.call("_find_view", 991) as CardView
+	assert_bool((first.find_child("RelicBadge", true, false) as Control).visible).is_false()
+	# Selecting the spell lights both Wälsungs in green; tapping the second one gives it the sword.
+	duel.call("_on_hand_card_pressed", 700, (duel.get("_own_hand") as HBoxContainer).get_child(0))
+	for uid: int in [991, 992]:
+		assert_str(String((duel.call("_find_view", uid) as CardView).get("_highlight"))).is_equal("friendly_target")
+	var second: CardView = duel.call("_find_view", 992) as CardView
+	duel.call("_on_board_card_pressed", 992, true, &"board", second)
+	await get_tree().process_frame
+	assert_object(player.board.find(992).relic).is_not_null()
+	assert_object(player.board.find(991).relic).is_null()
+	assert_int(player.artifacts.size()).is_equal(0)
+	# The bearer shows the Relic's name on a badge, and its zoom tells what it carries.
+	var bearer: CardView = duel.call("_find_view", 992) as CardView
+	var badge: Control = bearer.find_child("RelicBadge", true, false) as Control
+	assert_bool(badge.visible).is_true()
+	assert_str((badge.find_child("RelicName", true, false) as Label).text).is_equal(tr("CARD_NOTHUNG_NAME"))
+	assert_bool(((duel.call("_find_view", 991) as CardView).find_child("RelicBadge", true, false) as Control).visible).is_false()
+	duel.call("_show_card_zoom", bearer.card_data, bearer.card_instance, bearer)
+	var title: Label = duel.find_child("RelicTitle", true, false) as Label
+	assert_object(title).is_not_null()
+	assert_str(title.text).contains(tr("CARD_NOTHUNG_NAME"))
+	assert_str(title.text).contains("+3/+0")
+	duel.queue_free()
+	await get_tree().process_frame
+
+
 func test_results_show_the_icon_of_the_outcome() -> void:
 	for winner: int in [0, 1, -1]:
 		var duel: Control = await _create_duel()

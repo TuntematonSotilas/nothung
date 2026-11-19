@@ -332,9 +332,11 @@ func test_conditional_reforge_upgrades_a_relic_onto_its_required_bearer() -> voi
 	var broken_instance := CardInstance.new(broken, 0, 131)
 	engine.get_state().player(0).hand.add(broken_instance)
 
-	var play_action := PlayCardAction.new(0, broken_instance.uid)
+	# The player chooses the bearer of the reforged relic: the play targets Siegfried.
+	var play_action := PlayCardAction.new(0, broken_instance.uid, siegfried.uid)
 	# Reforging costs nothing on top of the card.
 	engine.get_state().player(0).energy = 1
+	assert_bool(engine.is_legal(PlayCardAction.new(0, broken_instance.uid))).is_false()
 	assert_bool(engine.is_legal(play_action)).is_true()
 	assert_bool(engine.apply(play_action)).is_true()
 	assert_int(engine.get_state().player(0).energy).is_equal(0)
@@ -582,7 +584,7 @@ func test_nothung_is_brought_drawn_shattered_and_reforged() -> void:
 	# Notung! Notung! reforges it onto another Wälsung.
 	player.energy = 10
 	assert_bool(engine.apply(PlayCardAction.new(0, sieglinde.uid))).is_true()
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_true()
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid, sieglinde.uid))).is_true()
 	assert_str(String(sieglinde.relic.data.id)).is_equal("nothung")
 	assert_int(sieglinde.attack).is_equal(6)
 
@@ -627,9 +629,36 @@ func test_notung_cannot_be_played_without_a_bearer() -> void:
 	# With a Wälsung on the board, it reforges and Nothung (broken) leaves the artifacts.
 	assert_bool(engine.apply(PlayCardAction.new(0, sieglinde.uid))).is_true()
 	assert_str(String(engine.play_block_reason(0, notung.uid))).is_equal("")
-	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_true()
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid, sieglinde.uid))).is_true()
 	assert_int(player.artifacts.size()).is_equal(0)
 	assert_str(String(sieglinde.relic.data.id)).is_equal("nothung")
+
+
+func test_notung_lets_the_player_choose_the_bearer() -> void:
+	var engine := Match.new(_deck(&"walsungs"), _deck(&"nibelungs"), 180)
+	_prepare_main_phase(engine)
+	var player := engine.get_state().player(0)
+	player.energy = 10
+	player.board.cards.clear()
+	player.artifacts.add(CardInstance.new(CardDatabase.get_card(&"nothung_broken"), 0, 181))
+	var sieglinde := CardInstance.new(CardDatabase.get_card(&"sieglinde"), 0, 182)
+	var siegmund := CardInstance.new(CardDatabase.get_card(&"siegmund"), 0, 183)
+	player.board.add(sieglinde)
+	player.board.add(siegmund)
+	var notung := CardInstance.new(CardDatabase.get_card(&"notung"), 0, 184)
+	player.hand.add(notung)
+	# One play per Wälsung that can carry it; none without a chosen bearer.
+	var bearers: Array[int] = []
+	for action: Action in engine.get_legal_actions(0):
+		if action is PlayCardAction and (action as PlayCardAction).card_uid == notung.uid:
+			bearers.append((action as PlayCardAction).target_uid)
+	bearers.sort()
+	assert_array(bearers).is_equal([182, 183])
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid))).is_false()
+	# The second Wälsung on the board, not the first, carries it.
+	assert_bool(engine.apply(PlayCardAction.new(0, notung.uid, siegmund.uid))).is_true()
+	assert_object(sieglinde.relic).is_null()
+	assert_str(String(siegmund.relic.data.id)).is_equal("nothung")
 
 
 func test_horn_call_lets_a_unit_played_this_turn_attack() -> void:

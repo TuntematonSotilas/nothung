@@ -103,7 +103,13 @@ func get_legal_actions(player_id: int) -> Array[Action]:
 			continue
 		if _controls_unique(current, card.data) or _reforge_without_bearer(player_id, card.data):
 			continue
-		if card.data.type == CardData.Type.ARTIFACT and not card.data.is_ring:
+		var reforged: CardData = _reforge_bearer_needed(player_id, card.data)
+		if reforged != null:
+			# Notung! Notung!: the player chooses which unit carries the reforged relic.
+			for bearer: CardInstance in current.board.cards:
+				if _can_bear(bearer, reforged):
+					actions.append(PlayCardAction.new(player_id, card.uid, bearer.uid))
+		elif card.data.type == CardData.Type.ARTIFACT and not card.data.is_ring:
 			if card.data.is_relic():
 				for bearer: CardInstance in current.board.cards:
 					if _can_bear(bearer, card.data):
@@ -427,6 +433,10 @@ func _is_legal_play(action: PlayCardAction) -> bool:
 		return false
 	if _controls_unique(player, card.data) or _reforge_without_bearer(action.player, card.data):
 		return false
+	var reforged: CardData = _reforge_bearer_needed(action.player, card.data)
+	if reforged != null:
+		var chosen := player.board.find(action.target_uid)
+		return chosen != null and action.target_player == -1 and _can_bear(chosen, reforged)
 	if card.data.type == CardData.Type.ARTIFACT:
 		if card.data.is_relic():
 			var bearer := player.board.find(action.target_uid)
@@ -755,7 +765,7 @@ func _resolve_effect(effect: EffectData, source: CardInstance, player_id: int, s
 		EffectData.Kind.RESURRECT:
 			_resurrect(player_id, effect.card)
 		EffectData.Kind.REFORGE:
-			_reforge(source, player_id, effect.card)
+			_reforge(source, player_id, effect.card, selected)
 		EffectData.Kind.CREATE_ARTIFACT:
 			if effect.card != null and effect.card.type == CardData.Type.ARTIFACT:
 				var owner := _state.player(player_id)
@@ -859,7 +869,9 @@ func _resurrect(player_id: int, requested_card: CardData) -> void:
 				return
 
 
-func _reforge(source: CardInstance, player_id: int, forged_data: CardData) -> void:
+## `selected`: the unit chosen to carry a reforged relic (Notung! Notung!). A unit that reforges carries it
+## itself (Siegmund); without a valid choice, the first unit that can carry it does.
+func _reforge(source: CardInstance, player_id: int, forged_data: CardData, selected: CardInstance = null) -> void:
 	if source == null or forged_data == null:
 		return
 	var player := _state.player(player_id)
@@ -879,6 +891,8 @@ func _reforge(source: CardInstance, player_id: int, forged_data: CardData) -> vo
 		# A unit that reforges the relic carries it when it can (Siegmund draws Nothung himself).
 		if unit_source != null and _can_bear(unit_source, forged_data):
 			bearer = unit_source
+		elif selected != null and player.board.find(selected.uid) != null and _can_bear(selected, forged_data):
+			bearer = selected
 		for unit: CardInstance in player.board.cards:
 			if bearer == null and _can_bear(unit, forged_data):
 				bearer = unit
@@ -982,20 +996,28 @@ func _unique_key(data: CardData) -> StringName:
 ## (Notung! Notung! with no Wälsung on the board): it cannot be played. A unit that reforges carries the
 ## relic itself (Siegmund), so units are not concerned.
 func _reforge_without_bearer(player_id: int, data: CardData) -> bool:
-	if data.is_unit():
+	var relic: CardData = _reforge_bearer_needed(player_id, data)
+	if relic == null:
 		return false
-	var player := _state.player(player_id)
+	for unit: CardInstance in _state.player(player_id).board.cards:
+		if _can_bear(unit, relic):
+			return false
+	return true
+
+
+## The relic a spell or artifact would reforge now (its on_play condition met). The player chooses its
+## bearer as the play's target. Null when the card reforges nothing now, and for units (Siegmund carries
+## it himself).
+func _reforge_bearer_needed(player_id: int, data: CardData) -> CardData:
+	if data.is_unit():
+		return null
 	for ability: AbilityData in data.abilities:
 		if ability.trigger != &"on_play" or not _condition_is_met(ability.condition, player_id):
 			continue
 		for effect: EffectData in ability.effects:
-			if effect.kind != EffectData.Kind.REFORGE or effect.card == null or not effect.card.is_relic():
-				continue
-			for unit: CardInstance in player.board.cards:
-				if _can_bear(unit, effect.card):
-					return false
-			return true
-	return false
+			if effect.kind == EffectData.Kind.REFORGE and effect.card != null and effect.card.is_relic():
+				return effect.card
+	return null
 
 
 func _can_bear(unit: CardInstance, relic: CardData) -> bool:

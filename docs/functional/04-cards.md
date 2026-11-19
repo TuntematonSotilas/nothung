@@ -131,6 +131,6 @@ These cards follow the [canon notes](02-lore-and-setting.md#canon-notes-libretto
 | Tarnhelm | 2 | Artifact — Relic | Nibelungs | – | Bearer gets +2/+2 and **Invisible** (cannot be attacked or targeted by the opponent until it attacks). |
 | Wotan's Spear | 5 | Artifact — Weapon | Gods | – | At the start of your turn: deal 1 damage to the enemy Leader (the treaties carved on it bind his foes). |
 | Siegmund | 4 | Unit — Wälsung, Hero | Wälsungs | 5/4 | **Valhalla.** On play: if you control *Nothung (broken)*, reforge *Nothung* — he carries it. |
-| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, reforge *Nothung* onto a Wälsung. Cannot be played then without a Wälsung on your board to carry it. |
+| Notung! Notung! | 3 | Spell | Wälsungs | – | On play: if you control *Nothung (broken)*, reforge *Nothung* onto a Wälsung you choose. Cannot be played then without a Wälsung on your board to carry it. |
 | The Ring | 0 | Artifact | Neutral | – | Created by Nibelung cards only. Held by a player. Start of your turn: +1 Energy — or, if you control **Alberich**, +2 Energy and draw 1. **Cursed** (see [The Ring](03-game-rules.md#the-ring-signature-mechanic)). |
 
