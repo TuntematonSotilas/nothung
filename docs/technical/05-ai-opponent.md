@@ -98,7 +98,7 @@ The AI never reads the opponent's hand or either deck order. `prepare()` hands t
 | Aggressive | Enemy Life 1.6, own Life 0.7 |
 | Defensive | Own Life 1.5, board 1.2 |
 
-Campaign bosses (milestone 7) will pick one, e.g.:
+Campaign bosses (milestone 8) will pick one, e.g.:
 - *Alberich*: prioritises Energy and the Ring (higher `ring_weight`).
 - *Fafner*: defensive, keeps Guard units.
 - *Hagen*: aggressive, targets the strongest enemy unit.

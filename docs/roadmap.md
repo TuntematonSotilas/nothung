@@ -16,19 +16,20 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | Done |
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | Done |
-| 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | In progress (achievements and phone checks left) |
-| 6 | [Test matches](#6--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
-| 7 | [Campaign](#7--campaign) | Prologue + chapter 1 playable | To do |
-| 8 | [Release](#8--release) | Internal build on Google Play | To do |
+| 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | In progress (phone checks left) |
+| 6 | [Progression & rewards](#6--progression--rewards) | A player has goals beyond the next match: level, achievements and their rewards | To refine |
+| 7 | [Test matches](#7--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
+| 8 | [Campaign](#8--campaign) | Prologue + chapter 1 playable | To do |
+| 9 | [Release](#9--release) | Internal build on Google Play | To do |
 | – | [Art & audio track](#art--audio-track-in-parallel) | Runs in parallel, no code dependency | In progress |
 
 ```mermaid
 flowchart LR
     M0[0 Foundations] --> M1[1 Rules engine] --> M3[3 Playable match]
     M0 --> M2[2 Card pipeline] --> M3
-    M3 --> M4[4 AI & balancing] --> M5[5 Menus & meta] --> M6[6 Test matches] --> M7[7 Campaign] --> M8[8 Release]
+    M3 --> M4[4 AI & balancing] --> M5[5 Menus & meta] --> M6[6 Progression] --> M7[7 Test matches] --> M8[8 Campaign] --> M9[9 Release]
     ART[Art & audio track] -.-> M3
-    ART -.-> M8
+    ART -.-> M9
 ```
 
 ## 0 — Foundations
@@ -106,17 +107,27 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)): collection, Leaders, decks, Rhinegold
 - [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))
 - [x] Settings: music / sound-effect volumes, language, reset progress ([UI implementation](technical/06-ui-implementation.md#menus))
-- [ ] Achievements ([progression](functional/06-progression.md#achievements-examples))
 - [ ] Check on the phone: scrolling the card grids with a finger (a scroll must not open a card), resuming after the app is force-stopped mid-duel, menu titles clear of the notch
 
-## 6 — Test matches
+## 6 — Progression & rewards
+
+Ideas still to refine ([progression ideas](functional/06-progression.md#ideas-to-refine-2026-11-20)): nothing is decided yet.
+
+- [ ] Decide the scope: rewards, level, unlocks, Leader powers, achievements
+- [ ] Achievements: list, tiers, rewards, Achievements screen, notification on the results screen ([examples](functional/06-progression.md#achievements-examples))
+- [ ] Player level (XP from matches and achievements) and what it unlocks (campaign chapters? Nibelheim? factions? cosmetics? mini-games, dungeons?)
+- [ ] Cosmetic rewards: home background, deck backgrounds, …
+- [ ] Leader powers: alternative abilities — where (Nibelheim, a Leader screen) and how (Rhinegold, mastery, level) they are unlocked
+- [ ] Profile v4: level, XP, achievement progress, unlocked cosmetics and abilities (migration)
+
+## 7 — Test matches
 
 Real matches on the phone, once the deck choice of milestone 5 exists.
 
 - [ ] Test a match with artifacts: play *Wotan's Spear* and *The Valkyrie Rock*, attach the *Tarnhelm* (Invisible) and *Nothung*, check that Nothung shatters and is reforged (Siegmund)
 - [ ] Test a match with the Ring: forge it with *Renunciation of Love* (Nibelungs), check the holder's bonus (+2 Energy and 1 card with Alberich, +1 Energy otherwise), the curse at the end of each of the holder's turns (1, 2, 3, then 3 Life) and *Waltraute* sending it back to the Rhine; then tune the curse from these matches and the AI soak
 
-## 7 — Campaign
+## 8 — Campaign
 
 - [ ] Chapter map, story panels
 - [ ] Campaign duels with fixed opponents and special rules; AI personalities
@@ -124,7 +135,7 @@ Real matches on the phone, once the deck choice of milestone 5 exists.
 - [ ] Tutorial in the *Rheingold* prologue
 - [ ] Prologue + chapter 1 (*Die Walküre*), then chapters 2–3 and the epilogue
 
-## 8 — Release
+## 9 — Release
 
 - [ ] Final art for every card (no placeholder left) ([artwork policy](tools/art-tools.md#artwork-policy))
 - [ ] Store listing: 512 × 512 icon, feature graphic, screenshots, descriptions in EN / DE / ES / FR
