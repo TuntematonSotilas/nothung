@@ -14,6 +14,8 @@ const RESULT_PLAYS: int = 2
 ## Artifact column on the right of each play area: slots shown even when empty, cards at this share of
 ## a board card's size. The Ring and limit-exempt artifacts can make a 4th slot appear.
 const ARTIFACT_SLOTS: int = 3
+## The long-press zoom: the card at this scale (as CardDetail in the menus).
+const ZOOM_CARD_SCALE: float = 2.6
 const ARTIFACT_CARD_SCALE: float = 0.6
 
 ## Board art to show behind the duel (campaign duels will set it; see assets/art/boards/).
@@ -607,57 +609,33 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 	var center: CenterContainer = CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_zoom_overlay.add_child(center)
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(760, 980)
-	center.add_child(panel)
+	# The card drawn as on the board and in the hand (current stats, Relic badge), only larger; the
+	# flavour and the duel's lines (why it cannot be played or attack, the Relic carried) under it.
+	var view := CardView.new()
+	view.name = "ZoomedCard"
+	view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	view.set_view_scale(ZOOM_CARD_SCALE)
+	view.set_card(data, instance, false, -1, "hand", false)
 	var content: VBoxContainer = VBoxContainer.new()
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_theme_constant_override("separation", 18)
-	panel.add_child(content)
-
-	var title: HBoxContainer = HBoxContainer.new()
-	var name_label: Label = _label("CARD_%s_NAME" % String(data.id).to_upper(), 28, Palette.ACCENT)
-	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title.add_child(name_label)
-	_icon_stat(title, "energy", Palette.ENERGY, 26).text = str(data.cost)
-	content.add_child(title)
-
-	var artwork: Control
-	if data.art != null:
-		var texture: TextureRect = TextureRect.new()
-		texture.texture = data.art
-		texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		artwork = texture
-	else:
-		var placeholder: ColorRect = ColorRect.new()
-		placeholder.color = Color("#20242d")
-		artwork = placeholder
-		var emblem: Label = _label(MenuUI.faction_name(data.faction).to_upper(), 25, Palette.ACCENT)
-		emblem.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		emblem.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		emblem.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		placeholder.add_child(emblem)
-	artwork.custom_minimum_size = Vector2(500, 360)
-	content.add_child(artwork)
-
-	var type_label: Label = _label("%s · %s" % [
-		MenuUI.faction_name(data.faction),
-		tr("UI_TYPE_%s" % CardView.type_id_of(data).to_upper()),
-	], 18, Palette.TEXT_MUTED)
-	content.add_child(type_label)
-	var rules: String = tr("CARD_%s_RULES" % String(data.id).to_upper())
-	if rules.begins_with("CARD_"):
-		rules = ""
-	var rules_label: Label = _label(rules, 22, Palette.TEXT)
-	rules_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	rules_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content.add_child(rules_label)
+	content.custom_minimum_size.x = view.custom_minimum_size.x
+	center.add_child(content)
+	content.add_child(view)
+	var flavour_key: String = "CARD_%s_FLAVOUR" % String(data.id).to_upper()
+	if tr(flavour_key) != flavour_key:
+		var flavour: Label = _label(flavour_key, 22, Palette.TEXT_MUTED)
+		flavour.name = "Flavour"
+		flavour.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		flavour.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(flavour)
 	if instance != null and _match.get_state().player(HUMAN_PLAYER).hand.find(instance.uid) != null:
 		var reason: StringName = _match.play_block_reason(HUMAN_PLAYER, instance.uid)
 		if reason != &"" and reason != &"not_your_turn":
 			var blocked_label: Label = _label(_block_reason_text(reason, instance.uid), 20, Palette.LIFE)
 			blocked_label.name = "BlockedReason"
 			blocked_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			blocked_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			content.add_child(blocked_label)
 	var on_own_board: bool = instance != null and _match.get_state().player(HUMAN_PLAYER).board.find(instance.uid) != null
 	if on_own_board and _match.get_state().active_player == HUMAN_PLAYER:
@@ -666,19 +644,13 @@ func _show_card_zoom(data: CardData, instance: CardInstance, source: CardView) -
 			var attack_label: Label = _label("UI_ATTACK_BLOCKED_%s" % String(attack_reason).to_upper(), 20, Palette.LIFE)
 			attack_label.name = "BlockedReason"
 			attack_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			attack_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			content.add_child(attack_label)
-	if data.type == CardData.Type.UNIT:
-		var attack: int = instance.attack if instance != null else data.attack
-		var health: int = instance.health if instance != null else data.health
-		var stats_row: HBoxContainer = HBoxContainer.new()
-		stats_row.add_theme_constant_override("separation", roundi(28 * _ui_scale))
-		content.add_child(stats_row)
-		_icon_stat(stats_row, "attack", Palette.TEXT, 26).text = str(attack)
-		_icon_stat(stats_row, "life", Palette.LIFE, 26).text = str(health)
 	if instance != null and instance.relic != null:
 		content.add_child(_relic_info(instance.relic.data))
 	var close: Button = _button("UI_CLOSE", 300)
-	_set_button_icon(close, "close", Palette.TEXT)
+	close.name = "CloseZoomButton"
+	close.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	close.pressed.connect(_close_card_zoom)
 	content.add_child(close)
 
@@ -689,6 +661,7 @@ func _relic_info(relic: CardData) -> VBoxContainer:
 	box.name = "RelicInfo"
 	box.add_theme_constant_override("separation", 6)
 	var row: HBoxContainer = HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 10)
 	box.add_child(row)
 	const RELIC_ICON: String = "res://ui/icons/type_relic.svg"
@@ -703,13 +676,12 @@ func _relic_info(relic: CardData) -> VBoxContainer:
 	var bonus: String = "%+d/%+d" % [relic.relic_attack_bonus, relic.relic_health_bonus]
 	var title: Label = _label(tr("UI_CARRIES_RELIC") % [tr("CARD_%s_NAME" % String(relic.id).to_upper()), bonus], 22, Palette.ACCENT)
 	title.name = "RelicTitle"
-	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(title)
 	var rules: String = tr("CARD_%s_RULES" % String(relic.id).to_upper())
 	if not rules.begins_with("CARD_"):
 		var rules_label: Label = _label(rules, 18, Palette.TEXT_MUTED)
 		rules_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		rules_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(rules_label)
 	return box
 

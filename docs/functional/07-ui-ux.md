@@ -102,7 +102,7 @@ flowchart TD
 
 | Action | Gesture |
 |--------|---------|
-| Inspect card | Long press → zoomed card with full text and trait tooltips |
+| Inspect card | Long press → the card itself, drawn as in the hand and on the board but larger (current stats, Relic badge), its flavour under it, then the duel's lines (why it cannot be played or attack, the Relic carried) and **Close** (text only) — the same presentation as a card opened in the Collection |
 | Play card | Drag from hand onto the highlighted own play area (or onto a target) — or tap-tap (below) |
 | Target colours | While a card, an attack or an ability is chosen (tap or drag), its valid targets glow **red** on the enemy side and **green** on the player's side (a buff on your unit, your Leader to heal) |
 | Attack | **Tap-tap only** (units are never dragged). Units that can attack now have a **gold border**. **Tap the unit, then a target**: while a unit is selected, its valid targets get a **red border** (enemy units, and the enemy Leader panel when it can be hit — only Guard units while the enemy has some). Tap the unit again to cancel |

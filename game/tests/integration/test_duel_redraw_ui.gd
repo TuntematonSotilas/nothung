@@ -137,6 +137,11 @@ func test_the_bearer_of_a_relic_shows_it_on_a_badge_and_in_its_zoom() -> void:
 	assert_str((badge.find_child("RelicName", true, false) as Label).text).is_equal(tr("CARD_NOTHUNG_NAME"))
 	assert_bool(((duel.call("_find_view", 991) as CardView).find_child("RelicBadge", true, false) as Control).visible).is_false()
 	duel.call("_show_card_zoom", bearer.card_data, bearer.card_instance, bearer)
+	# The zoom draws the card itself (current stats, the Relic badge), and Close has no icon.
+	var zoomed: CardView = duel.find_child("ZoomedCard", true, false) as CardView
+	assert_object(zoomed.card_instance).is_same(bearer.card_instance)
+	assert_bool((zoomed.find_child("RelicBadge", true, false) as Control).visible).is_true()
+	assert_object((duel.find_child("CloseZoomButton", true, false) as Button).icon).is_null()
 	var title: Label = duel.find_child("RelicTitle", true, false) as Label
 	assert_object(title).is_not_null()
 	assert_str(title.text).contains(tr("CARD_NOTHUNG_NAME"))

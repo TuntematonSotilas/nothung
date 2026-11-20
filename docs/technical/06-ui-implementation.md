@@ -58,13 +58,14 @@
 - Highlights are a `shadow` glow on the style; neither the card nor its face clip, so the glow and the full-width name banner can draw outside the face (the rules text clips itself).
 - The duel reconstructs hand/board/Leader/Energy/Life views from `Match` state after authoritative `GameEvent`s; views never mutate the rules engine.
 - A unit carrying a Relic shows the `RelicBadge` (above the stats: `RelicName`, and the `type_relic.svg` icon once drawn); the duel zoom of the bearer adds `RelicInfo` (`UI_CARRIES_RELIC`, bonus, the Relic's rules).
-- Exhausted and ready units have distinct visual states. Dragging, zoom and pooling are not implemented yet.
+- The duel's long-press zoom (`_show_card_zoom()`) shows a `CardView` (`ZoomedCard`, `ZOOM_CARD_SCALE` 2.6, with the instance) like `CardDetail` in the menus, then the flavour, the block reasons, `RelicInfo` and Close (no icon).
+- Exhausted and ready units have distinct visual states. Pooling is not implemented yet.
 
 ## Input
 
 - The current interaction uses touch-friendly button targets: tap a card, then tap a legal unit/Leader target; tap an attacking unit, then its target. End Turn and Leader ability have dedicated buttons.
 - The opening Redraw overlay lets the player select any subset of their hand and confirm it.
-- Drag-and-drop targeting arrows and long-press zoom remain future work.
+- Drag-and-drop targeting arrows remain future work.
 - Android back button: `NOTIFICATION_WM_GO_BACK_REQUEST` handled by `SceneRouter`: a screen may handle it first with `handle_back() -> bool` (duel: pause panel; deck editor: incomplete deck popup) — the header's Back button goes through the same check (`SceneRouter.request_back()`) —, else back to the previous screen (`SceneRouter.go_to()` keeps a history), or quit when there is none. `application/config/quit_on_go_back=false` so Godot does not quit on its own.
 
 ## Duel and AI
