@@ -80,6 +80,8 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 
 > **Decision (2026-11-12, playtest):** **no drag and drop** in the deck editor: a tap adds a card, a tap on its chip takes it out; the Energy chart is replaced by a count gauge; Auto-fill and Starter deck buttons are added.
 
+> **Decision (2026-11-20, playtest):** an **Empty the deck** button (asks first), and leaving a deck that cannot be played asks first in a popup (Keep editing / Leave).
+
 > **Decision (2026-10-30):** the starter decks are **editable copies** in the player's 12 slots (not fixed decks next to them). A deck without a name shows its faction's name.
 
 > **Decision (2026-11-13, playtest):** **one deck per faction**, with the faction's name: no New deck, no rename, no Duplicate, no Delete. The current deck is chosen with **Change deck** (main menu and Quick match), which only shows the current one.

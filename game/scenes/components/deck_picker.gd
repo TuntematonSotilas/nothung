@@ -30,6 +30,9 @@ static func open(parent: Node, on_chosen: Callable) -> ColorRect:
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 16)
+	# Fills the scroll's height, its content centred vertically (it scrolls once taller than the screen).
+	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	list.alignment = BoxContainer.ALIGNMENT_CENTER
 	scroll.add_child(list)
 	var current: String = str(MenuUI.current_deck().get("id", ""))
 	for entry: Dictionary in MenuUI.playable_decks():

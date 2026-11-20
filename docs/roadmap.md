@@ -107,7 +107,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))
 - [x] Settings: music / sound-effect volumes, language, reset progress ([UI implementation](technical/06-ui-implementation.md#menus))
 - [ ] Achievements ([progression](functional/06-progression.md#achievements-examples))
-- [ ] Check on the phone: scrolling the card grids with a finger (a scroll must not open a card), typing a deck name with the Android keyboard, resuming after the app is force-stopped mid-duel, menu titles clear of the notch
+- [ ] Check on the phone: scrolling the card grids with a finger (a scroll must not open a card), resuming after the app is force-stopped mid-duel, menu titles clear of the notch
 
 ## 6 — Test matches
 

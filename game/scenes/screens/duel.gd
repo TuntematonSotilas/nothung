@@ -1182,6 +1182,7 @@ func _show_pause_menu(panel: PanelContainer) -> void:
 	content.add_child(resume)
 	var leave: Button = _button("UI_LEAVE", 420)
 	leave.name = "LeaveButton"
+	leave.add_theme_color_override("font_color", Palette.LIFE)
 	leave.pressed.connect(_show_leave_confirmation.bind(panel))
 	content.add_child(leave)
 
@@ -1198,6 +1199,7 @@ func _show_leave_confirmation(panel: PanelContainer) -> void:
 	content.add_child(question)
 	var confirm: Button = _button("UI_LEAVE", 420)
 	confirm.name = "ConfirmLeaveButton"
+	confirm.add_theme_color_override("font_color", Palette.LIFE)
 	confirm.pressed.connect(func() -> void:
 		_go_to_main_menu()
 	)

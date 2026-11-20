@@ -5,8 +5,9 @@ extends Control
 ## (Ready, or what is missing). Then the deck zone: "Deck n / 20" with a gauge, the types and one chip
 ## per card. Below: the Leader's faction and Neutral cards, filtered. No drag and drop: a tap on a card
 ## adds a copy (or shows the card with why it cannot be added); a tap on a chip takes a copy out. At the
-## bottom: Auto-fill and Starter deck (both replace the deck, asking first when it is not empty). Every
-## change is saved at once.
+## bottom: Auto-fill and Starter deck (both replace the deck, asking first when it is not empty), and
+## Empty the deck (asks first). Every change is saved at once; leaving a deck that cannot be played
+## (Back, or the Android back button) asks first in a popup.
 ## See docs/functional/05-game-modes.md#deck-builder.
 
 ## The deck to edit (a player deck ID), set before opening the screen.
@@ -266,6 +267,77 @@ func _show_actions() -> void:
 		starter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		starter.pressed.connect(_replace_cards.bind(starter_cards))
 		fill_row.add_child(starter)
+	if not (_entry["cards"] as Array).is_empty():
+		var clear: Button = MenuUI.button("UI_CLEAR_DECK", 72, 26)
+		clear.name = "ClearDeckButton"
+		clear.add_theme_color_override("font_color", Palette.LIFE)
+		clear.pressed.connect(_confirm.bind("UI_CLEAR_DECK_CONFIRM", "UI_CLEAR", clear_deck))
+		_actions.add_child(clear)
+
+
+## Takes every card out of the deck.
+func clear_deck() -> void:
+	(_entry["cards"] as Array).clear()
+	SaveManager.update_deck(_entry)
+	_show_actions()
+	_refresh()
+
+
+## Back (header button or Android): a deck that cannot be played asks first; true when handled here.
+func handle_back() -> bool:
+	if _entry.is_empty() or has_node("LeavePrompt"):
+		return has_node("LeavePrompt")
+	if DeckRules.problems(_entry, CardDatabase, SaveManager.owned_count).is_empty():
+		return false
+	_show_leave_prompt()
+	return true
+
+
+## Popup: the deck is not complete. Keep editing (highlighted) or leave anyway (red).
+func _show_leave_prompt() -> void:
+	var overlay := ColorRect.new()
+	overlay.name = "LeavePrompt"
+	overlay.color = Color(Palette.BG, 0.9)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(overlay)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size.x = 820
+	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, Palette.ACCENT, 3)
+	style.set_content_margin_all(40)
+	panel.add_theme_stylebox_override("panel", style)
+	center.add_child(panel)
+	var content := VBoxContainer.new()
+	content.add_theme_constant_override("separation", 28)
+	panel.add_child(content)
+	var title: Label = MenuUI.label("UI_DECK_INCOMPLETE_TITLE", 40, Palette.ACCENT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+	var problems: Label = MenuUI.label(_status.text, 28, Palette.LIFE)
+	problems.name = "LeaveProblems"
+	problems.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	problems.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	problems.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(problems)
+	var text: Label = MenuUI.label("UI_DECK_INCOMPLETE_TEXT", 28)
+	text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(text)
+	var keep: Button = MenuUI.button("UI_KEEP_EDITING")
+	keep.name = "KeepEditingButton"
+	keep.theme_type_variation = &"ButtonPrimary"
+	keep.pressed.connect(overlay.queue_free)
+	content.add_child(keep)
+	var leave: Button = MenuUI.button("UI_LEAVE")
+	leave.name = "LeaveAnywayButton"
+	leave.add_theme_color_override("font_color", Palette.LIFE)
+	leave.pressed.connect(func() -> void:
+		overlay.queue_free()
+		SceneRouter.go_back())
+	content.add_child(leave)
 
 
 ## Replaces the deck with `cards_source.call()`; asks first when the deck already has cards.

@@ -115,6 +115,9 @@ func test_collection_shows_every_card_with_the_copies_owned() -> void:
 func test_collection_card_opens_large_with_its_copies() -> void:
 	SaveManager.profile["collection"] = {"loge": 2}
 	var screen: Control = await _open("res://scenes/screens/collection.tscn")
+	# My decks and Nibelheim are reached from the main menu only.
+	assert_object(screen.find_child("MyDecksButton", true, false)).is_null()
+	assert_object(screen.find_child("NibelheimButton", true, false)).is_null()
 	(screen.find_child("Card_loge", true, false).get_child(0) as CardView).pressed.emit()
 	var detail: Control = screen.find_child("CardDetail", true, false) as Control
 	assert_object(detail).is_not_null()
@@ -209,6 +212,34 @@ func test_deck_editor_auto_fills_and_restores_the_starter_deck() -> void:
 	for card: CardData in CardDatabase.get_deck(&"gods_starter").cards:
 		starter.append(String(card.id))
 	assert_array(entry["cards"]).contains_exactly_in_any_order(starter)
+	editor.queue_free()
+
+
+func test_deck_editor_empties_the_deck_and_asks_before_leaving_it_incomplete() -> void:
+	DeckEditor.deck_id = "deck_1"
+	var entry: Dictionary = SaveManager.find_deck("deck_1")
+	var editor: DeckEditor = await _open("res://scenes/screens/deck_editor.tscn") as DeckEditor
+	# A complete deck leaves without a question.
+	assert_bool(editor.handle_back()).is_false()
+	# Empty the deck: asks first (Cancel keeps it), then the deck is empty and the button goes.
+	var clear: Button = editor.find_child("ClearDeckButton", true, false) as Button
+	assert_str(clear.get_theme_color("font_color").to_html(false)).is_equal(Palette.LIFE.to_html(false))
+	clear.pressed.emit()
+	(editor.find_child("CancelButton", true, false) as Button).pressed.emit()
+	assert_int((entry["cards"] as Array).size()).is_equal(20)
+	(editor.find_child("ClearDeckButton", true, false) as Button).pressed.emit()
+	(editor.find_child("ConfirmButton", true, false) as Button).pressed.emit()
+	assert_int((entry["cards"] as Array).size()).is_equal(0)
+	assert_object(editor.find_child("ClearDeckButton", true, false)).is_null()
+	# Incomplete: Back opens a popup naming the problem; Keep editing closes it.
+	assert_bool(editor.handle_back()).is_true()
+	var prompt: Control = editor.find_child("LeavePrompt", true, false) as Control
+	assert_object(prompt).is_not_null()
+	assert_str((prompt.find_child("LeaveProblems", true, false) as Label).text).contains("0 / 20")
+	assert_object(prompt.find_child("LeaveAnywayButton", true, false)).is_not_null()
+	(prompt.find_child("KeepEditingButton", true, false) as Button).pressed.emit()
+	await get_tree().process_frame
+	assert_object(editor.find_child("LeavePrompt", true, false)).is_null()
 	editor.queue_free()
 
 

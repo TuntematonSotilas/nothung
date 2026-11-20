@@ -32,9 +32,15 @@ func _ready() -> void:
 
 
 func _build() -> void:
-	var column: VBoxContainer = MenuUI.screen_column(self, 24)
-
-	column.add_child(MenuUI.header("UI_QUICK_MATCH"))
+	var screen_column: VBoxContainer = MenuUI.screen_column(self, 24)
+	screen_column.add_child(MenuUI.header("UI_QUICK_MATCH"))
+	# The choices and Play sit in the middle of the height left under the title.
+	var column := VBoxContainer.new()
+	column.name = "QuickMatchBody"
+	column.add_theme_constant_override("separation", 24)
+	column.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	screen_column.add_child(column)
 
 	column.add_child(_section("UI_YOUR_DECK"))
 	if _player_entry.is_empty():

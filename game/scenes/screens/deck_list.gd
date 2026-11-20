@@ -19,6 +19,9 @@ func _ready() -> void:
 	list.name = "DeckTiles"
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 16)
+	# Fills the scroll's height, its content centred vertically (it scrolls once taller than the screen).
+	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	list.alignment = BoxContainer.ALIGNMENT_CENTER
 	scroll.add_child(list)
 	for entry: Dictionary in SaveManager.decks():
 		list.add_child(_deck_tile(entry))

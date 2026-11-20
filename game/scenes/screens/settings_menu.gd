@@ -23,6 +23,9 @@ func _build() -> void:
 	var body := VBoxContainer.new()
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", 24)
+	# Fills the scroll's height, its content centred vertically (it scrolls once taller than the screen).
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.alignment = BoxContainer.ALIGNMENT_CENTER
 	scroll.add_child(body)
 
 	body.add_child(_section("UI_AUDIO"))

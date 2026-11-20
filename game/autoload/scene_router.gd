@@ -24,12 +24,23 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what != NOTIFICATION_WM_GO_BACK_REQUEST:
 		return
-	# A screen can handle back itself (e.g. the duel opens its pause panel) by defining handle_back() -> bool.
-	var current: Node = get_tree().current_scene
-	if current != null and current.has_method("handle_back") and current.call("handle_back"):
+	if _current_handles_back():
 		return
 	if not go_back():
 		get_tree().quit()
+
+
+## The Back button of a screen's header: like the Android back button, the screen may handle it first.
+func request_back() -> void:
+	if not _current_handles_back():
+		go_back()
+
+
+## A screen can handle back itself (e.g. the duel opens its pause panel, the deck editor asks before
+## leaving an incomplete deck) by defining handle_back() -> bool.
+func _current_handles_back() -> bool:
+	var current: Node = get_tree().current_scene
+	return current != null and current.has_method("handle_back") and bool(current.call("handle_back"))
 
 
 ## Opens a screen; the current one is kept in the history unless `remember` is false.

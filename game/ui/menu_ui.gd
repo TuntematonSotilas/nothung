@@ -31,7 +31,7 @@ static func header(title_key: String, right: Control = null) -> HBoxContainer:
 	var back: Button = button("UI_BACK", 88, 26)
 	back.name = "BackButton"
 	back.custom_minimum_size.x = 200
-	back.pressed.connect(func() -> void: SceneRouter.go_back())
+	back.pressed.connect(func() -> void: SceneRouter.request_back())
 	row.add_child(back)
 	var title: Label = label(title_key, 44, Palette.ACCENT)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL

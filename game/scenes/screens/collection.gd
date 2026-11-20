@@ -1,11 +1,9 @@
 extends Control
 
 ## Collection: every card with the copies the player owns, filtered (CardFilterBar). Tap a card to see
-## it large. My decks opens the deck list, Nibelheim the forge. See docs/functional/07-ui-ux.md.
+## it large. My decks and Nibelheim are reached from the main menu. See docs/functional/07-ui-ux.md.
 
 const FACTIONS: Array[StringName] = [&"gods", &"nibelungs", &"walsungs", &"valkyries", &"neutral"]
-const DECKS_SCENE: String = "res://scenes/screens/deck_list.tscn"
-const NIBELHEIM_SCENE: String = "res://scenes/screens/nibelheim.tscn"
 
 var _filter_bar: CardFilterBar
 var _grid: CardGrid
@@ -14,20 +12,6 @@ var _grid: CardGrid
 func _ready() -> void:
 	var column: VBoxContainer = MenuUI.screen_column(self, 20)
 	column.add_child(MenuUI.header("UI_COLLECTION", MenuUI.rhinegold_counter()))
-	var decks: Button = MenuUI.button("UI_MY_DECKS", 88, 28)
-	decks.name = "MyDecksButton"
-	decks.theme_type_variation = &"ButtonPrimary"
-	decks.pressed.connect(func() -> void: SceneRouter.go_to(DECKS_SCENE))
-	decks.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var links := HBoxContainer.new()
-	links.add_theme_constant_override("separation", 16)
-	links.add_child(decks)
-	var nibelheim: Button = MenuUI.button("UI_NIBELHEIM", 88, 28)
-	nibelheim.name = "NibelheimButton"
-	nibelheim.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	nibelheim.pressed.connect(func() -> void: SceneRouter.go_to(NIBELHEIM_SCENE))
-	links.add_child(nibelheim)
-	column.add_child(links)
 	_filter_bar = CardFilterBar.new(FACTIONS)
 	_filter_bar.changed.connect(_apply_filters)
 	column.add_child(_filter_bar)
