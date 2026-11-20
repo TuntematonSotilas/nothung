@@ -164,6 +164,9 @@ func test_results_show_the_icon_of_the_outcome() -> void:
 		assert_str(icon.texture.resource_path).ends_with("%s.svg" % expected)
 		# Animation speed 0 in these tests: the icon is shown as is.
 		assert_float(icon.scale.x).is_equal(1.0)
+		# Rematch after a defeat only; Play again after a win or a draw.
+		var again: Button = duel.find_child("RematchButton", true, false) as Button
+		assert_str(again.text).is_equal(tr("UI_REMATCH" if winner == 1 else "UI_PLAY_AGAIN"))
 		duel.queue_free()
 		await get_tree().process_frame
 

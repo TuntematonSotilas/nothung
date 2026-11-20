@@ -1538,7 +1538,10 @@ func _show_results() -> void:
 	_results_undo_button.visible = false
 	_results_undo_button.pressed.connect(_on_undo_play_pressed)
 	content.add_child(_results_undo_button)
-	var rematch: Button = _button("UI_REMATCH", 250)
+	# Rematch after a defeat; after a win or a draw it is simply Play again.
+	var lost: bool = _match.get_state().winner == AI_PLAYER
+	var rematch: Button = _button("UI_REMATCH" if lost else "UI_PLAY_AGAIN", 250)
+	rematch.name = "RematchButton"
 	rematch.pressed.connect(func() -> void:
 		_overlay.queue_free()
 		_overlay = null
