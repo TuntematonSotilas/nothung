@@ -116,7 +116,7 @@ Ideas still to refine ([progression ideas](functional/06-progression.md#ideas-to
 - [ ] Decide the scope: rewards, level, unlocks, Leader powers, achievements
 - [x] Achievements, first set: 13 achievements paying Rhinegold, counted on Quick matches and crafting, taken back with an undone winning play; Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
 - [ ] Achievements, next: tiers, XP and cosmetic rewards
-- [ ] Player level (XP from matches and achievements) and what it unlocks (campaign chapters? Nibelheim? factions? cosmetics? mini-games, dungeons?)
+- [ ] Player level: XP from every finished match (more for a win, by difficulty) and from achievements; fast then slower up to ~level 30; each level gives Rhinegold and cosmetics, chapters stay story-gated (decided 2026-11-20, numbers to set)
 - [ ] Cosmetic rewards: home background, deck backgrounds, …
 - [ ] Leader powers: alternative abilities — where (Nibelheim, a Leader screen) and how (Rhinegold, mastery, level) they are unlocked
 - [ ] Profile v4: level, XP, achievement progress, unlocked cosmetics and abilities (migration)

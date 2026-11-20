@@ -73,7 +73,8 @@ Quick matches count (a duel without rewards does not), and crafting in Nibelheim
 
 - XP for each match played (more for a win, by difficulty) and for each achievement; one level every N XP.
 - Possible unlocks: campaign chapters; Nibelheim (after the tutorial); factions and their starter decks (today tied to the campaign: see [Starting collection](#starting-collection)); Hard difficulty; backgrounds and skins; mini-games or "dungeons" (e.g. a run down into Nibelheim with a deck built along the way — a later mode).
-- Open question: do campaign chapters open with the level, or only with the story (the previous chapter won)?
+
+> **Decision (2026-11-20):** campaign chapters open **with the story only** (the previous chapter won), never with the level. A level up gives **cosmetics and Rhinegold** — it locks nothing (no Hard difficulty, Leader power or chapter behind a level). Pace: **fast, then slower** — level 2 after the first match or two, then about 3 to 5 matches a level, slower and slower, up to a cap around level 30. **Every finished match gives XP** — a win more than a loss, with a bonus by difficulty — and so does each achievement. Exact numbers to set.
 
 ### Leader powers
 
