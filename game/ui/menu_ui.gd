@@ -120,6 +120,35 @@ static func screen_column(screen: Control, separation: int = 28) -> VBoxContaine
 	return column
 
 
+## A short message over the bottom of the screen (an achievement unlocked…), gone after a few seconds.
+static func toast(screen: Control, text: String) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.name = "Toast"
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style: StyleBoxFlat = _tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 3)
+	style.set_content_margin_all(24)
+	panel.add_theme_stylebox_override("panel", style)
+	var message: Label = label(text, 28, Palette.ACCENT)
+	message.name = "ToastText"
+	message.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	panel.add_child(message)
+	screen.add_child(panel)
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	panel.offset_left = SCREEN_MARGIN
+	panel.offset_right = -SCREEN_MARGIN
+	panel.anchor_left = 0.0
+	panel.anchor_right = 1.0
+	panel.offset_top = -260
+	panel.offset_bottom = -SCREEN_MARGIN - 40
+	var tween: Tween = panel.create_tween()
+	tween.tween_interval(3.0)
+	tween.tween_property(panel, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(panel.queue_free)
+	return panel
+
+
 ## A selectable tile (toggle button): border in `color`, gold and thicker when selected.
 static func choice_tile(text: String, color: Color, height: int, icon_path: String = "") -> Button:
 	var tile := Button.new()

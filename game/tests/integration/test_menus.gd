@@ -246,6 +246,8 @@ func test_deck_editor_empties_the_deck_and_asks_before_leaving_it_incomplete() -
 func test_nibelheim_forges_the_missing_copies() -> void:
 	SaveManager.profile["rhinegold"] = 150
 	SaveManager.profile["collection"].erase("loge")
+	# Already a forger: no achievement reward mixes with the prices here.
+	SaveManager.profile["achievements"] = ["mimes_apprentice"]
 	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
 	# Complete cards are hidden: nothing to forge.
 	var complete: CardData = CardDatabase.get_card(&"wotans_ravens")
@@ -278,14 +280,55 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 	state.winner = 0
 	duel.call("_save_progress")
 	duel.call("_save_progress")
-	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD))
-	# Undoing the winning play takes it back.
+	# The win and the achievements it unlocks (first win, a win on Hard…) pay once.
+	var change: Dictionary = duel.get("_achievements_change")
+	assert_array(change["unlocked"]).contains(["first_victory", "gotterdammerung"])
+	assert_bool(Achievements.is_unlocked("first_victory")).is_true()
+	assert_int(Achievements.stat("wins")).is_equal(1)
+	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD) + int(change["rhinegold"]))
+	# The results list the achievements unlocked.
+	duel.call("_show_results")
+	assert_object(duel.find_child("Achievement_first_victory", true, false)).is_not_null()
+	# Undoing the winning play takes it all back.
 	state.phase = GameState.Phase.MAIN
 	state.winner = -1
 	duel.call("_save_progress")
 	assert_int(SaveManager.rhinegold()).is_equal(0)
+	assert_bool(Achievements.is_unlocked("first_victory")).is_false()
+	assert_int(Achievements.stat("matches")).is_equal(0)
 	duel.queue_free()
 	await get_tree().process_frame
+
+
+func test_achievements_screen_lists_progress_and_the_main_menu_opens_it() -> void:
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_object(menu.find_child("AchievementsButton", true, false)).is_not_null()
+	menu.queue_free()
+	SaveManager.profile["stats"] = {"wins": 3}
+	SaveManager.profile["achievements"] = ["first_victory"]
+	var screen: Control = await _open("res://scenes/screens/achievements.tscn")
+	assert_int(screen.find_child("AchievementList", true, false).get_child_count()).is_equal(Achievements.LIST.size())
+	var done: Node = screen.find_child("Achievement_first_victory", true, false)
+	assert_str((done.find_child("Progress", true, false) as Label).text).is_equal(tr("UI_ACHIEVEMENT_DONE"))
+	var counting: Node = screen.find_child("Achievement_einherjar", true, false)
+	assert_str((counting.find_child("Progress", true, false) as Label).text).is_equal("3 / 10")
+	screen.queue_free()
+
+
+func test_forging_in_nibelheim_unlocks_mimes_apprentice() -> void:
+	SaveManager.add_rhinegold(1000)
+	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
+	var data: CardData = null
+	for card_id: StringName in CardDatabase.card_ids():
+		var card: CardData = CardDatabase.get_card(card_id)
+		if card.rarity == CardData.Rarity.COMMON and Progression.can_craft(card, SaveManager.owned_count(card_id)):
+			data = card
+			break
+	assert_bool(screen.call("forge", data)).is_true()
+	assert_bool(Achievements.is_unlocked("mimes_apprentice")).is_true()
+	assert_int(SaveManager.rhinegold()).is_equal(1000 - Progression.craft_price(data) + 20)
+	assert_object(screen.find_child("Toast", true, false)).is_not_null()
+	screen.queue_free()
 
 
 func _press(screen: Control, chip_name: String) -> void:

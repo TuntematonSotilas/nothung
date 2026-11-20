@@ -1,7 +1,7 @@
 extends Control
 
-## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left and Settings
-## (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader) with
+## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left, Achievements
+## (trophy) and Settings (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader) with
 ## Change deck and My decks under it, then Campaign (greyed out until it exists) and Quick match side by
 ## side; Collection, smaller, at the bottom.
 ## The Android back button quits from here (the menu is the root of the history).
@@ -12,6 +12,7 @@ const SETTINGS_SCENE: String = "res://scenes/screens/settings_menu.tscn"
 const COLLECTION_SCENE: String = "res://scenes/screens/collection.tscn"
 const DECKS_SCENE: String = "res://scenes/screens/deck_list.tscn"
 const NIBELHEIM_SCENE: String = "res://scenes/screens/nibelheim.tscn"
+const ACHIEVEMENTS_SCENE: String = "res://scenes/screens/achievements.tscn"
 const DUEL_SCENE: String = "res://scenes/screens/duel.tscn"
 const PORTRAIT_SIZE: Vector2 = Vector2(300, 390)
 const PORTRAIT_BORDER: int = 5
@@ -46,6 +47,13 @@ func _build() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(spacer)
+	var achievements: Button = _icon_button("", "achievements", Palette.ACCENT)
+	achievements.name = "AchievementsButton"
+	achievements.tooltip_text = "UI_ACHIEVEMENTS"
+	achievements.custom_minimum_size = Vector2(96, 96)
+	achievements.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	achievements.pressed.connect(func() -> void: SceneRouter.go_to(ACHIEVEMENTS_SCENE))
+	top.add_child(achievements)
 	var settings: Button = _icon_button("", "settings", Palette.TEXT)
 	settings.name = "SettingsButton"
 	settings.tooltip_text = "UI_SETTINGS"

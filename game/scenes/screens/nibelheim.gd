@@ -70,5 +70,11 @@ func _show_forge(data: CardData) -> void:
 func forge(data: CardData) -> bool:
 	if not SaveManager.craft(data):
 		return false
+	var lines: PackedStringArray = []
+	for achievement_id: Variant in Achievements.record_craft():
+		lines.append(Achievements.unlocked_text(achievement_id))
 	_refresh()
+	if not lines.is_empty():
+		MenuUI.toast(self, "
+".join(lines))
 	return true

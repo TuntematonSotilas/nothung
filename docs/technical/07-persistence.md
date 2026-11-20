@@ -31,7 +31,8 @@ On Android `user://` maps to the app's private internal storage.
     { "id": "deck_2", "name": "Hoard of Nibelheim", "leader": "alberich", "cards": ["nibelung_miner", "..."] }
   ],
   "campaign": { "rheingold": { "completed": true, "duels_won": ["rg_01", "rg_02"], "quest_endings": { "rg_q1": ["hoard_found"] } } },
-  "achievements": ["renunciation_of_love"],
+  "achievements": ["first_victory", "renunciation_of_love"],
+  "stats": { "matches": 12, "wins": 7, "hard_wins": 1, "leaders_won": ["wotan", "alberich"], "artifacts_played": 9, "cards_crafted": 2 },
   "starter_collection_granted": true,
   "starter_decks_copied": true
 }
@@ -41,6 +42,7 @@ On Android `user://` maps to the app's private internal storage.
 
 - Atomic writes: write to `profile.json.tmp`, then rename over `profile.json`; keep `profile.json.bak`.
 - On load error: fall back to `.bak`, then to a fresh profile (and log it). After a restore from `.bak`, the next save **deletes** the unreadable `profile.json` instead of rotating it into `.bak`, so the good backup is not lost.
+- `stats`: the counters achievements read (`Achievements.LIST`); a profile without it (before 2026-11-20) gets `{}` like any missing key, so no version change.
 - A missing or wrongly typed key (hand-edited or damaged save) gets its default value. JSON reads numbers back as floats: `rhinegold` and the collection counts are turned back into ints on load.
 - Unknown card IDs in a save (card removed) are converted to Rhinegold instead of crashing: each owned copy is refunded at the Common crafting price (`SaveManager.REMOVED_CARD_VALUE` = 40; the rarity of a removed card is unknown). They are removed from decks; a deck whose Leader is gone is dropped.
 

@@ -87,6 +87,9 @@ var _pending_events: Array[GameEvent] = []
 var _fx: DuelFx
 ## Rhinegold paid for this match's win (0 until then); taken back if the winning play is undone.
 var _reward: int = 0
+## What the finished match added to the statistics and achievements (Achievements.record_match()),
+## taken back if the winning play is undone from the results; empty while the match goes on.
+var _achievements_change: Dictionary = {}
 ## The Götterdämmerung explanation pops up once per match.
 var _doom_explained: bool = false
 
@@ -278,6 +281,7 @@ func _start_match() -> void:
 	_results_shown = false
 	_doom_explained = false
 	_reward = 0
+	_achievements_change = {}
 	_clear_undo()
 	_log_lines.clear()
 	_pending_events.clear()
@@ -316,6 +320,7 @@ func _save_progress() -> void:
 	else:
 		SaveManager.save_match(_record.to_dict())
 	_settle_reward()
+	_settle_achievements()
 
 
 ## A win pays once; undoing the winning play from the results takes it back.
@@ -328,6 +333,21 @@ func _settle_reward() -> void:
 	elif not won and _reward > 0:
 		SaveManager.add_rhinegold(-_reward)
 		_reward = 0
+
+
+## A finished Quick match counts once for the achievements; undoing its last play takes it back.
+func _settle_achievements() -> void:
+	if not _setup.rewards or _record == null:
+		return
+	var over: bool = _match.get_state().phase == GameState.Phase.GAME_OVER
+	if over and _achievements_change.is_empty():
+		var stats := MatchStats.new()
+		if _record.replay(CardDatabase, stats) == null:
+			return
+		_achievements_change = Achievements.record_match(Achievements.summarize(_match.get_state(), stats, _setup.difficulty))
+	elif not over and not _achievements_change.is_empty():
+		Achievements.revert(_achievements_change)
+		_achievements_change = {}
 
 
 func _record_action(action: Action) -> void:
@@ -1533,6 +1553,14 @@ func _show_results() -> void:
 		reward.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		content.add_child(reward)
+	_settle_achievements()
+	for achievement_id: Variant in _achievements_change.get("unlocked", []):
+		var unlocked: Label = _label("", 24, Palette.ACCENT)
+		unlocked.name = "Achievement_%s" % achievement_id
+		unlocked.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		unlocked.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		unlocked.text = Achievements.unlocked_text(achievement_id)
+		content.add_child(unlocked)
 	_results_undo_button = _button("UI_UNDO_PLAY", 250)
 	_set_button_icon(_results_undo_button, "undo", Palette.TEXT)
 	_results_undo_button.visible = false

@@ -16,8 +16,8 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 2 | [Card pipeline](#2--card-pipeline) | The validator rejects an invalid card | Done |
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | Done |
-| 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | In progress (phone checks left) |
-| 6 | [Progression & rewards](#6--progression--rewards) | A player has goals beyond the next match: level, achievements and their rewards | To refine |
+| 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | Done |
+| 6 | [Progression & rewards](#6--progression--rewards) | A player has goals beyond the next match: level, achievements and their rewards | In progress (first achievements done) |
 | 7 | [Test matches](#7--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
 | 8 | [Campaign](#8--campaign) | Prologue + chapter 1 playable | To do |
 | 9 | [Release](#9--release) | Internal build on Google Play | To do |
@@ -107,14 +107,15 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 - [x] Profile save (atomic JSON, backup, migrations, removed cards → Rhinegold) ([persistence](technical/07-persistence.md)): collection, Leaders, decks, Rhinegold
 - [x] Resume an interrupted match (Quick match; campaign duels will add their own fields) ([persistence](technical/07-persistence.md#resume-an-interrupted-match))
 - [x] Settings: music / sound-effect volumes, language, reset progress ([UI implementation](technical/06-ui-implementation.md#menus))
-- [ ] Check on the phone: scrolling the card grids with a finger (a scroll must not open a card), resuming after the app is force-stopped mid-duel, menu titles clear of the notch
+- [x] Checked on the phone: scrolling the card grids with a finger (a scroll does not open a card), resuming after the app is force-stopped mid-duel, menu titles clear of the notch (2026-11-20)
 
 ## 6 — Progression & rewards
 
 Ideas still to refine ([progression ideas](functional/06-progression.md#ideas-to-refine-2026-11-20)): nothing is decided yet.
 
 - [ ] Decide the scope: rewards, level, unlocks, Leader powers, achievements
-- [ ] Achievements: list, tiers, rewards, Achievements screen, notification on the results screen ([examples](functional/06-progression.md#achievements-examples))
+- [x] Achievements, first set: 13 achievements paying Rhinegold, counted on Quick matches and crafting, taken back with an undone winning play; Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
+- [ ] Achievements, next: tiers, XP and cosmetic rewards
 - [ ] Player level (XP from matches and achievements) and what it unlocks (campaign chapters? Nibelheim? factions? cosmetics? mini-games, dungeons?)
 - [ ] Cosmetic rewards: home background, deck backgrounds, …
 - [ ] Leader powers: alternative abilities — where (Nibelheim, a Leader screen) and how (Rhinegold, mastery, level) they are unlocked

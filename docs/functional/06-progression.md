@@ -24,7 +24,7 @@
 | Campaign Quest (each ending, first time) | Card, Rhinegold or cosmetic ([Quests](05-game-modes.md#quests-non-combat-stages)) |
 | Campaign chapter complete | Legendary card + faction starter deck |
 | Quick match win | Rhinegold: 10 (Easy) / 20 (Normal) / 40 (Hard); nothing for a loss, a draw or leaving |
-| Achievements | Rhinegold, card backs, cosmetic frames |
+| Achievements | Rhinegold (cosmetics later: card backs, frames…) |
 
 ## Meta currency
 
@@ -37,11 +37,27 @@
 
 > **Decision (2026-10-09):** Direct crafting only — no random card packs.
 
-## Achievements (examples)
+## Achievements
 
-- *Renunciation of Love* — win a match while holding the Ring the whole game.
-- *Twilight* — win with your Leader at 1 Life.
-- *Notung! Notung!* — reforge Nothung in 10 matches.
+Quick matches count (a duel without rewards does not), and crafting in Nibelheim. Each achievement is unlocked once and pays its Rhinegold at once; undoing the winning play from the results takes the match back (statistics, achievements and their Rhinegold).
+
+| Achievement | To do | Rhinegold |
+|-------------|-------|-----------|
+| *Hojotoho!* | Win a Quick match | 20 |
+| *Einherjar* | Win 10 matches | 50 |
+| *Valhalla* | Win 50 matches | 150 |
+| *The Ring Cycle* | Play 100 matches | 100 |
+| *Four Evenings* | Win with each of the four Leaders | 100 |
+| *Götterdämmerung* | Win a match on Hard | 60 |
+| *Twilight* | Win with your Leader at 1 Life | 40 |
+| *Renunciation of Love* | Win holding the Ring, the opponent never having had it | 40 |
+| *Notung! Notung!* | Reforge Nothung in 10 matches | 80 |
+| *The Nibelung Hoard* | Play 20 artifacts | 40 |
+| *Invulnerable* | Win without losing a unit | 60 |
+| *Mime's Apprentice* | Forge a card in Nibelheim | 20 |
+| *The Forging Song* | Forge 10 cards in Nibelheim | 60 |
+
+> **Decision (2026-11-20):** first set of 13 achievements, Rhinegold only; *Renunciation of Love* becomes "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). Tiers, XP and cosmetic rewards wait for the rest of [milestone 6](../roadmap.md#6--progression--rewards).
 
 ## Ideas to refine (2026-11-20)
 
@@ -67,6 +83,8 @@
 - Open question: chosen in Nibelheim (a tab) or on a Leader screen (from the deck editor, tap the Leader)?
 
 ### Achievements
+
+> A first set is in place ([Achievements](#achievements)); the ideas below are for the next ones.
 
 - Progression: play / win 10, 50, 100 matches.
 - Factions: win with each Leader.

@@ -61,22 +61,31 @@ static func undo_play(engine: Match, snapshot: GameState, card_uid: int) -> bool
 
 ## Rebuilds the match, or returns null when it cannot be resumed: unknown card, card data changed
 ## since the match started, or an entry the engine rejects. `database` resolves IDs (CardDatabase).
-func replay(database: Object) -> Match:
+## `stats` (optional) watches the replay: what the player did, for achievements.
+func replay(database: Object, stats: MatchStats = null) -> Match:
 	var rebuilt: Array[DeckData] = rebuild_decks(database)
 	if rebuilt.size() != 2 or content_hash_of(rebuilt) != content_hash:
 		return null
 	var engine := Match.new(rebuilt[0], rebuilt[1], seed)
 	if engine.get_state().phase == GameState.Phase.GAME_OVER:
 		return null
+	if stats != null:
+		engine.event_emitted.connect(stats.on_event)
 	var before_play: GameState
 	for entry: Dictionary in entries:
 		if String(entry.get("type", "")) == "undo_play":
 			if before_play == null or not undo_play(engine, before_play, int(entry.get("card_uid", -1))):
 				return null
+			if stats != null:
+				stats.rollback()
 			before_play = null
 			continue
 		var action: Action = Action.from_record(entry)
 		var snapshot: GameState = engine.get_state().duplicate_state() if action is PlayCardAction else null
+		if stats != null and action != null:
+			if action is PlayCardAction:
+				stats.checkpoint()
+			stats.before_action(engine, action)
 		if action == null or not engine.apply(action):
 			return null
 		before_play = snapshot

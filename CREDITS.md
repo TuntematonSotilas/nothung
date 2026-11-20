@@ -19,6 +19,7 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 | `nibelheim.svg` | Anvil impact | Lorc |
 | `refresh.svg` | Cycle | Lorc |
 | `victory.svg` | Laurel crown | Lorc |
+| `achievements.svg` | Trophy | Lorc |
 | `defeat.svg` | Broken shield | Lorc |
 | `faction_gods.svg` | Barbed spear | Lorc |
 | `faction_nibelungs.svg` | Anvil | Lorc |

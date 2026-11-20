@@ -33,6 +33,8 @@ static func default_profile() -> Dictionary:
 		"decks": [],
 		"campaign": {},
 		"achievements": [],
+		# Counters the achievements read (Achievements.LIST): matches, wins, leaders_won…
+		"stats": {},
 		# Until the campaign unlocks factions, a new player owns the four starter decks, and gets a
 		# copy of each as an editable deck.
 		"starter_collection_granted": false,
