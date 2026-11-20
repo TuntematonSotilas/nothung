@@ -1542,10 +1542,25 @@ func _show_results() -> void:
 	var content: VBoxContainer = VBoxContainer.new()
 	content.add_theme_constant_override("separation", 20)
 	center.add_child(content)
-	content.add_child(_result_icon(_match.get_state().winner))
 	var status: Label = _label(_status_text(_match.get_state()), 42, Palette.ACCENT)
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	content.add_child(status)
+	var result_icon: Control = _result_icon(_match.get_state().winner)
+	if _match.get_state().winner == HUMAN_PLAYER:
+		var victory := PanelContainer.new()
+		victory.name = "VictoryPanel"
+		victory.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		var victory_style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, Palette.ACCENT, 3)
+		victory_style.set_content_margin_all(roundi(18 * _ui_scale))
+		victory.add_theme_stylebox_override("panel", victory_style)
+		var heading := VBoxContainer.new()
+		heading.add_theme_constant_override("separation", roundi(8 * _ui_scale))
+		heading.add_child(result_icon)
+		heading.add_child(status)
+		victory.add_child(heading)
+		content.add_child(victory)
+	else:
+		content.add_child(result_icon)
+		content.add_child(status)
 	if _reward > 0:
 		var reward: Label = _label("", 28, Palette.ACCENT)
 		reward.name = "RewardLabel"
@@ -1554,12 +1569,12 @@ func _show_results() -> void:
 		reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		content.add_child(reward)
 	_settle_achievements()
-	for achievement_id: Variant in _achievements_change.get("unlocked", []):
+	for achievement_id: Variant in _achievements_change.get("reached", []):
 		var unlocked: Label = _label("", 24, Palette.ACCENT)
 		unlocked.name = "Achievement_%s" % achievement_id
 		unlocked.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		unlocked.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		unlocked.text = Achievements.unlocked_text(achievement_id)
+		unlocked.text = Achievements.ready_text(achievement_id)
 		content.add_child(unlocked)
 	var level_change: Dictionary = _achievements_change.get("level", {})
 	if int(level_change.get("xp", 0)) > 0:
@@ -1856,10 +1871,55 @@ func _leader_panel(player_id: int) -> Dictionary:
 	var ability: Button = Button.new()
 	ability.name = "OwnAbilityButton" if is_human else "EnemyAbilityButton"
 	ability.custom_minimum_size = Vector2(roundi(250 * _ui_scale), roundi(90 * _ui_scale))
-	ability.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	ability.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	ability.add_theme_font_size_override("font_size", roundi(15 * _ui_scale))
-	_set_button_icon(ability, "energy", Palette.ENERGY)
+	var ability_content := HBoxContainer.new()
+	ability_content.name = "AbilityContent"
+	ability_content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	ability_content.offset_left = roundi(8 * _ui_scale)
+	ability_content.offset_top = roundi(4 * _ui_scale)
+	ability_content.offset_right = roundi(-8 * _ui_scale)
+	ability_content.offset_bottom = roundi(-4 * _ui_scale)
+	ability_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_content.add_theme_constant_override("separation", roundi(2 * _ui_scale))
+	ability.add_child(ability_content)
+	var ability_cost: Label = _label("", 15, Palette.ENERGY)
+	ability_cost.name = "AbilityCost"
+	ability_cost.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ability_cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_content.add_child(ability_cost)
+	var ability_icon := TextureRect.new()
+	ability_icon.name = "EnergyIcon"
+	ability_icon.texture = _icon("energy")
+	ability_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	ability_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	ability_icon.custom_minimum_size = Vector2.ONE * roundi(22 * _ui_scale)
+	ability_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ability_icon.modulate = Palette.ENERGY
+	ability_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_content.add_child(ability_icon)
+	var ability_lines := VBoxContainer.new()
+	ability_lines.name = "AbilityLines"
+	ability_lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ability_lines.alignment = BoxContainer.ALIGNMENT_CENTER
+	ability_lines.add_theme_constant_override("separation", roundi(2 * _ui_scale))
+	ability_lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_content.add_child(ability_lines)
+	var ability_heading := HBoxContainer.new()
+	ability_heading.add_theme_constant_override("separation", roundi(6 * _ui_scale))
+	ability_heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_lines.add_child(ability_heading)
+	var ability_title: Label = _label("", 15, Palette.TEXT)
+	ability_title.name = "AbilityTitle"
+	ability_title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	ability_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ability_title.clip_text = true
+	ability_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_heading.add_child(ability_title)
+	var ability_action: Label = _label("", 14, Palette.TEXT_MUTED)
+	ability_action.name = "AbilityAction"
+	ability_action.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	ability_action.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ability_action.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ability_lines.add_child(ability_action)
 	if not is_human:
 		ability.disabled = true
 		ability.focus_mode = Control.FOCUS_NONE
@@ -1888,15 +1948,22 @@ func _update_leader_panel(player: PlayerState, name_label: Label, life_label: La
 	artwork.visible = player.leader.art != null
 	initial.text = leader_name.left(1)
 	initial.visible = player.leader.art == null
+	var ability_cost: Label = ability_button.find_child("AbilityCost", true, false) as Label
+	var ability_title: Label = ability_button.find_child("AbilityTitle", true, false) as Label
+	var ability_action: Label = ability_button.find_child("AbilityAction", true, false) as Label
 	if player.leader.ability == null:
-		ability_button.text = tr("UI_ABILITY")
+		ability_cost.visible = false
+		ability_title.text = tr("UI_ABILITY")
+		ability_action.visible = false
 		return
-	# The Energy icon sits on the button; the text starts with the cost, then the ability name and effect.
-	ability_button.text = "%d   %s\n%s" % [
-		player.leader.ability.cost,
-		tr(player.leader.ability_key() + "_NAME"),
-		tr(player.leader.ability_key() + "_TEXT"),
-	]
+	var ability_key: String = player.leader.ability_key()
+	ability_cost.text = str(player.leader.ability.cost)
+	ability_title.text = tr(ability_key + "_NAME")
+	ability_title.add_theme_color_override(
+		"font_color",
+		(CardPalette.FACTIONS[player.leader.faction]["frame"] as Color).lightened(0.55)
+	)
+	ability_action.text = tr(ability_key + "_TEXT")
 
 
 func _section_label(value: String) -> Label:

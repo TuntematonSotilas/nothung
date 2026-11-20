@@ -40,7 +40,7 @@
 
 ## Achievements
 
-Quick matches count (a duel without rewards does not), and crafting in Nibelheim. Each achievement is unlocked once and pays its Rhinegold at once; undoing the winning play from the results takes the match back (statistics, achievements and their Rhinegold).
+Quick matches count (a duel without rewards does not), and crafting in Nibelheim. Reaching a target makes an achievement available to claim in the Achievements screen; its Rhinegold and 25 XP are paid only after the player claims it. Undoing the winning play from the results takes back the match's statistics and any achievements it newly made available.
 
 | Achievement | To do | Rhinegold |
 |-------------|-------|-----------|
@@ -62,13 +62,13 @@ Quick matches count (a duel without rewards does not), and crafting in Nibelheim
 
 ## Player level
 
-Every finished Quick match gives XP, and so does each achievement unlocked (in a match or in Nibelheim); undoing the winning play from the results takes the match's XP back, with its levels. The level locks nothing: each level reached pays Rhinegold (cosmetics later).
+Every finished Quick match gives XP, and so does each achievement claimed (in a match or in Nibelheim); undoing the winning play from the results takes the match's XP back, with its levels. The level locks nothing: each level reached pays Rhinegold (cosmetics later).
 
 | Source | XP |
 |--------|----|
 | Quick match lost or drawn | 10 |
 | Quick match won | 20 (Easy) / 30 (Normal) / 40 (Hard) |
-| Achievement unlocked | 25 |
+| Achievement claimed | 25 |
 
 - From level *n* to *n* + 1: **20 + 10 × (*n* − 1)** XP — 20 for level 2 (one match), 110 from level 10 (about 5 matches), 300 for the last one; **level 30** is the cap (4,640 XP, about 230 matches).
 - Each level reached: **+40 Rhinegold**.
@@ -107,7 +107,7 @@ Each Leader has its base ability and **two powers**: other versions of it, a lit
 - XP for each match played (more for a win, by difficulty) and for each achievement; one level every N XP.
 - Possible unlocks: campaign chapters; Nibelheim (after the tutorial); factions and their starter decks (today tied to the campaign: see [Starting collection](#starting-collection)); Hard difficulty; backgrounds and skins; mini-games or "dungeons" (e.g. a run down into Nibelheim with a deck built along the way — a later mode).
 
-> **Decision (2026-11-20):** campaign chapters open **with the story only** (the previous chapter won), never with the level. A level up gives **cosmetics and Rhinegold** — it locks nothing (no Hard difficulty or chapter behind a level; amended the same day: [Leader powers](#leader-powers) need a level). Pace: **fast, then slower** — level 2 after the first match or two, then about 3 to 5 matches a level, slower and slower, up to a cap around level 30. **Every finished match gives XP** — a win more than a loss, with a bonus by difficulty — and so does each achievement. Numbers: see [Player level](#player-level).
+> **Decision (2026-11-20):** campaign chapters open **with the story only** (the previous chapter won), never with the level. A level up gives **cosmetics and Rhinegold** — it locks nothing (no Hard difficulty or chapter behind a level; amended the same day: [Leader powers](#leader-powers) need a level). Pace: **fast, then slower** — level 2 after the first match or two, then about 3 to 5 matches a level, slower and slower, up to a cap around level 30. **Every finished match gives XP** — a win more than a loss, with a bonus by difficulty — and each achievement gives XP when manually claimed. Numbers: see [Player level](#player-level).
 
 ### Leader powers
 
@@ -123,7 +123,7 @@ Each Leader has its base ability and **two powers**: other versions of it, a lit
 - Challenge: *Twilight*, *Renunciation of Love*, win on Hard, win without losing a unit.
 - Collection: craft a first card in Nibelheim, own every card.
 - Tiers (bronze / silver / gold) for the counters; rewards: Rhinegold, XP, cosmetics.
-- Shown on the results screen when unlocked, and listed in an Achievements screen with their progress (e.g. 3 / 10).
+- Reached achievements are shown on the results screen and listed with progress in the Achievements screen; Rhinegold and XP require a manual claim.
 
 ## Cosmetics
 

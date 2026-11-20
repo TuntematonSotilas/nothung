@@ -1,45 +1,65 @@
 extends Control
 
-## Achievements: one row per achievement (Achievements.LIST) — the trophy icon (gold once unlocked),
-## name, what to do, progress ("3 / 10") or Unlocked, and the Rhinegold and XP it gives. Opened from the main
-## menu's trophy. See docs/functional/06-progression.md#achievements.
+## Reached achievements wait here to be claimed manually for Rhinegold and XP.
 
+var _count: Label
+var _list: VBoxContainer
 
 func _ready() -> void:
 	var column: VBoxContainer = MenuUI.screen_column(self, 24)
 	column.add_child(MenuUI.header("UI_ACHIEVEMENTS", MenuUI.rhinegold_counter()))
-	var done: int = 0
-	for achievement: Dictionary in Achievements.LIST:
-		if Achievements.is_unlocked(achievement["id"]):
-			done += 1
-	var count: Label = MenuUI.label("", 26, Palette.TEXT_MUTED)
-	count.name = "AchievementCount"
-	count.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	count.text = tr("UI_ACHIEVEMENTS_COUNT").format({"done": done, "total": Achievements.LIST.size()})
-	column.add_child(count)
+	_count = MenuUI.label("", 26, Palette.TEXT_MUTED)
+	_count.name = "AchievementCount"
+	_count.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(_count)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(scroll)
-	var list := VBoxContainer.new()
-	list.name = "AchievementList"
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation", 14)
+	_list = VBoxContainer.new()
+	_list.name = "AchievementList"
+	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_list.add_theme_constant_override("separation", 14)
 	# Fills the scroll's height, centred vertically (it scrolls once taller than the screen).
-	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	list.alignment = BoxContainer.ALIGNMENT_CENTER
-	scroll.add_child(list)
+	_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_list.alignment = BoxContainer.ALIGNMENT_CENTER
+	scroll.add_child(_list)
+	_refresh()
+
+
+func _refresh() -> void:
+	var claimed: int = 0
 	for achievement: Dictionary in Achievements.LIST:
-		list.add_child(_row(achievement))
+		if Achievements.is_unlocked(achievement["id"]):
+			claimed += 1
+	_count.text = tr("UI_ACHIEVEMENTS_COUNT").format({"done": claimed, "total": Achievements.LIST.size()})
+	for child: Node in _list.get_children():
+		_list.remove_child(child)
+		child.queue_free()
+	for achievement: Dictionary in Achievements.LIST:
+		_list.add_child(_row(achievement))
+
+
+func _claim(achievement_id: String) -> void:
+	var change: Dictionary = Achievements.claim(achievement_id)
+	if change.is_empty():
+		return
+	var lines: PackedStringArray = [Achievements.claimed_text(achievement_id)]
+	lines.append(tr("UI_XP_GAINED").format({"amount": change["level"]["xp"]}))
+	for reached: Variant in change["level"]["levels"]:
+		lines.append(PlayerLevel.level_up_text(reached))
+	MenuUI.toast(self, "\n".join(lines))
+	_refresh()
 
 
 func _row(achievement: Dictionary) -> PanelContainer:
 	var achievement_id: String = achievement["id"]
 	var unlocked: bool = Achievements.is_unlocked(achievement_id)
+	var claimable: bool = Achievements.is_claimable(achievement_id)
 	var row := PanelContainer.new()
 	row.name = "Achievement_%s" % achievement_id
-	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, Palette.ACCENT if unlocked else Palette.BORDER, 3)
+	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, Palette.ACCENT if unlocked or claimable else Palette.BORDER, 3)
 	style.set_content_margin_all(18)
 	row.add_theme_stylebox_override("panel", style)
 	var line := HBoxContainer.new()
@@ -52,14 +72,14 @@ func _row(achievement: Dictionary) -> PanelContainer:
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.custom_minimum_size = Vector2(64, 64)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	icon.modulate = Palette.ACCENT if unlocked else Color(Palette.TEXT_MUTED, 0.45)
+	icon.modulate = Palette.ACCENT if unlocked or claimable else Color(Palette.TEXT_MUTED, 0.45)
 	line.add_child(icon)
 
 	var texts := VBoxContainer.new()
 	texts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	texts.add_theme_constant_override("separation", 4)
 	line.add_child(texts)
-	var title: Label = MenuUI.label("ACHIEVEMENT_%s_NAME" % achievement_id.to_upper(), 28, Palette.ACCENT if unlocked else Palette.TEXT)
+	var title: Label = MenuUI.label("ACHIEVEMENT_%s_NAME" % achievement_id.to_upper(), 28, Palette.ACCENT if unlocked or claimable else Palette.TEXT)
 	texts.add_child(title)
 	var description: Label = MenuUI.label("ACHIEVEMENT_%s_DESC" % achievement_id.to_upper(), 22, Palette.TEXT_MUTED)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -72,7 +92,12 @@ func _row(achievement: Dictionary) -> PanelContainer:
 	state.name = "Progress"
 	state.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	state.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	state.text = tr("UI_ACHIEVEMENT_DONE") if unlocked else "%d / %d" % [Achievements.progress(achievement), int(achievement["target"])]
+	if unlocked:
+		state.text = tr("UI_ACHIEVEMENT_DONE")
+	elif claimable:
+		state.text = tr("UI_ACHIEVEMENT_CLAIMABLE")
+	else:
+		state.text = "%d / %d" % [Achievements.progress(achievement), int(achievement["target"])]
 	right.add_child(state)
 	var reward: Label = MenuUI.label("", 22, Palette.TEXT_MUTED)
 	reward.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -80,4 +105,12 @@ func _row(achievement: Dictionary) -> PanelContainer:
 	reward.text = "%s · %s" % [tr("UI_REWARD").format({"amount": achievement["reward"]}),
 			tr("UI_XP_GAINED").format({"amount": PlayerLevel.XP_ACHIEVEMENT})]
 	right.add_child(reward)
+	if claimable:
+		var claim: Button = MenuUI.button("", 64, 20)
+		claim.name = "ClaimButton"
+		claim.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		claim.text = tr("UI_ACHIEVEMENT_CLAIM").format({"amount": achievement["reward"]})
+		claim.theme_type_variation = &"ButtonPrimary"
+		claim.pressed.connect(_claim.bind(achievement_id))
+		right.add_child(claim)
 	return row

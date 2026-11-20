@@ -1,10 +1,9 @@
 class_name Achievements
 extends RefCounted
 
-## Achievements (docs/functional/06-progression.md#achievements): each one counts a statistic of the
-## profile (SaveManager.profile["stats"]) up to a target, and pays Rhinegold once when reached. Unlocked
-## IDs are kept in profile["achievements"]. Only Quick matches count (DuelSetup.rewards), plus crafting
-## in Nibelheim. Names and descriptions: ACHIEVEMENT_<ID>_NAME / _DESC.
+## Achievements (docs/functional/06-progression.md#achievements): reaching a target makes it claimable;
+## a manual claim pays Rhinegold and XP. Reached IDs are in profile["achievements"], claimed IDs in
+## profile["claimed_achievements"]. Only Quick matches count (DuelSetup.rewards), plus Nibelheim crafting.
 
 ## id, statistic counted, target, Rhinegold reward. Order = order on the Achievements screen.
 const LIST: Array[Dictionary] = [
@@ -41,9 +40,8 @@ static func summarize(state: GameState, stats: MatchStats, difficulty: int) -> D
 	}
 
 
-## Adds a finished match to the statistics, unlocks what it reaches and gives the XP of the match and
-## of its achievements (PlayerLevel). Returns what changed, for revert() (undoing the winning play from
-## the results) and the results screen: {"counts", "leader", "unlocked", "rhinegold", "level"}.
+## Adds a finished match to the statistics and gives the match XP. Newly reached achievements are
+## claimable but pay nothing until claimed. Returns what changed for revert() and the results screen.
 static func record_match(summary: Dictionary) -> Dictionary:
 	var won: bool = summary["won"]
 	var counts: Dictionary = {
@@ -63,30 +61,40 @@ static func record_match(summary: Dictionary) -> Dictionary:
 		leaders.append(leader)
 	_add_counts(counts, 1)
 	var change: Dictionary = {"counts": counts, "leader": leader}
-	change.merge(_unlock_reached())
-	var xp: int = PlayerLevel.match_xp(won, int(summary["difficulty"])) + PlayerLevel.XP_ACHIEVEMENT * (change["unlocked"] as Array).size()
+	change.merge(_mark_reached())
+	var xp: int = PlayerLevel.match_xp(won, int(summary["difficulty"]))
 	change["level"] = PlayerLevel.add_xp(xp)
 	return change
 
 
-## A card forged in Nibelheim: {"unlocked" (IDs), "level" (PlayerLevel.add_xp() of their XP)}.
+## A card forged in Nibelheim: newly reached achievements are claimable, with no automatic reward.
 static func record_craft() -> Dictionary:
 	_add_counts({"cards_crafted": 1}, 1)
-	var change: Dictionary = _unlock_reached()
-	change["level"] = PlayerLevel.add_xp(PlayerLevel.XP_ACHIEVEMENT * (change["unlocked"] as Array).size())
-	return change
+	return _mark_reached()
 
 
-## Takes back a match recorded by record_match(): counts, Leader, achievements and their Rhinegold, XP.
+## Pays a reached achievement once. Returns its XP and level changes; false when not claimable.
+static func claim(achievement_id: String) -> Dictionary:
+	if not is_claimable(achievement_id):
+		return {}
+	var achievement: Dictionary = find(achievement_id)
+	(SaveManager.profile["claimed_achievements"] as Array).append(achievement_id)
+	var level: Dictionary = PlayerLevel.add_xp(PlayerLevel.XP_ACHIEVEMENT)
+	SaveManager.add_rhinegold(int(achievement["reward"]))
+	return {"achievement": achievement_id, "reward": int(achievement["reward"]), "level": level}
+
+
+## Takes back a match recorded by record_match(): counts, Leader, pending achievements and match XP.
 static func revert(change: Dictionary) -> void:
 	PlayerLevel.revert(change.get("level", {}))
 	_add_counts(change.get("counts", {}), -1)
 	var leader: String = change.get("leader", "")
 	if not leader.is_empty():
 		_leaders_won().erase(leader)
-	for achievement_id: Variant in change.get("unlocked", []):
+	for achievement_id: Variant in change.get("reached", []):
 		(SaveManager.profile["achievements"] as Array).erase(achievement_id)
-	SaveManager.add_rhinegold(-int(change.get("rhinegold", 0)))
+	SaveManager.save_profile()
+	SaveManager.profile_changed.emit()
 
 
 ## Current value of an achievement's statistic, capped at its target.
@@ -101,11 +109,26 @@ static func stat(stat_id: String) -> int:
 
 
 static func is_unlocked(achievement_id: String) -> bool:
+	return (SaveManager.profile["claimed_achievements"] as Array).has(achievement_id)
+
+
+static func is_reached(achievement_id: String) -> bool:
 	return (SaveManager.profile["achievements"] as Array).has(achievement_id)
 
 
-## "Achievement unlocked: Name (+40 Rhinegold)", for the results screen and Nibelheim.
-static func unlocked_text(achievement_id: String) -> String:
+static func is_claimable(achievement_id: String) -> bool:
+	return is_reached(achievement_id) and not is_unlocked(achievement_id)
+
+
+## "Achievement ready to claim: Name", for match results and Nibelheim.
+static func ready_text(achievement_id: String) -> String:
+	return TranslationServer.translate("UI_ACHIEVEMENT_READY").format({
+		"name": TranslationServer.translate("ACHIEVEMENT_%s_NAME" % achievement_id.to_upper()),
+	})
+
+
+## "Achievement claimed: Name (+40 Rhinegold)", for the claim confirmation.
+static func claimed_text(achievement_id: String) -> String:
 	return TranslationServer.translate("UI_ACHIEVEMENT_UNLOCKED").format({
 		"name": TranslationServer.translate("ACHIEVEMENT_%s_NAME" % achievement_id.to_upper()),
 		"amount": find(achievement_id).get("reward", 0),
@@ -140,17 +163,16 @@ static func _add_counts(counts: Dictionary, direction: int) -> void:
 	SaveManager.save_profile()
 
 
-## Unlocks every achievement whose target is reached and pays its reward: {"unlocked", "rhinegold"}.
-static func _unlock_reached() -> Dictionary:
-	var unlocked: Array = []
-	var total: int = 0
+## Records every achievement whose target is reached, without paying its reward.
+static func _mark_reached() -> Dictionary:
+	var reached: Array = []
 	for achievement: Dictionary in LIST:
 		var achievement_id: String = achievement["id"]
-		if is_unlocked(achievement_id) or stat(achievement["stat"]) < int(achievement["target"]):
+		if is_reached(achievement_id) or stat(achievement["stat"]) < int(achievement["target"]):
 			continue
 		(SaveManager.profile["achievements"] as Array).append(achievement_id)
-		unlocked.append(achievement_id)
-		total += int(achievement["reward"])
-	# add_rhinegold saves the profile (with the new achievements) and tells the screens.
-	SaveManager.add_rhinegold(total)
-	return {"unlocked": unlocked, "rhinegold": total}
+		reached.append(achievement_id)
+	if not reached.is_empty():
+		SaveManager.save_profile()
+		SaveManager.profile_changed.emit()
+	return {"reached": reached}

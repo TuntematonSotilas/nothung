@@ -120,7 +120,7 @@ static func screen_column(screen: Control, separation: int = 28) -> VBoxContaine
 	return column
 
 
-## A short message over the bottom of the screen (an achievement unlocked…), gone after a few seconds.
+## A short message over the bottom of the screen (an achievement ready to claim…), gone after a few seconds.
 static func toast(screen: Control, text: String) -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.name = "Toast"

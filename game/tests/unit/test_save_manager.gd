@@ -177,9 +177,18 @@ func test_migration_v1_renames_hoard_to_rhinegold() -> void:
 	assert_int(int(migrated["version"])).is_equal(SaveManagerScript.CURRENT_VERSION)
 
 
+func test_v3_achievements_are_migrated_as_already_claimed() -> void:
+	var migrated: Dictionary = SaveManagerScript.migrate({
+		"version": 3,
+		"achievements": ["first_victory"],
+	})
+	assert_array(migrated["achievements"]).contains_exactly(["first_victory"])
+	assert_array(migrated["claimed_achievements"]).contains_exactly(["first_victory"])
+
+
 func test_migration_fills_missing_keys() -> void:
 	var migrated: Dictionary = SaveManagerScript.migrate({"version": 2, "rhinegold": 5})
-	assert_dict(migrated).contains_keys(["collection", "decks", "campaign", "achievements"])
+	assert_dict(migrated).contains_keys(["collection", "decks", "campaign", "achievements", "claimed_achievements"])
 	assert_int(int(migrated["rhinegold"])).is_equal(5)
 
 

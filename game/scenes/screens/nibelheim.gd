@@ -112,10 +112,8 @@ func forge(data: CardData) -> bool:
 		return false
 	var lines: PackedStringArray = []
 	var change: Dictionary = Achievements.record_craft()
-	for achievement_id: Variant in change["unlocked"]:
-		lines.append(Achievements.unlocked_text(achievement_id))
-	for reached: Variant in change["level"]["levels"]:
-		lines.append(PlayerLevel.level_up_text(reached))
+	for achievement_id: Variant in change["reached"]:
+		lines.append(Achievements.ready_text(achievement_id))
 	_refresh()
 	if not lines.is_empty():
 		MenuUI.toast(self, "
@@ -166,12 +164,27 @@ func _power_row(leader: LeaderData, index: int) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.name = "Power%d" % index
 	row.add_theme_constant_override("separation", 16)
-	var text: Label = MenuUI.label("", 22, Palette.TEXT)
-	text.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var text := VBoxContainer.new()
+	text.name = "PowerText"
 	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	text.text = "%s (%s)" % [LeaderPowers.title(leader, index), tr("UI_POWER_COST").format({"cost": leader.with_power(index).ability.cost})]
+	text.add_theme_constant_override("separation", 2)
 	row.add_child(text)
+	var ability_key: String = leader.with_power(index).ability_key()
+	var title_color: Color = (CardPalette.FACTIONS[leader.faction]["frame"] as Color).lightened(0.55)
+	var title: Label = MenuUI.label("", 24, title_color)
+	title.name = "PowerTitle"
+	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	title.text = "%s (%s)" % [
+		tr(ability_key + "_NAME"),
+		tr("UI_POWER_COST").format({"cost": leader.with_power(index).ability.cost}),
+	]
+	text.add_child(title)
+	var action: Label = MenuUI.label("", 20, Palette.TEXT_MUTED)
+	action.name = "PowerAction"
+	action.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	action.text = tr(ability_key + "_TEXT")
+	action.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	text.add_child(action)
 	if LeaderPowers.is_unlocked(leader.id, index):
 		var state: Label = MenuUI.label("UI_POWER_BASE" if index == 0 else "UI_ACHIEVEMENT_DONE", 22, Palette.TEXT_MUTED if index == 0 else Palette.ACCENT)
 		state.name = "State"

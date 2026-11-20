@@ -5,7 +5,7 @@ extends Node
 
 signal profile_changed
 
-const CURRENT_VERSION: int = 3
+const CURRENT_VERSION: int = 4
 const DEFAULT_PATH: String = "user://profile.json"
 const DEFAULT_MATCH_PATH: String = "user://current_match.json"
 ## Rhinegold refunded per copy of a card that no longer exists (its rarity is unknown): the Common
@@ -33,6 +33,7 @@ static func default_profile() -> Dictionary:
 		"decks": [],
 		"campaign": {},
 		"achievements": [],
+		"claimed_achievements": [],
 		# Counters the achievements read (Achievements.LIST): matches, wins, leaders_won…
 		"stats": {},
 		# Total XP; the player level is derived from it (PlayerLevel).
@@ -251,6 +252,8 @@ static func migrate(data: Dictionary) -> Dictionary:
 				_migrate_v1_to_v2(migrated)
 			2:
 				_migrate_v2_to_v3(migrated)
+			3:
+				_migrate_v3_to_v4(migrated)
 		version += 1
 	migrated["version"] = CURRENT_VERSION
 	# Missing or mistyped keys (a hand-edited or damaged save) get their default.
@@ -314,6 +317,12 @@ static func _migrate_v2_to_v3(data: Dictionary) -> void:
 	data["leaders"] = []
 	data["starter_collection_granted"] = false
 	data["starter_decks_copied"] = false
+
+
+## v3 → v4: achievements already unlocked had their rewards paid; treat them as claimed.
+static func _migrate_v3_to_v4(data: Dictionary) -> void:
+	var achievements: Variant = data.get("achievements", [])
+	data["claimed_achievements"] = (achievements as Array).duplicate() if achievements is Array else []
 
 
 func _backup_path() -> String:

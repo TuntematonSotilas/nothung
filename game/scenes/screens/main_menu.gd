@@ -30,6 +30,7 @@ func _build() -> void:
 
 	var top := HBoxContainer.new()
 	top.name = "TopBar"
+	top.add_theme_constant_override("separation", 20)
 	column.add_child(top)
 	var forge := VBoxContainer.new()
 	forge.add_theme_constant_override("separation", 4)

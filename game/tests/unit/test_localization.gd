@@ -27,6 +27,7 @@ func test_translations_are_loaded() -> void:
 	assert_str(tr("UI_SPLASH_TAGLINE")).is_equal("INSPIRÉ DE DER RING DES NIBELUNGEN")
 	assert_str(tr("UI_CLOSE")).is_equal("FERMER")
 	assert_str(tr("UI_UNDO_PLAY")).is_equal("ANNULER LA POSE")
+	assert_str(tr("UI_ACHIEVEMENT_CLAIMABLE")).is_equal("À réclamer")
 	assert_str(tr("UI_DROP_TO_PLAY")).is_equal("DÉPOSER ICI POUR JOUER")
 	assert_str(tr("CARD_LOGE_NAME")).is_equal("Loge")
 	assert_str(tr("LEADER_WOTAN_RULES")).is_equal("Capacité (3 Énergie) : Inflige 2 dégâts à une unité.")

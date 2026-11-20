@@ -2,7 +2,7 @@ class_name PlayerLevel
 extends RefCounted
 
 ## Player level (docs/functional/06-progression.md#player-level): XP from every finished Quick match
-## (more for a win, by difficulty) and from each achievement unlocked. The profile keeps the total
+## (more for a win, by difficulty) and from each achievement claimed. The profile keeps the total
 ## (profile["xp"]); the level is derived from it. Each level reached pays Rhinegold; levels lock nothing.
 
 ## Loss or draw.

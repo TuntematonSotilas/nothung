@@ -52,6 +52,7 @@ func test_main_menu_offers_quick_match_collection_and_settings_and_greys_out_the
 	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
 	for button_name: String in ["NibelheimButton", "SettingsButton", "ChangeDeckButton", "MyDecksButton", "QuickMatchButton", "CollectionButton"]:
 		assert_bool((menu.find_child(button_name, true, false) as Button).disabled).is_false()
+	assert_int((menu.find_child("TopBar", true, false) as HBoxContainer).get_theme_constant("separation")).is_equal(20)
 	assert_bool((menu.find_child("CampaignButton", true, false) as Button).disabled).is_true()
 	assert_str((menu.find_child("RhinegoldLabel", true, false) as Label).text).starts_with("320 ")
 	menu.queue_free()
@@ -280,20 +281,39 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 	state.winner = 0
 	duel.call("_save_progress")
 	duel.call("_save_progress")
-	# The win and the achievements it unlocks (first win, a win on Hard…) pay once.
+	# The win reaches achievements, but their rewards wait for a manual claim.
 	var change: Dictionary = duel.get("_achievements_change")
-	assert_array(change["unlocked"]).contains(["first_victory", "gotterdammerung"])
-	assert_bool(Achievements.is_unlocked("first_victory")).is_true()
+	assert_array(change["reached"]).contains(["first_victory", "gotterdammerung"])
+	assert_bool(Achievements.is_claimable("first_victory")).is_true()
+	assert_bool(Achievements.is_unlocked("first_victory")).is_false()
 	assert_int(Achievements.stat("wins")).is_equal(1)
-	# XP: the Hard win and each achievement; the levels reached pay Rhinegold too.
+	# XP: only the Hard win; the level reached pays Rhinegold.
 	var level: Dictionary = change["level"]
-	assert_int(level["xp"]).is_equal(PlayerLevel.XP_WIN[AIProfile.Difficulty.HARD] + PlayerLevel.XP_ACHIEVEMENT * (change["unlocked"] as Array).size())
+	assert_int(level["xp"]).is_equal(PlayerLevel.XP_WIN[AIProfile.Difficulty.HARD])
+	var ability_button: Button = duel.find_child("OwnAbilityButton", true, false) as Button
+	var ability_cost: Label = ability_button.find_child("AbilityCost", true, false) as Label
+	var ability_title: Label = ability_button.find_child("AbilityTitle", true, false) as Label
+	var ability_action: Label = ability_button.find_child("AbilityAction", true, false) as Label
+	var ability_content: HBoxContainer = ability_button.find_child("AbilityContent", true, false) as HBoxContainer
+	var ability_icon: TextureRect = ability_button.find_child("EnergyIcon", true, false) as TextureRect
+	assert_int(ability_cost.get_index()).is_equal(0)
+	assert_int(ability_icon.get_index()).is_equal(1)
+	assert_int(ability_content.get_theme_constant("separation")).is_equal(roundi(2 * float(duel.get("_ui_scale"))))
+	assert_str(ability_cost.text).is_equal("2")
+	assert_that(ability_cost.get_theme_color("font_color")).is_equal(Palette.ENERGY)
+	assert_str(ability_title.text).is_equal(tr("LEADER_SIEGFRIED_ABILITY_NAME"))
+	assert_that(ability_title.get_theme_color("font_color")).is_equal(
+		(CardPalette.FACTIONS[&"walsungs"]["frame"] as Color).lightened(0.55)
+	)
+	assert_str(ability_action.text).is_equal(tr("LEADER_SIEGFRIED_ABILITY_TEXT"))
+	assert_that(ability_action.get_theme_color("font_color")).is_equal(Palette.TEXT_MUTED)
 	assert_int(PlayerLevel.total_xp()).is_equal(level["xp"])
 	assert_array(level["levels"]).contains([2])
-	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD) + int(change["rhinegold"]) + int(level["rhinegold"]))
-	# The results list the achievements unlocked, the XP gained and the levels reached.
+	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD) + int(level["rhinegold"]))
+	# The results list claimable achievements, match XP and the levels reached.
 	duel.call("_show_results")
 	assert_object(duel.find_child("Achievement_first_victory", true, false)).is_not_null()
+	assert_object(duel.find_child("VictoryPanel", true, false)).is_not_null()
 	assert_str((duel.find_child("XpLabel", true, false) as Label).text).is_equal(tr("UI_XP_GAINED").format({"amount": level["xp"]}))
 	assert_object(duel.find_child("LevelBar", true, false)).is_not_null()
 	assert_object(duel.find_child("LevelUp_2", true, false)).is_not_null()
@@ -317,8 +337,18 @@ func test_achievements_screen_lists_progress_and_the_main_menu_opens_it() -> voi
 	menu.queue_free()
 	SaveManager.profile["stats"] = {"wins": 3}
 	SaveManager.profile["achievements"] = ["first_victory"]
+	SaveManager.profile["claimed_achievements"] = []
 	var screen: Control = await _open("res://scenes/screens/achievements.tscn")
 	assert_int(screen.find_child("AchievementList", true, false).get_child_count()).is_equal(Achievements.LIST.size())
+	var pending: Node = screen.find_child("Achievement_first_victory", true, false)
+	assert_str((pending.find_child("Progress", true, false) as Label).text).is_equal(tr("UI_ACHIEVEMENT_CLAIMABLE"))
+	var claim: Button = pending.find_child("ClaimButton", true, false) as Button
+	assert_bool(claim.disabled).is_false()
+	claim.pressed.emit()
+	assert_bool(Achievements.is_unlocked("first_victory")).is_true()
+	assert_int(PlayerLevel.total_xp()).is_equal(PlayerLevel.XP_ACHIEVEMENT)
+	assert_int(SaveManager.rhinegold()).is_equal(20 + PlayerLevel.RHINEGOLD_PER_LEVEL)
+	assert_object(screen.find_child("Achievement_first_victory", true, false).find_child("ClaimButton", true, false)).is_null()
 	var done: Node = screen.find_child("Achievement_first_victory", true, false)
 	assert_str((done.find_child("Progress", true, false) as Label).text).is_equal(tr("UI_ACHIEVEMENT_DONE"))
 	var counting: Node = screen.find_child("Achievement_einherjar", true, false)
@@ -326,7 +356,7 @@ func test_achievements_screen_lists_progress_and_the_main_menu_opens_it() -> voi
 	screen.queue_free()
 
 
-func test_forging_in_nibelheim_unlocks_mimes_apprentice() -> void:
+func test_forging_in_nibelheim_makes_mimes_apprentice_claimable() -> void:
 	SaveManager.add_rhinegold(1000)
 	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
 	var data: CardData = null
@@ -336,11 +366,13 @@ func test_forging_in_nibelheim_unlocks_mimes_apprentice() -> void:
 			data = card
 			break
 	assert_bool(screen.call("forge", data)).is_true()
-	assert_bool(Achievements.is_unlocked("mimes_apprentice")).is_true()
-	# Its 25 XP reach level 2: +20 for the achievement, +40 for the level.
-	assert_int(PlayerLevel.level()).is_equal(2)
-	assert_int(SaveManager.rhinegold()).is_equal(1000 - Progression.craft_price(data) + 20 + PlayerLevel.RHINEGOLD_PER_LEVEL)
-	assert_str((screen.find_child("ToastText", true, false) as Label).text).contains(PlayerLevel.level_up_text(2))
+	assert_bool(Achievements.is_claimable("mimes_apprentice")).is_true()
+	# Crafting reaches the achievement but awards no XP or Rhinegold for it yet.
+	assert_int(PlayerLevel.level()).is_equal(1)
+	assert_int(SaveManager.rhinegold()).is_equal(1000 - Progression.craft_price(data))
+	assert_str((screen.find_child("ToastText", true, false) as Label).text).contains(tr("UI_ACHIEVEMENT_READY").format({
+		"name": tr("ACHIEVEMENT_MIMES_APPRENTICE_NAME"),
+	}))
 	screen.queue_free()
 
 
@@ -353,6 +385,15 @@ func test_nibelheim_unlocks_a_leader_power_from_its_level() -> void:
 	assert_str((wotan.find_child("Power0", true, false).find_child("State", true, false) as Label).text).is_equal("UI_POWER_BASE")
 	# Level 1: greyed, with the level needed.
 	var power: Node = wotan.find_child("Power1", true, false)
+	var power_title: Label = power.find_child("PowerTitle", true, false) as Label
+	var power_action: Label = power.find_child("PowerAction", true, false) as Label
+	assert_str(power_title.text).contains(tr("LEADER_WOTAN_POWER1_NAME"))
+	assert_str(power_title.text).contains(tr("UI_POWER_COST").format({"cost": 3}))
+	assert_str(power_action.text).is_equal(tr("LEADER_WOTAN_POWER1_TEXT"))
+	assert_that(power_title.get_theme_color("font_color")).is_equal(
+		(CardPalette.FACTIONS[&"gods"]["frame"] as Color).lightened(0.55)
+	)
+	assert_that(power_title.get_theme_color("font_color")).is_not_equal(power_action.get_theme_color("font_color"))
 	assert_bool((power.find_child("UnlockButton", true, false) as Button).disabled).is_true()
 	assert_str((power.find_child("Reason", true, false) as Label).text).is_equal(tr("UI_POWER_LEVEL_NEEDED").format({"level": 5}))
 	# Level 5: it can be unlocked for its price.
