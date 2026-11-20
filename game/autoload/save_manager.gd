@@ -35,6 +35,10 @@ static func default_profile() -> Dictionary:
 		"achievements": [],
 		# Counters the achievements read (Achievements.LIST): matches, wins, leaders_won…
 		"stats": {},
+		# Total XP; the player level is derived from it (PlayerLevel).
+		"xp": 0,
+		# Leader powers unlocked in Nibelheim, per Leader: {"wotan": [1, 2]} (LeaderPowers).
+		"leader_powers": {},
 		# Until the campaign unlocks factions, a new player owns the four starter decks, and gets a
 		# copy of each as an editable deck.
 		"starter_collection_granted": false,
@@ -256,6 +260,14 @@ static func migrate(data: Dictionary) -> Dictionary:
 			migrated[key] = defaults[key]
 	# JSON reads every number back as a float: counts are ints again.
 	migrated["rhinegold"] = int(migrated["rhinegold"])
+	migrated["xp"] = int(migrated["xp"])
+	var powers: Dictionary = migrated["leader_powers"]
+	for leader_id: Variant in powers:
+		var indices: Array = []
+		if powers[leader_id] is Array:
+			for index: Variant in powers[leader_id]:
+				indices.append(int(index))
+		powers[leader_id] = indices
 	var collection: Dictionary = migrated["collection"]
 	for card_id: Variant in collection:
 		collection[card_id] = int(collection[card_id])

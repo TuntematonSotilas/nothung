@@ -30,17 +30,22 @@ func _summary(won: bool, overrides: Dictionary = {}) -> Dictionary:
 func test_a_first_win_unlocks_once_and_pays() -> void:
 	var change: Dictionary = Achievements.record_match(_summary(true))
 	assert_array(change["unlocked"]).contains_exactly(["first_victory"])
-	assert_int(SaveManager.rhinegold()).is_equal(20)
+	# The Normal win and the achievement give XP; the levels reached pay their own Rhinegold.
+	assert_int(change["level"]["xp"]).is_equal(PlayerLevel.XP_WIN[1] + PlayerLevel.XP_ACHIEVEMENT)
+	assert_int(SaveManager.rhinegold()).is_equal(20 + int(change["level"]["rhinegold"]))
+	var before: int = SaveManager.rhinegold()
 	var again: Dictionary = Achievements.record_match(_summary(true))
 	assert_array(again["unlocked"]).is_empty()
+	assert_int(again["level"]["xp"]).is_equal(PlayerLevel.XP_WIN[1])
 	assert_int(Achievements.stat("wins")).is_equal(2)
 	assert_int(Achievements.stat("matches")).is_equal(2)
-	assert_int(SaveManager.rhinegold()).is_equal(20)
+	assert_int(SaveManager.rhinegold()).is_equal(before + int(again["level"]["rhinegold"]))
 
 
 func test_a_loss_counts_the_match_only() -> void:
 	var change: Dictionary = Achievements.record_match(_summary(false, {"life": 1, "units_lost": 0}))
 	assert_array(change["unlocked"]).is_empty()
+	assert_int(change["level"]["xp"]).is_equal(PlayerLevel.XP_MATCH)
 	assert_int(Achievements.stat("matches")).is_equal(1)
 	assert_int(Achievements.stat("wins")).is_equal(0)
 	assert_int(Achievements.stat("twilight_wins")).is_equal(0)
@@ -76,6 +81,7 @@ func test_revert_takes_the_match_back() -> void:
 	assert_int(Achievements.stat("artifacts_played")).is_equal(0)
 	assert_int(Achievements.stat("leaders_won")).is_equal(0)
 	assert_bool(Achievements.is_unlocked("first_victory")).is_false()
+	assert_int(PlayerLevel.total_xp()).is_equal(0)
 	assert_int(SaveManager.rhinegold()).is_equal(5)
 
 
@@ -85,7 +91,7 @@ func test_counters_unlock_at_their_target() -> void:
 	assert_bool(Achievements.is_unlocked("notung")).is_true()
 	assert_bool(Achievements.is_unlocked("nibelung_hoard")).is_true()
 	assert_int(Achievements.progress(Achievements.find("nibelung_hoard"))).is_equal(20)
-	assert_array(Achievements.record_craft()).contains_exactly(["mimes_apprentice"])
+	assert_array(Achievements.record_craft()["unlocked"]).contains_exactly(["mimes_apprentice"])
 
 
 func test_match_stats_count_the_players_artifacts_and_forget_an_undone_play() -> void:

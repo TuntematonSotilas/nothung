@@ -24,14 +24,15 @@
 | Campaign Quest (each ending, first time) | Card, Rhinegold or cosmetic ([Quests](05-game-modes.md#quests-non-combat-stages)) |
 | Campaign chapter complete | Legendary card + faction starter deck |
 | Quick match win | Rhinegold: 10 (Easy) / 20 (Normal) / 40 (Hard); nothing for a loss, a draw or leaving |
-| Achievements | Rhinegold (cosmetics later: card backs, frames…) |
+| Achievements | Rhinegold and 25 XP (cosmetics later: card backs, frames…) |
+| Player level reached | 40 Rhinegold (cosmetics later); from level 5 and 10, Leader powers can be unlocked |
 
 ## Meta currency
 
 > Distinct from in-match Energy. The progression currency is **Rhinegold**.
 
-- Earned in quick matches and achievements.
-- Spent in **Nibelheim** (the crafting screen) to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values), one copy at a time, up to the copies a deck can hold (2, or 1 for Epic and Legendary): beyond that a copy is useless, so Nibelheim does not offer it.
+- Earned in quick matches, achievements and level ups.
+- Spent in **Nibelheim** on [Leader powers](#leader-powers), and to craft a specific card (Common 40, Rare 100, Epic 400, Legendary 1600 — draft values), one copy at a time, up to the copies a deck can hold (2, or 1 for Epic and Legendary): beyond that a copy is useless, so Nibelheim does not offer it.
 - A Quick match win pays at the end of the match and is shown on the results. Undoing the winning play from the results takes it back (it is paid again if the match is won again).
 - Duplicate extra copies above the deck limit are automatically converted to Rhinegold.
 
@@ -57,7 +58,39 @@ Quick matches count (a duel without rewards does not), and crafting in Nibelheim
 | *Mime's Apprentice* | Forge a card in Nibelheim | 20 |
 | *The Forging Song* | Forge 10 cards in Nibelheim | 60 |
 
-> **Decision (2026-11-20):** first set of 13 achievements, Rhinegold only; *Renunciation of Love* becomes "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). Tiers, XP and cosmetic rewards wait for the rest of [milestone 6](../roadmap.md#6--progression--rewards).
+> **Decision (2026-11-20):** first set of 13 achievements paying Rhinegold (and, since the [player level](#player-level), 25 XP each); *Renunciation of Love* becomes "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). Tiers and cosmetic rewards wait for the rest of [milestone 6](../roadmap.md#6--progression--rewards).
+
+## Player level
+
+Every finished Quick match gives XP, and so does each achievement unlocked (in a match or in Nibelheim); undoing the winning play from the results takes the match's XP back, with its levels. The level locks nothing: each level reached pays Rhinegold (cosmetics later).
+
+| Source | XP |
+|--------|----|
+| Quick match lost or drawn | 10 |
+| Quick match won | 20 (Easy) / 30 (Normal) / 40 (Hard) |
+| Achievement unlocked | 25 |
+
+- From level *n* to *n* + 1: **20 + 10 × (*n* − 1)** XP — 20 for level 2 (one match), 110 from level 10 (about 5 matches), 300 for the last one; **level 30** is the cap (4,640 XP, about 230 matches).
+- Each level reached: **+40 Rhinegold**.
+- Shown in the main menu (level, XP bar) and on the results (XP gained, level reached).
+
+> **Decision (2026-11-20):** numbers above; cosmetic rewards come with their artwork, later in [milestone 6](../roadmap.md#6--progression--rewards).
+
+## Leader powers
+
+Each Leader has its base ability and **two powers**: other versions of it, a little stronger. They are unlocked in **Nibelheim** (Leaders tab) once the player level is reached, for Rhinegold; each deck then chooses the version its Leader plays with (deck editor: **Change the Leader's power**). The AI plays a version of its Leader drawn at random in each Quick match.
+
+| Leader | Base ability | Power 1 — level 5, 300 Rhinegold | Power 2 — level 10, 600 Rhinegold |
+|--------|--------------|----------------------------------|-----------------------------------|
+| Wotan | 3 Energy: 2 damage to a unit | *Wotans Zorn* — 3 Energy: 2 damage, double against Nibelungs | *Walvater* — 2 Energy: 2 damage |
+| Alberich | 2 Energy: summon a Nibelung Miner | *Des Ringes Herr* — 3 Energy: summon a Nibelung Host (2/3, guard) | *Verwandlung* — 2 Energy: summon *Alberich, the Toad* (2/3, invisible) |
+| Siegfried | 2 Energy: 1 damage, double against Gods | *Nothungs Schneide* — 3 Energy: 2 damage, double against Gods | *Furchtlos* — 1 Energy: 1 damage, double against Gods |
+| Brünnhilde | 3 Energy: summon a Fallen Hero (2/3) | *Walhalls Wahl* — 3 Energy: summon a Hero of Valhalla (2/4, guard) | *Wunschmaid* — 2 Energy: summon Ortlinde (1/4, guard) |
+
+- Power names are the original German names, the same in every language.
+- Source: `cards/leader_powers.md`. Each power wins about **10 points** more often than the base ability against the other starter decks (AI soak, [testing](../technical/09-testing.md#ai-soak)).
+
+> **Decision (2026-11-20):** Leader powers are **upgrades** of the ability, two per Leader, unlocked in Nibelheim with a **player level and Rhinegold** (level 5 / 300, level 10 / 600) — the only thing a level locks. The deck editor chooses the version; the AI draws one at random. Strength target: about +10 points of win rate over the base ability. A first draft (power 1 stronger for the same cost, power 2 one Energy cheaper) won up to 87 % (*Alberich*, a Nibelung Miner for 1 Energy) and was retuned.
 
 ## Ideas to refine (2026-11-20)
 
@@ -74,14 +107,11 @@ Quick matches count (a duel without rewards does not), and crafting in Nibelheim
 - XP for each match played (more for a win, by difficulty) and for each achievement; one level every N XP.
 - Possible unlocks: campaign chapters; Nibelheim (after the tutorial); factions and their starter decks (today tied to the campaign: see [Starting collection](#starting-collection)); Hard difficulty; backgrounds and skins; mini-games or "dungeons" (e.g. a run down into Nibelheim with a deck built along the way — a later mode).
 
-> **Decision (2026-11-20):** campaign chapters open **with the story only** (the previous chapter won), never with the level. A level up gives **cosmetics and Rhinegold** — it locks nothing (no Hard difficulty, Leader power or chapter behind a level). Pace: **fast, then slower** — level 2 after the first match or two, then about 3 to 5 matches a level, slower and slower, up to a cap around level 30. **Every finished match gives XP** — a win more than a loss, with a bonus by difficulty — and so does each achievement. Exact numbers to set.
+> **Decision (2026-11-20):** campaign chapters open **with the story only** (the previous chapter won), never with the level. A level up gives **cosmetics and Rhinegold** — it locks nothing (no Hard difficulty or chapter behind a level; amended the same day: [Leader powers](#leader-powers) need a level). Pace: **fast, then slower** — level 2 after the first match or two, then about 3 to 5 matches a level, slower and slower, up to a cap around level 30. **Every finished match gives XP** — a win more than a loss, with a bonus by difficulty — and so does each achievement. Numbers: see [Player level](#player-level).
 
 ### Leader powers
 
-- Idea: improve or change the Leader's ability.
-- Suggestion: **alternative abilities** — choose 1 of 2–3 per Leader — rather than stronger numbers, so balance and the AI soak stay meaningful.
-- Unlocked by Leader mastery (matches played with that Leader), bought with Rhinegold at Nibelheim, or given by levels.
-- Open question: chosen in Nibelheim (a tab) or on a Leader screen (from the deck editor, tap the Leader)?
+- Decided: see [Leader powers](#leader-powers) (upgrades, level + Rhinegold, Nibelheim tab, chosen per deck).
 
 ### Achievements
 

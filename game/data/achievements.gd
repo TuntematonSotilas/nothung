@@ -41,9 +41,9 @@ static func summarize(state: GameState, stats: MatchStats, difficulty: int) -> D
 	}
 
 
-## Adds a finished match to the statistics and unlocks what it reaches. Returns what changed, for
-## revert() (undoing the winning play from the results) and the results screen: {"counts", "leader",
-## "unlocked", "rhinegold"}.
+## Adds a finished match to the statistics, unlocks what it reaches and gives the XP of the match and
+## of its achievements (PlayerLevel). Returns what changed, for revert() (undoing the winning play from
+## the results) and the results screen: {"counts", "leader", "unlocked", "rhinegold", "level"}.
 static func record_match(summary: Dictionary) -> Dictionary:
 	var won: bool = summary["won"]
 	var counts: Dictionary = {
@@ -64,17 +64,22 @@ static func record_match(summary: Dictionary) -> Dictionary:
 	_add_counts(counts, 1)
 	var change: Dictionary = {"counts": counts, "leader": leader}
 	change.merge(_unlock_reached())
+	var xp: int = PlayerLevel.match_xp(won, int(summary["difficulty"])) + PlayerLevel.XP_ACHIEVEMENT * (change["unlocked"] as Array).size()
+	change["level"] = PlayerLevel.add_xp(xp)
 	return change
 
 
-## A card forged in Nibelheim. Returns the IDs unlocked.
-static func record_craft() -> Array:
+## A card forged in Nibelheim: {"unlocked" (IDs), "level" (PlayerLevel.add_xp() of their XP)}.
+static func record_craft() -> Dictionary:
 	_add_counts({"cards_crafted": 1}, 1)
-	return _unlock_reached()["unlocked"]
+	var change: Dictionary = _unlock_reached()
+	change["level"] = PlayerLevel.add_xp(PlayerLevel.XP_ACHIEVEMENT * (change["unlocked"] as Array).size())
+	return change
 
 
-## Takes back a match recorded by record_match(): counts, Leader, achievements and their Rhinegold.
+## Takes back a match recorded by record_match(): counts, Leader, achievements and their Rhinegold, XP.
 static func revert(change: Dictionary) -> void:
+	PlayerLevel.revert(change.get("level", {}))
 	_add_counts(change.get("counts", {}), -1)
 	var leader: String = change.get("leader", "")
 	if not leader.is_empty():

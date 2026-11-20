@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-11-19
+> Status: Draft · Last updated: 2026-11-20
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -17,7 +17,7 @@ Tick items (`- [x]`) as they are done. A milestone is complete when its **Done w
 | 3 | [**Playable match**](#3--playable-match) | A full match vs AI on the phone | Done |
 | 4 | [AI & balancing](#4--ai--balancing) | Average match length 5–7 min | Done |
 | 5 | [Menus & meta](#5--menus--meta) | Full loop without debug tools | Done |
-| 6 | [Progression & rewards](#6--progression--rewards) | A player has goals beyond the next match: level, achievements and their rewards | In progress (first achievements done) |
+| 6 | [Progression & rewards](#6--progression--rewards) | A player has goals beyond the next match: level, achievements and their rewards | In progress (achievements, player level and Leader powers done) |
 | 7 | [Test matches](#7--test-matches) | Artifacts and the Ring checked in real matches on the phone | To do |
 | 8 | [Campaign](#8--campaign) | Prologue + chapter 1 playable | To do |
 | 9 | [Release](#9--release) | Internal build on Google Play | To do |
@@ -111,15 +111,16 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 
 ## 6 — Progression & rewards
 
-Ideas still to refine ([progression ideas](functional/06-progression.md#ideas-to-refine-2026-11-20)): nothing is decided yet.
+Achievements, the player level and Leader powers are done; the rest is still to refine ([progression ideas](functional/06-progression.md#ideas-to-refine-2026-11-20)).
 
-- [ ] Decide the scope: rewards, level, unlocks, Leader powers, achievements
+- [x] Decide the scope: achievements, a player level that locks nothing (Rhinegold, then cosmetics), campaign chapters story-gated (decided 2026-11-20); Leader powers decided the same day (upgrades, level + Rhinegold); cosmetics keep their open questions in their own item below
 - [x] Achievements, first set: 13 achievements paying Rhinegold, counted on Quick matches and crafting, taken back with an undone winning play; Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
-- [ ] Achievements, next: tiers, XP and cosmetic rewards
-- [ ] Player level: XP from every finished match (more for a win, by difficulty) and from achievements; fast then slower up to ~level 30; each level gives Rhinegold and cosmetics, chapters stay story-gated (decided 2026-11-20, numbers to set)
+- [ ] Achievements, next: tiers and cosmetic rewards (each one already gives 25 XP)
+- [x] Player level: XP from every finished Quick match (10, or 20 / 30 / 40 for a win) and from achievements (25); 20 + 10 × (n − 1) XP a level, up to level 30; +40 Rhinegold a level; shown in the main menu and on the results; chapters stay story-gated ([player level](functional/06-progression.md#player-level))
+- [ ] Level rewards: cosmetics every 5 levels, once their artwork exists
 - [ ] Cosmetic rewards: home background, deck backgrounds, …
-- [ ] Leader powers: alternative abilities — where (Nibelheim, a Leader screen) and how (Rhinegold, mastery, level) they are unlocked
-- [ ] Profile v4: level, XP, achievement progress, unlocked cosmetics and abilities (migration)
+- [x] Leader powers: two upgraded versions of each Leader's ability, unlocked in Nibelheim (Leaders tab) with a level and Rhinegold (5 / 300, 10 / 600), chosen per deck in the deck editor; the AI draws one at random; tuned with the soak to about +10 points ([Leader powers](functional/06-progression.md#leader-powers))
+- [ ] Profile v4: unlocked cosmetics, if they need a migration (XP, achievement progress and Leader powers are new keys with defaults: no version change)
 
 ## 7 — Test matches
 

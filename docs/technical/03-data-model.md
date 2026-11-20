@@ -46,7 +46,7 @@ extends Resource
 
 `EffectData` is a typed Resource with a `Kind`, `Target`, numeric values, an optional keyword, an optional `CardData` reference and an optional `bonus_faction` (damage doubled against that faction). Supported kinds are damage, draw, energy, summon, heal, buff, transform, resurrect, Ring create/steal/return, reforge, create artifact and take control. `ConditionData` supports `controls(card_id)` (a unit, artifact or Leader you control) and `holds_ring`.
 
-Other resources: `LeaderData` (life, ability), `DeckData` (leader + ordered card definitions), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards), `CampaignQuestData` (non-combat stage: steps, each with an illustration, a text key and choices pointing to the next step or to an ending; reward per ending — [Quests](../functional/05-game-modes.md#quests-non-combat-stages)). Quest texts go in the localisation file, like card names.
+Other resources: `LeaderData` (life, ability, `powers`: the two `LeaderPowerData` — ability, level, price — of [Leader powers](../functional/06-progression.md#leader-powers); `with_power(index)` returns a copy whose `ability` is that power's, so the engine only reads `ability`; `ability_key()` gives its translation keys), `DeckData` (leader + ordered card definitions), `CampaignDuelData` (opponent deck, AI profile, special rules, rewards), `CampaignQuestData` (non-combat stage: steps, each with an illustration, a text key and choices pointing to the next step or to an ending; reward per ending — [Quests](../functional/05-game-modes.md#quests-non-combat-stages)). Quest texts go in the localisation file, like card names.
 
 The rules-engine Resources are implemented in `game/data/cards/` and `game/data/{leaders,decks}/`: `CardData`, `AbilityData`, `ConditionData`, `EffectData`, `LeaderData`, and `DeckData`. For the initial engine milestone, `DeckData.cards` contains `CardData` references (the Markdown card pipeline and ID-to-resource database are milestone 2); authored definitions are treated as immutable during a match. `CardData.is_ring`, `attachable`, `bearer`, relic bonuses, `bonus_damage_faction`, and `shatters_into` encode signature artifact and combat cases in data; the Ring's named Alberich bonus is a game-specific rule.
 
@@ -106,7 +106,7 @@ Why Markdown: readable on GitHub and in VS Code, easy to diff and review, the wh
 
 ### Source format
 
-One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`, `cards/valkyries.md`, `cards/neutral.md`), one table row per card. Leaders and starter deck lists use the same tabular format in `cards/leaders.md` and `cards/starter_decks.md`.
+One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`, `cards/valkyries.md`, `cards/neutral.md`), one table row per card. Leaders, Leader powers and starter deck lists use the same tabular format in `cards/leaders.md`, `cards/leader_powers.md` and `cards/starter_decks.md`.
 
 ```markdown
 | id | name | type | subtypes | rarity | cost | atk | hp | keywords | bearer | abilities | leitmotifs | flavour |
@@ -123,7 +123,7 @@ One file per faction (`cards/gods.md`, `cards/nibelungs.md`, `cards/walsungs.md`
 - `name` and `flavour` are the **English** source text; the converter writes them into the `en` column of the localisation file. Until translated, new strings are copied to other locale columns (a test then fails until they are translated in the CSV); existing translations are preserved. Rules text is generated in English only: translate it in the CSV with the [glossary](06-ui-implementation.md#glossary).
 - `abilities` uses a small syntax: `trigger[condition]: effect(args); …`. Each clause has one effect; multiple effects use multiple clauses. Every trigger, condition, effect, target and trait must be implemented by the engine; unknown names are errors.
 - Rules text shown on the card is **generated from `keywords` + `abilities`**, so it can never disagree with the actual behaviour.
-- `leaders.md` defines each Leader's faction, Life, ability name (`ability_name`, required when the Leader has an ability, shown on the duel screen), activated effect and Energy cost. The converter also writes `LEADER_<ID>_ABILITY_NAME` and `LEADER_<ID>_ABILITY_TEXT` (effect only) to the localisation file. `starter_decks.md` lists the 20 card IDs in each starter deck.
+- `leaders.md` defines each Leader's faction, Life, ability name (`ability_name`, required when the Leader has an ability, shown on the duel screen), activated effect and Energy cost. The converter also writes `LEADER_<ID>_ABILITY_NAME` and `LEADER_<ID>_ABILITY_TEXT` (effect only) to the localisation file. `leader_powers.md` lists powers 1 and 2 of each Leader with an ability (`leader | power | name | cost | ability | level | price`); the converter writes them into the Leader's `.tres` and `LEADER_<ID>_POWER<n>_NAME` (German name, every language) / `_TEXT` (effect, to translate). `starter_decks.md` lists the 20 card IDs in each starter deck.
 
 ### Converter
 

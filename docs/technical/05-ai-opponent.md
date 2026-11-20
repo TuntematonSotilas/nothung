@@ -117,4 +117,4 @@ Rules that make this safe:
 
 For debugging and tests, `AIPlayer.choose()` can also run **synchronously** on the calling thread.
 
-The player picks the difficulty in **Quick match**; the duel reads it from `DuelSetup` (Normal when started without one, e.g. in tests).
+The player picks the difficulty in **Quick match**; the duel reads it from `DuelSetup` (Normal when started without one, e.g. in tests). The AI's Leader plays a version drawn at random — base ability or one of its two [powers](../functional/06-progression.md#leader-powers) (`QuickMatch.with_random_power()`).

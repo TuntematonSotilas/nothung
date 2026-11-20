@@ -1,3 +1,4 @@
+class_name QuickMatch
 extends Control
 
 ## Quick match: your current deck (Change deck picks another one ready to play), the opponent's deck (a
@@ -103,7 +104,21 @@ func build_setup(rng: RandomNumberGenerator = null) -> DuelSetup:
 			rng = RandomNumberGenerator.new()
 			rng.randomize()
 		opponent = candidates[rng.randi_range(0, candidates.size() - 1)]
-	return DuelSetup.new(player, CardDatabase.get_deck(opponent), _difficulty)
+	return DuelSetup.new(player, with_random_power(CardDatabase.get_deck(opponent), rng), _difficulty)
+
+
+## The AI's deck with one of its Leader's versions (base ability or a power), drawn at random.
+static func with_random_power(deck: DeckData, rng: RandomNumberGenerator = null) -> DeckData:
+	if deck.leader.powers.is_empty():
+		return deck
+	if rng == null:
+		rng = RandomNumberGenerator.new()
+		rng.randomize()
+	var copy := DeckData.new()
+	copy.id = deck.id
+	copy.leader = deck.leader.with_power(rng.randi_range(0, deck.leader.powers.size()))
+	copy.cards = deck.cards
+	return copy
 
 
 func _on_play_pressed() -> void:

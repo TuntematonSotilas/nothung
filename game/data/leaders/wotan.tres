@@ -1,22 +1,55 @@
 [gd_resource type="Resource" script_class="LeaderData" format=3]
 
-[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_c4wh6"]
-[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="2_l3lxp"]
-[ext_resource type="Texture2D" path="res://assets/art/cards/wotan_leader.png" id="3_p6snu"]
-[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="4_q1j5j"]
+[ext_resource type="Script" path="res://data/cards/effect_data.gd" id="1_l3lxp"]
+[ext_resource type="Script" path="res://data/cards/ability_data.gd" id="2_p6snu"]
+[ext_resource type="Texture2D" path="res://assets/art/cards/wotan_leader.png" id="3_q1j5j"]
+[ext_resource type="Script" path="res://data/leaders/leader_power_data.gd" id="4_666mu"]
+[ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="5_lh11j"]
 
-[sub_resource type="Resource" id="Resource_666mu"]
-script = ExtResource("1_c4wh6")
+[sub_resource type="Resource" id="Resource_a1gst"]
+script = ExtResource("1_l3lxp")
 amount = 2
 
-[sub_resource type="Resource" id="Resource_lh11j"]
-script = ExtResource("2_l3lxp")
+[sub_resource type="Resource" id="Resource_xriq2"]
+script = ExtResource("2_p6snu")
 cost = 3
-effects = Array[ExtResource("1_c4wh6")]([SubResource("Resource_666mu")])
+effects = Array[ExtResource("1_l3lxp")]([SubResource("Resource_a1gst")])
+
+[sub_resource type="Resource" id="Resource_smwx5"]
+script = ExtResource("1_l3lxp")
+amount = 2
+bonus_faction = &"nibelungs"
+
+[sub_resource type="Resource" id="Resource_3imih"]
+script = ExtResource("2_p6snu")
+cost = 3
+effects = Array[ExtResource("1_l3lxp")]([SubResource("Resource_smwx5")])
+
+[sub_resource type="Resource" id="Resource_20aca"]
+script = ExtResource("4_666mu")
+ability = SubResource("Resource_3imih")
+level = 5
+price = 300
+
+[sub_resource type="Resource" id="Resource_e3nog"]
+script = ExtResource("1_l3lxp")
+amount = 2
+
+[sub_resource type="Resource" id="Resource_485hy"]
+script = ExtResource("2_p6snu")
+cost = 2
+effects = Array[ExtResource("1_l3lxp")]([SubResource("Resource_e3nog")])
+
+[sub_resource type="Resource" id="Resource_2qdnq"]
+script = ExtResource("4_666mu")
+ability = SubResource("Resource_485hy")
+level = 10
+price = 600
 
 [resource]
-script = ExtResource("4_q1j5j")
+script = ExtResource("5_lh11j")
 id = &"wotan"
 faction = &"gods"
-ability = SubResource("Resource_lh11j")
-art = ExtResource("3_p6snu")
+ability = SubResource("Resource_xriq2")
+powers = Array[ExtResource("4_666mu")]([SubResource("Resource_20aca"), SubResource("Resource_2qdnq")])
+art = ExtResource("3_q1j5j")

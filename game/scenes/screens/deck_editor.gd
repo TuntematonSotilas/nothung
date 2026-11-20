@@ -7,7 +7,8 @@ extends Control
 ## adds a copy (or shows the card with why it cannot be added); a tap on a chip takes a copy out. At the
 ## bottom: Auto-fill and Starter deck (both replace the deck, asking first when it is not empty), and
 ## Empty the deck (asks first). Every change is saved at once; leaving a deck that cannot be played
-## (Back, or the Android back button) asks first in a popup.
+## (Back, or the Android back button) asks first in a popup. Under the name, the Leader's power in use
+## and Change the Leader's power (the versions unlocked in Nibelheim).
 ## See docs/functional/05-game-modes.md#deck-builder.
 
 ## The deck to edit (a player deck ID), set before opening the screen.
@@ -27,6 +28,7 @@ var _chips: HFlowContainer
 var _filter_bar: CardFilterBar
 var _grid: CardGrid
 var _actions: VBoxContainer
+var _power_label: Label
 
 
 func _ready() -> void:
@@ -37,6 +39,8 @@ func _ready() -> void:
 	if _entry.is_empty() or _leader == null:
 		return
 	column.add_child(_identity_row())
+	if not _leader.powers.is_empty():
+		column.add_child(_power_row())
 	_status = MenuUI.label("", 24)
 	_status.name = "DeckStatus"
 	_status.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -88,6 +92,89 @@ func _identity_row() -> HBoxContainer:
 	leader_name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	identity.add_child(leader_name)
 	return identity
+
+
+## The Leader's power in use ("Power: Wotans Zorn — Deal 3 damage to a unit. (3 Energy)") and the
+## button that changes it.
+func _power_row() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	_power_label = MenuUI.label("", 22, Palette.TEXT_MUTED)
+	_power_label.name = "LeaderPower"
+	_power_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_power_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_power_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_power_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_power_label)
+	var change: Button = MenuUI.button("UI_CHANGE_POWER", 72, 22)
+	change.name = "ChangePowerButton"
+	change.custom_minimum_size.x = 300
+	change.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	change.pressed.connect(open_power_picker)
+	row.add_child(change)
+	_update_power_label()
+	return row
+
+
+func _update_power_label() -> void:
+	var index: int = LeaderPowers.of_entry(_entry)
+	_power_label.text = tr("UI_LEADER_POWER").format({
+		"power": LeaderPowers.title(_leader, index),
+		"cost": _leader.with_power(index).ability.cost,
+	})
+
+
+## A popup listing the base ability and each power: the unlocked ones can be chosen, the others say
+## where and from which level they are unlocked.
+func open_power_picker() -> ColorRect:
+	var overlay := ColorRect.new()
+	overlay.name = "PowerPicker"
+	overlay.color = Color(Palette.BG, 0.98)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(overlay)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var content := VBoxContainer.new()
+	content.custom_minimum_size.x = get_viewport_rect().size.x - 2 * MenuUI.SCREEN_MARGIN
+	content.add_theme_constant_override("separation", 20)
+	center.add_child(content)
+	var title: Label = MenuUI.label("UI_CHANGE_POWER", 36, Palette.ACCENT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+	var current: int = LeaderPowers.of_entry(_entry)
+	for index: int in range(_leader.powers.size() + 1):
+		var text: String = "%s\n%s" % [LeaderPowers.title(_leader, index), tr("UI_POWER_COST").format({"cost": _leader.with_power(index).ability.cost})]
+		var unlocked: bool = LeaderPowers.is_unlocked(_leader.id, index)
+		if not unlocked:
+			text += " · " + tr("UI_POWER_LOCKED").format({"level": _leader.powers[index - 1].level})
+		var tile: Button = MenuUI.choice_tile(text, CardPalette.FACTIONS[_leader.faction]["frame"], 130)
+		tile.name = "Power_%d" % index
+		tile.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		tile.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		tile.add_theme_font_size_override("font_size", 24)
+		tile.button_pressed = index == current
+		tile.disabled = not unlocked
+		tile.pressed.connect(func() -> void:
+			choose_power(index)
+			overlay.queue_free())
+		content.add_child(tile)
+	var cancel: Button = MenuUI.button("UI_CANCEL")
+	cancel.name = "CancelPowerButton"
+	cancel.pressed.connect(overlay.queue_free)
+	content.add_child(cancel)
+	return overlay
+
+
+## Saves the Leader's power this deck plays with; an index not unlocked is refused.
+func choose_power(index: int) -> bool:
+	if not LeaderPowers.is_unlocked(_leader.id, index) or index > _leader.powers.size():
+		return false
+	_entry["power"] = index
+	SaveManager.update_deck(_entry)
+	_update_power_label()
+	return true
 
 
 ## "Deck n / 20" and its gauge, the types, then the chips (or how to add cards).

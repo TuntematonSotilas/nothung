@@ -1561,6 +1561,24 @@ func _show_results() -> void:
 		unlocked.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		unlocked.text = Achievements.unlocked_text(achievement_id)
 		content.add_child(unlocked)
+	var level_change: Dictionary = _achievements_change.get("level", {})
+	if int(level_change.get("xp", 0)) > 0:
+		var xp: Label = _label("", 26, Palette.TEXT)
+		xp.name = "XpLabel"
+		xp.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		xp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		xp.text = tr("UI_XP_GAINED").format({"amount": level_change["xp"]})
+		content.add_child(xp)
+		var bar: Control = MenuUI.level_bar()
+		bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		content.add_child(bar)
+	for reached: Variant in level_change.get("levels", []):
+		var level_up: Label = _label("", 28, Palette.ACCENT)
+		level_up.name = "LevelUp_%d" % reached
+		level_up.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		level_up.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		level_up.text = PlayerLevel.level_up_text(reached)
+		content.add_child(level_up)
 	_results_undo_button = _button("UI_UNDO_PLAY", 250)
 	_set_button_icon(_results_undo_button, "undo", Palette.TEXT)
 	_results_undo_button.visible = false
@@ -1876,8 +1894,8 @@ func _update_leader_panel(player: PlayerState, name_label: Label, life_label: La
 	# The Energy icon sits on the button; the text starts with the cost, then the ability name and effect.
 	ability_button.text = "%d   %s\n%s" % [
 		player.leader.ability.cost,
-		tr("LEADER_%s_ABILITY_NAME" % key),
-		tr("LEADER_%s_ABILITY_TEXT" % key),
+		tr(player.leader.ability_key() + "_NAME"),
+		tr(player.leader.ability_key() + "_TEXT"),
 	]
 
 

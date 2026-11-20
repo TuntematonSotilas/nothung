@@ -285,10 +285,18 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 	assert_array(change["unlocked"]).contains(["first_victory", "gotterdammerung"])
 	assert_bool(Achievements.is_unlocked("first_victory")).is_true()
 	assert_int(Achievements.stat("wins")).is_equal(1)
-	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD) + int(change["rhinegold"]))
-	# The results list the achievements unlocked.
+	# XP: the Hard win and each achievement; the levels reached pay Rhinegold too.
+	var level: Dictionary = change["level"]
+	assert_int(level["xp"]).is_equal(PlayerLevel.XP_WIN[AIProfile.Difficulty.HARD] + PlayerLevel.XP_ACHIEVEMENT * (change["unlocked"] as Array).size())
+	assert_int(PlayerLevel.total_xp()).is_equal(level["xp"])
+	assert_array(level["levels"]).contains([2])
+	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD) + int(change["rhinegold"]) + int(level["rhinegold"]))
+	# The results list the achievements unlocked, the XP gained and the levels reached.
 	duel.call("_show_results")
 	assert_object(duel.find_child("Achievement_first_victory", true, false)).is_not_null()
+	assert_str((duel.find_child("XpLabel", true, false) as Label).text).is_equal(tr("UI_XP_GAINED").format({"amount": level["xp"]}))
+	assert_object(duel.find_child("LevelBar", true, false)).is_not_null()
+	assert_object(duel.find_child("LevelUp_2", true, false)).is_not_null()
 	# Undoing the winning play takes it all back.
 	state.phase = GameState.Phase.MAIN
 	state.winner = -1
@@ -296,6 +304,7 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 	assert_int(SaveManager.rhinegold()).is_equal(0)
 	assert_bool(Achievements.is_unlocked("first_victory")).is_false()
 	assert_int(Achievements.stat("matches")).is_equal(0)
+	assert_int(PlayerLevel.total_xp()).is_equal(0)
 	duel.queue_free()
 	await get_tree().process_frame
 
@@ -303,6 +312,8 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 func test_achievements_screen_lists_progress_and_the_main_menu_opens_it() -> void:
 	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
 	assert_object(menu.find_child("AchievementsButton", true, false)).is_not_null()
+	assert_str((menu.find_child("LevelLabel", true, false) as Label).text).is_equal(tr("UI_LEVEL").format({"level": 1}))
+	assert_str((menu.find_child("XpAmount", true, false) as Label).text).is_equal(tr("UI_XP_PROGRESS").format({"xp": 0, "needed": 20}))
 	menu.queue_free()
 	SaveManager.profile["stats"] = {"wins": 3}
 	SaveManager.profile["achievements"] = ["first_victory"]
@@ -326,9 +337,56 @@ func test_forging_in_nibelheim_unlocks_mimes_apprentice() -> void:
 			break
 	assert_bool(screen.call("forge", data)).is_true()
 	assert_bool(Achievements.is_unlocked("mimes_apprentice")).is_true()
-	assert_int(SaveManager.rhinegold()).is_equal(1000 - Progression.craft_price(data) + 20)
+	# Its 25 XP reach level 2: +20 for the achievement, +40 for the level.
+	assert_int(PlayerLevel.level()).is_equal(2)
+	assert_int(SaveManager.rhinegold()).is_equal(1000 - Progression.craft_price(data) + 20 + PlayerLevel.RHINEGOLD_PER_LEVEL)
+	assert_str((screen.find_child("ToastText", true, false) as Label).text).contains(PlayerLevel.level_up_text(2))
+	screen.queue_free()
+
+
+func test_nibelheim_unlocks_a_leader_power_from_its_level() -> void:
+	SaveManager.add_rhinegold(400)
+	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
+	(screen.find_child("LeadersTab", true, false) as Button).pressed.emit()
+	assert_bool((screen.find_child("LeaderPowers", true, false) as Control).visible).is_true()
+	var wotan: Node = screen.find_child("Leader_wotan", true, false)
+	assert_str((wotan.find_child("Power0", true, false).find_child("State", true, false) as Label).text).is_equal("UI_POWER_BASE")
+	# Level 1: greyed, with the level needed.
+	var power: Node = wotan.find_child("Power1", true, false)
+	assert_bool((power.find_child("UnlockButton", true, false) as Button).disabled).is_true()
+	assert_str((power.find_child("Reason", true, false) as Label).text).is_equal(tr("UI_POWER_LEVEL_NEEDED").format({"level": 5}))
+	# Level 5: it can be unlocked for its price.
+	SaveManager.profile["xp"] = 140
+	screen.call("_refresh")
+	power = screen.find_child("Leader_wotan", true, false).find_child("Power1", true, false)
+	(power.find_child("UnlockButton", true, false) as Button).pressed.emit()
+	assert_bool(LeaderPowers.is_unlocked(&"wotan", 1)).is_true()
+	assert_int(SaveManager.rhinegold()).is_equal(100)
+	power = screen.find_child("Leader_wotan", true, false).find_child("Power1", true, false)
+	assert_object(power.find_child("UnlockButton", true, false)).is_null()
 	assert_object(screen.find_child("Toast", true, false)).is_not_null()
 	screen.queue_free()
+
+
+func test_deck_editor_changes_the_leader_power_among_those_unlocked() -> void:
+	SaveManager.profile["leader_powers"] = {"wotan": [1]}
+	var entry: Dictionary = SaveManager.create_deck("wotan")
+	DeckEditor.deck_id = str(entry["id"])
+	var editor: DeckEditor = await _open("res://scenes/screens/deck_editor.tscn") as DeckEditor
+	var wotan: LeaderData = CardDatabase.get_leader(&"wotan")
+	var label: Label = editor.find_child("LeaderPower", true, false) as Label
+	assert_str(label.text).contains(LeaderPowers.title(wotan, 0))
+	(editor.find_child("ChangePowerButton", true, false) as Button).pressed.emit()
+	var picker: Node = editor.find_child("PowerPicker", true, false)
+	assert_bool((picker.find_child("Power_0", true, false) as Button).button_pressed).is_true()
+	assert_bool((picker.find_child("Power_2", true, false) as Button).disabled).is_true()
+	(picker.find_child("Power_1", true, false) as Button).pressed.emit()
+	assert_int(int(entry["power"])).is_equal(1)
+	assert_str(label.text).contains(LeaderPowers.title(wotan, 1))
+	assert_int(DeckRules.to_deck_data(entry, CardDatabase).leader.power).is_equal(1)
+	# A power not unlocked cannot be chosen.
+	assert_bool(editor.choose_power(2)).is_false()
+	editor.queue_free()
 
 
 func _press(screen: Control, chip_name: String) -> void:

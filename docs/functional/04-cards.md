@@ -42,7 +42,7 @@
 | **Spell** | One-shot effect, then goes to the graveyard |
 | **Artifact** | Stays in the artifact zone with an ongoing effect; can't be attacked, can be destroyed by effects |
 | **Artifact — Relic** | Equipment: attached to one of your units instead of the artifact zone ([Relic rules](03-game-rules.md#relics-equipment)) |
-| **Leader** | Not in the deck; chosen at deck creation; provides Life and Leader ability |
+| **Leader** | Not in the deck; chosen at deck creation; provides Life and Leader ability (its base ability or a [power](06-progression.md#leader-powers) chosen in the deck editor) |
 
 ## Traits (initial list)
 

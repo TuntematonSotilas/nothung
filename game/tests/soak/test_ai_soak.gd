@@ -89,6 +89,52 @@ func _soak(deck_a: StringName, deck_b: StringName) -> void:
 	])
 
 
+## Each Leader power (docs/functional/06-progression.md#leader-powers): each starter deck plays with its
+## base ability, then power 1, then power 2, against the three other starter decks (base abilities).
+## Prints the win rate of each version; a power should not move it far from the base one.
+func test_leader_powers_soak() -> void:
+	const STARTERS: Array[StringName] = [&"gods_starter", &"nibelungs_starter", &"walsungs_starter", &"valkyries_starter"]
+	const MATCHES_PER_OPPONENT: int = 20
+	for deck_id: StringName in STARTERS:
+		var rates: Array[String] = []
+		for power: int in 3:
+			var deck := DeckData.new()
+			deck.id = deck_id
+			deck.leader = CardDatabase.get_deck(deck_id).leader.with_power(power)
+			deck.cards = CardDatabase.get_deck(deck_id).cards
+			var wins: int = 0
+			var played: int = 0
+			for opponent_id: StringName in STARTERS:
+				if opponent_id == deck_id:
+					continue
+				for match_index: int in MATCHES_PER_OPPONENT:
+					var first: bool = match_index % 2 == 0
+					var opponent: DeckData = CardDatabase.get_deck(opponent_id)
+					var winner: int = _play(deck if first else opponent, opponent if first else deck, 20261120 + match_index)
+					played += 1
+					if winner == (0 if first else 1):
+						wins += 1
+			rates.append("power %d: %.0f%%" % [power, float(wins) * 100.0 / played])
+		print("Leader powers soak %s (%d matches each): %s." % [deck_id, 3 * MATCHES_PER_OPPONENT, ", ".join(rates)])
+
+
+## Plays one Easy AI vs Easy AI match with legal actions only; returns the winner (-1 for a draw).
+func _play(first: DeckData, second: DeckData, match_seed: int) -> int:
+	var engine := Match.new(first, second, match_seed)
+	var action_count: int = 0
+	while engine.get_state().phase != GameState.Phase.GAME_OVER and action_count < ACTION_LIMIT:
+		var state: GameState = engine.get_state()
+		var player_id: int = state.redraw_player if state.phase == GameState.Phase.REDRAW else state.active_player
+		var records: Array[Dictionary] = EasyAI.prepare_actions(state, engine.get_legal_actions(player_id))
+		var selected: Action = Action.from_record(EasyAI.choose_action(records))
+		assert_bool(selected != null and engine.is_legal(selected) and engine.apply(selected)).override_failure_message(
+			"AI action refused (%s vs %s, seed %d, turn %d)" % [first.leader.id, second.leader.id, match_seed, state.turn]
+		).is_true()
+		action_count += 1
+	assert_int(engine.get_state().phase).is_equal(GameState.Phase.GAME_OVER)
+	return engine.get_state().winner
+
+
 ## A starter deck, or "neutral_test": Alberich with 20 of the 21 Neutral cards once (all but Woglinde, a plain 1/2).
 func _deck(deck_id: StringName) -> DeckData:
 	if deck_id != &"neutral_test":

@@ -1,7 +1,7 @@
 extends Control
 
-## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left, Achievements
-## (trophy) and Settings (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader) with
+## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left, the player
+## level (level, XP bar) in the middle, Achievements (trophy) and Settings (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader) with
 ## Change deck and My decks under it, then Campaign (greyed out until it exists) and Quick match side by
 ## side; Collection, smaller, at the bottom.
 ## The Android back button quits from here (the menu is the root of the history).
@@ -44,9 +44,12 @@ func _build() -> void:
 	rhinegold.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	rhinegold.text = "%d %s" % [SaveManager.rhinegold(), tr("UI_RHINEGOLD")]
 	forge.add_child(rhinegold)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top.add_child(spacer)
+	# The player level in the middle of the top bar.
+	var level := CenterContainer.new()
+	level.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	level.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	top.add_child(level)
+	level.add_child(MenuUI.level_bar(220))
 	var achievements: Button = _icon_button("", "achievements", Palette.ACCENT)
 	achievements.name = "AchievementsButton"
 	achievements.tooltip_text = "UI_ACHIEVEMENTS"

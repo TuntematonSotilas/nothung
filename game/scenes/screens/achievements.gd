@@ -1,7 +1,7 @@
 extends Control
 
 ## Achievements: one row per achievement (Achievements.LIST) — the trophy icon (gold once unlocked),
-## name, what to do, progress ("3 / 10") or Unlocked, and the Rhinegold it pays. Opened from the main
+## name, what to do, progress ("3 / 10") or Unlocked, and the Rhinegold and XP it gives. Opened from the main
 ## menu's trophy. See docs/functional/06-progression.md#achievements.
 
 
@@ -77,6 +77,7 @@ func _row(achievement: Dictionary) -> PanelContainer:
 	var reward: Label = MenuUI.label("", 22, Palette.TEXT_MUTED)
 	reward.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	reward.text = tr("UI_REWARD").format({"amount": achievement["reward"]})
+	reward.text = "%s · %s" % [tr("UI_REWARD").format({"amount": achievement["reward"]}),
+			tr("UI_XP_GAINED").format({"amount": PlayerLevel.XP_ACHIEVEMENT})]
 	right.add_child(reward)
 	return row

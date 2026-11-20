@@ -49,6 +49,9 @@ const CARD_HEADER: PackedStringArray = [
 ]
 const LEADER_HEADER: PackedStringArray = ["id", "name", "faction", "life", "ability_name", "ability_cost", "ability", "flavour"]
 const DECK_HEADER: PackedStringArray = ["id", "leader", "cards"]
+const LEADER_POWER_HEADER: PackedStringArray = ["leader", "power", "name", "cost", "ability", "level", "price"]
+## Upgraded abilities per Leader (cards/leader_powers.md): powers 1 and 2.
+const LEADER_POWER_COUNT: int = 2
 const ART_DIRECTORY: String = "res://assets/art/cards"
 ## Display names of subtypes used in generated rules text (e.g. "Bearer: Wälsung.").
 const SUBTYPE_NAMES: Dictionary = {"walsung": "Wälsung"}
@@ -132,7 +135,7 @@ func _load_sources() -> bool:
 	var factions: PackedStringArray = DirAccess.get_files_at(cards_dir)
 	factions.sort()
 	for filename: String in factions:
-		if not filename.ends_with(".md") or filename in ["leaders.md", "starter_decks.md"]:
+		if not filename.ends_with(".md") or filename in ["leaders.md", "leader_powers.md", "starter_decks.md"]:
 			continue
 		var faction: String = filename.get_basename()
 		var path: String = cards_dir.path_join(filename)
@@ -174,6 +177,7 @@ func _load_sources() -> bool:
 		var leader_resource_path: String = "res://data/leaders/%s.tres" % leader_id
 		leader.take_over_path(leader_resource_path)
 		_resources[leader_resource_path] = leader
+	_load_leader_powers(cards_dir.path_join("leader_powers.md"))
 
 	if not _errors.is_empty():
 		return false
@@ -301,6 +305,39 @@ func _parse_card(row: Dictionary, faction: String, path: String) -> CardData:
 		return null
 	card.art = _art_for("%s.png" % card_id)
 	return card
+
+
+## Powers 1 and 2 of each Leader with an ability, in order; their names go to LEADER_<ID>_POWER<n>_NAME.
+func _load_leader_powers(path: String) -> void:
+	var found: Dictionary = {}
+	for row: Dictionary in _read_table(path, LEADER_POWER_HEADER):
+		var line: int = int(row["line"])
+		var leader_id: String = String(row["leader"])
+		if not _leaders.has(leader_id):
+			_error(path, line, "Unknown leader id: %s" % leader_id)
+			continue
+		var leader: LeaderData = _leaders[leader_id]
+		var index: int = _required_int(row, "power", 1, LEADER_POWER_COUNT, path, line)
+		if index < 1 or leader.ability == null or found.has("%s_%d" % [leader_id, index]) or leader.powers.size() != index - 1:
+			_error(path, line, "Leader powers must be 1 then 2, once each, for a Leader with an ability.")
+			continue
+		if String(row["name"]).strip_edges().is_empty():
+			_error(path, line, "Leader power name is required.")
+			continue
+		var power := LeaderPowerData.new()
+		power.ability = AbilityData.new()
+		power.ability.cost = _required_int(row, "cost", 0, 10, path, line)
+		power.level = _required_int(row, "level", 1, 99, path, line)
+		power.price = _required_int(row, "price", 0, 99999, path, line)
+		var effect: EffectData = _parse_effect(String(row["ability"]), path, line)
+		if effect == null:
+			continue
+		if effect.kind == EffectData.Kind.CREATE_RING:
+			_error(path, line, "Leader abilities cannot create the Ring.")
+		power.ability.effects.append(effect)
+		leader.powers.append(power)
+		found["%s_%d" % [leader_id, index]] = true
+		_translation_entries["LEADER_%s_POWER%d_NAME" % [leader_id.to_upper(), index]] = String(row["name"])
 
 
 func _parse_leader(row: Dictionary, path: String) -> LeaderData:
@@ -599,6 +636,8 @@ func _collect_rules_texts() -> void:
 				effect_text,
 			]
 			_translation_entries["LEADER_%s_ABILITY_TEXT" % leader_id.to_upper()] = effect_text
+		for index: int in leader.powers.size():
+			_translation_entries["LEADER_%s_POWER%d_TEXT" % [leader_id.to_upper(), index + 1]] = _effect_text(leader.powers[index].ability.effects[0])
 
 
 func _validate_decks() -> bool:

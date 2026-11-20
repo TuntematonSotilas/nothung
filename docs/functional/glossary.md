@@ -27,6 +27,7 @@
 | **Curse** | Drawback attached to the Ring and cursed cards |
 | **Relic** | Artifact attached to one of your units (equipment), e.g. Nothung, Tarnhelm |
 | **Bearer** | The unit carrying a Relic; *Bearer (X)* restricts which units can carry it |
+| **Leader power** | An upgraded version of a Leader's ability, unlocked in Nibelheim (level + Rhinegold) and chosen per deck ([Leader powers](06-progression.md#leader-powers)) |
 | **Spear-breaker** | Siegfried's Leader ability: damage to a unit, double against Gods (he shatters Wotan's spear) |
 
 > **Decision (2026-10-15):** The game uses **Trait** (not "keyword") and **Redraw** / **Opening hand**. Code and data use the same terms where they are player-facing concepts.

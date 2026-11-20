@@ -63,13 +63,15 @@ static func problem_text(problem: Dictionary) -> String:
 	return TranslationServer.translate(problem["key"]).format(problem["args"])
 
 
-## The DeckData the engine plays, or null when the Leader or a card is unknown.
+## The DeckData the engine plays, or null when the Leader or a card is unknown. The Leader plays with the
+## entry's power (LeaderPowers.of_entry()).
 static func to_deck_data(entry: Dictionary, database: Object) -> DeckData:
 	var deck := DeckData.new()
 	deck.id = StringName(str(entry.get("id", "")))
 	deck.leader = database.call("get_leader", StringName(str(entry.get("leader", "")))) as LeaderData
 	if deck.leader == null:
 		return null
+	deck.leader = deck.leader.with_power(LeaderPowers.of_entry(entry))
 	for card_id: Variant in entry.get("cards", []):
 		var card: CardData = database.call("get_card", StringName(str(card_id))) as CardData
 		if card == null:

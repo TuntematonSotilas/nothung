@@ -12,7 +12,8 @@ var player_deck_id: StringName
 var opponent_deck_id: StringName
 var difficulty: int = 0
 var seed: int = 0
-## [{leader, cards}] for players 0 and 1: card IDs, not deck references.
+## [{leader, power, cards}] for players 0 and 1: card IDs, not deck references; power is the Leader's
+## (LeaderData.with_power(), 0 when missing).
 var decks: Array[Dictionary] = []
 ## Hash of the card data at match start; replaying on changed data could diverge.
 var content_hash: String = ""
@@ -34,7 +35,7 @@ static func deck_snapshot(deck: DeckData) -> Dictionary:
 	var cards: Array[String] = []
 	for card: CardData in deck.cards:
 		cards.append(String(card.id))
-	return {"leader": String(deck.leader.id), "cards": cards}
+	return {"leader": String(deck.leader.id), "power": deck.leader.power, "cards": cards}
 
 
 func add_action(action: Action) -> void:
@@ -183,6 +184,7 @@ static func _rebuild_deck(snapshot: Dictionary, database: Object) -> DeckData:
 	deck.leader = database.call("get_leader", StringName(str(snapshot.get("leader", "")))) as LeaderData
 	if deck.leader == null or not snapshot.get("cards") is Array:
 		return null
+	deck.leader = deck.leader.with_power(int(snapshot.get("power", 0)))
 	for card_id: Variant in snapshot["cards"]:
 		var card: CardData = database.call("get_card", StringName(str(card_id))) as CardData
 		if card == null:

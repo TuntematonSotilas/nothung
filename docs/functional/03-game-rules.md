@@ -98,6 +98,7 @@ A **Relic** is an artifact that is attached to a unit instead of going to the ar
 ## Leader
 
 - Each Leader has Life 20 and a **Leader ability** (costs Energy, once per turn).
+- A Leader can play with one of two **powers** instead of its base ability: upgraded versions unlocked in Nibelheim ([Leader powers](06-progression.md#leader-powers)); the deck chooses which.
 - Starter Leaders: *Wotan* (3 Energy): deal 2 damage to a unit. *Alberich* (2 Energy): summon a Nibelung Miner — he commands his Nibelungs. *Siegfried* (2 Energy, **Spear-breaker**): deal 1 damage to a unit, double against Gods. *Brünnhilde* (3 Energy, **Chooser of the Slain**): summon a *Fallen Hero* (2/3, Valhalla).
 
 ## The Ring (signature mechanic)

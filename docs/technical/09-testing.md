@@ -36,6 +36,8 @@
 - A replay test re-applies a saved action list and compares the final state hash.
 - `tests/unit/test_match_record.gd` replays a recorded match (after a JSON round trip, with an undone play) to the same state hash, and checks what must not replay (changed card data, unknown card, rejected action).
 - `tests/unit/test_achievements.gd`: statistics and unlocking (once, with its Rhinegold), taking a match back, `MatchStats` counting only the player's plays and forgetting an undone one; `tests/integration/test_menus.gd` covers the duel (unlock on a Quick match win, shown on the results, taken back with the undo), the Achievements screen and Nibelheim.
+- `tests/unit/test_leader_powers.gd`: two powers per Leader (level 5 / 300, level 10 / 600), `LeaderData.with_power()` leaving the base Leader untouched, unlocking (level, then Rhinegold, once), a deck playing its power only once unlocked, the powers read back as ints, the engine and the match record (snapshot, rebuild, content hash) using the power, and the AI's random version; `tests/integration/test_menus.gd` covers the Nibelheim Leaders tab (greyed with the level needed, unlocked for its price) and the deck editor's power picker.
+- `tests/unit/test_player_level.gd`: the XP curve and its cap, match XP by result and difficulty, levels paying Rhinegold and taken back; `tests/integration/test_menus.gd` checks the XP and level ups of a Quick match win on the results (taken back with the undo), the level bar on the main menu and a level reached by forging in Nibelheim.
 - **Resume tests** ([07-persistence](07-persistence.md#resume-an-interrupted-match)): save `current_match.json` at random points of scripted matches, rebuild, and check the state hash equals the live one; a file with a wrong `content_hash` or an illegal action is rejected cleanly.
 
 ## Running headless
@@ -237,6 +239,17 @@ Retained matrix (row deck's win rate, 400 matches each; 8.0–9.5 turns per play
 **Difficulty ladder (2026-10-27).** `test_difficulty_ladder` plays each difficulty against the one below it with the Gods and Nibelungs starters, alternating decks and who goes first, and checks that every action is legal. Hard uses a fixed **60 iterations** per action instead of its time budget, so the result is reproducible (seeded) and the test takes about 20 s. Current result: Normal beats Easy **29 / 40** (asserted > 60 %), Hard beats Normal **7 / 10** (asserted > 50 %). With 200 iterations, Hard beats Normal 18 / 20 (≈ 180 ms per action on desktop). The starter balance matrix above stays measured Easy vs Easy.
 
 `tests/unit/test_ai.gd` covers the hidden-information mask (the opponent's hand is redealt from their own cards, the live state is untouched), lethal attacks for Normal and Hard, Normal refusing a losing trade, and Hard's time budget.
+
+**Leader powers (2026-11-20).** `test_leader_powers_soak` plays each starter deck with its base ability, then power 1, then power 2 against the three other starter decks (base abilities), 20 matches per opponent, and prints the win rate of each version. Target: a power wins about **10 points** more than the base ability ([Leader powers](../functional/06-progression.md#leader-powers)). The first draft (power 1 stronger for the same cost, power 2 one Energy cheaper) was far above it: Gods 43 → 58 / 55 %, Nibelungs 55 → 75 / **87 %** (a Nibelung Miner for 1 Energy), Wälsungs 53 → 75 / 62 %, Valkyries 43 → 77 / 70 %. Candidates were then compared over 180–270 matches each (a run varies by about ±5 points with the seeds); retained, in the soak test's run:
+
+| Deck | Base | Power 1 | Power 2 |
+|------|------|---------|---------|
+| Gods | 43 % | 58 % (*Wotans Zorn*: 2 damage, double against Nibelungs, 3 Energy) | 55 % (*Walvater*: 2 damage, 2 Energy) |
+| Nibelungs | 55 % | 55 % (*Des Ringes Herr*: Nibelung Host, 3 Energy) | 72 % (*Verwandlung*: Alberich, the Toad, 2 Energy) |
+| Wälsungs | 53 % | 65 % (*Nothungs Schneide*: 2 damage, double against Gods, 3 Energy) | 62 % (*Furchtlos*: 1 damage, double against Gods, 1 Energy) |
+| Valkyries | 43 % | 60 % (*Walhalls Wahl*: Hero of Valhalla, 3 Energy) | 50 % (*Wunschmaid*: Ortlinde, 2 Energy) |
+
+On average a power gains about 11 points; over the longer comparison runs *Verwandlung* averaged +15 and *Des Ringes Herr* +9. Summons are judged by the body: *Mime* summoned does not draw (summoning is not playing), and the Valhalla keyword makes *Slain Warrior* (3/3) far stronger than its stats (+30). A draw ability made the Easy AI lose (it drew instead of developing).
 
 ## Manual test checklist (release)
 

@@ -49,6 +49,14 @@ func deck_ids() -> Array[StringName]:
 	return ids
 
 
+## Returns the IDs of every Leader.
+func leader_ids() -> Array[StringName]:
+	var ids: Array[StringName] = []
+	for leader_id: StringName in _leaders.keys():
+		ids.append(leader_id)
+	return ids
+
+
 ## Returns the IDs of every card (all of them can be collected).
 func card_ids() -> Array[StringName]:
 	var ids: Array[StringName] = []

@@ -149,6 +149,44 @@ static func toast(screen: Control, text: String) -> PanelContainer:
 	return panel
 
 
+## The player level: "Level 7", a gold XP bar and "45 / 80 XP" ("Max level" at the last one).
+static func level_bar(width: int = 300) -> VBoxContainer:
+	var box := VBoxContainer.new()
+	box.name = "LevelBar"
+	box.add_theme_constant_override("separation", 6)
+	box.custom_minimum_size.x = width
+	var current: int = PlayerLevel.level()
+	var progress: Vector2i = PlayerLevel.progress()
+	var title: Label = label("", 26, Palette.ACCENT)
+	title.name = "LevelLabel"
+	title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.text = TranslationServer.translate("UI_LEVEL").format({"level": current})
+	box.add_child(title)
+	var bar := ProgressBar.new()
+	bar.name = "XpBar"
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(width, 14)
+	bar.max_value = maxi(1, progress.y)
+	bar.value = bar.max_value if progress.y == 0 else progress.x
+	for part: String in ["background", "fill"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Palette.SURFACE_RAISED if part == "background" else Palette.ACCENT
+		style.set_corner_radius_all(7)
+		bar.add_theme_stylebox_override(part, style)
+	box.add_child(bar)
+	var amount: Label = label("", 20, Palette.TEXT_MUTED)
+	amount.name = "XpAmount"
+	amount.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	if progress.y == 0:
+		amount.text = TranslationServer.translate("UI_LEVEL_MAX")
+	else:
+		amount.text = TranslationServer.translate("UI_XP_PROGRESS").format({"xp": progress.x, "needed": progress.y})
+	box.add_child(amount)
+	return box
+
+
 ## A selectable tile (toggle button): border in `color`, gold and thicker when selected.
 static func choice_tile(text: String, color: Color, height: int, icon_path: String = "") -> Button:
 	var tile := Button.new()

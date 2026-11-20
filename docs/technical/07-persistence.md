@@ -28,11 +28,13 @@ On Android `user://` maps to the app's private internal storage.
   "collection": { "loge": 2, "fafner": 1, "wotans_spear": 1 },
   "leaders": ["wotan", "alberich", "siegfried", "brunnhilde"],
   "decks": [
-    { "id": "deck_2", "name": "Hoard of Nibelheim", "leader": "alberich", "cards": ["nibelung_miner", "..."] }
+    { "id": "deck_2", "name": "Hoard of Nibelheim", "leader": "alberich", "power": 1, "cards": ["nibelung_miner", "..."] }
   ],
   "campaign": { "rheingold": { "completed": true, "duels_won": ["rg_01", "rg_02"], "quest_endings": { "rg_q1": ["hoard_found"] } } },
   "achievements": ["first_victory", "renunciation_of_love"],
   "stats": { "matches": 12, "wins": 7, "hard_wins": 1, "leaders_won": ["wotan", "alberich"], "artifacts_played": 9, "cards_crafted": 2 },
+  "xp": 315,
+  "leader_powers": { "alberich": [1] },
   "starter_collection_granted": true,
   "starter_decks_copied": true
 }
@@ -43,6 +45,8 @@ On Android `user://` maps to the app's private internal storage.
 - Atomic writes: write to `profile.json.tmp`, then rename over `profile.json`; keep `profile.json.bak`.
 - On load error: fall back to `.bak`, then to a fresh profile (and log it). After a restore from `.bak`, the next save **deletes** the unreadable `profile.json` instead of rotating it into `.bak`, so the good backup is not lost.
 - `stats`: the counters achievements read (`Achievements.LIST`); a profile without it (before 2026-11-20) gets `{}` like any missing key, so no version change.
+- `xp`: total XP; the player level is derived from it (`PlayerLevel`). Missing in older profiles: `0`, no version change.
+- `leader_powers`: the Leader powers unlocked in Nibelheim, per Leader (`LeaderPowers`); a deck's `power` is the version its Leader plays (0 or missing = base ability; a power not unlocked is played as the base one). Missing in older profiles: `{}`; the indices are turned back into ints on load.
 - A missing or wrongly typed key (hand-edited or damaged save) gets its default value. JSON reads numbers back as floats: `rhinegold` and the collection counts are turned back into ints on load.
 - Unknown card IDs in a save (card removed) are converted to Rhinegold instead of crashing: each owned copy is refunded at the Common crafting price (`SaveManager.REMOVED_CARD_VALUE` = 40; the rarity of a removed card is unknown). They are removed from decks; a deck whose Leader is gone is dropped.
 
@@ -80,8 +84,8 @@ Because the engine is deterministic, a match is saved as **seed + decks + list o
   "difficulty": 1,
   "seed": 184467,
   "decks": [
-    { "leader": "wotan", "cards": ["wotans_spear", "..."] },
-    { "leader": "alberich", "cards": ["nibelung_miner", "..."] }
+    { "leader": "wotan", "power": 0, "cards": ["wotans_spear", "..."] },
+    { "leader": "alberich", "power": 2, "cards": ["nibelung_miner", "..."] }
   ],
   "actions": [
     { "type": "refresh_hand", "player": 0 },
@@ -95,7 +99,7 @@ Because the engine is deterministic, a match is saved as **seed + decks + list o
 - `actions` are `Action.to_record()` entries, plus `undo_play` when the player undoes a card play (the screen restores the state before the play and puts the card on top of the deck: `MatchRecord.undo_play()`, used by the duel and the replay alike).
 - `player_deck` / `opponent_deck` / `difficulty` rebuild the Quick match setup, so **Rematch** after a resume plays the same decks. Campaign duels will add `campaign_duel`.
 
-- **Decks are snapshots** (card IDs), not references to the player's deck slots: editing a deck later can't change a saved match.
+- **Decks are snapshots** (card IDs, and the Leader's `power`: `LeaderData.with_power()`, 0 when missing), not references to the player's deck slots: editing a deck later can't change a saved match.
 - **AI moves are recorded as actions** like the player's. Replay never re-runs the AI search, so it doesn't depend on thread timing or on AI tuning changes.
 - `content_hash` is a SHA-256 of the card data at match start (every stored property of the Leaders and cards in both decks, art excluded; a card met inside another one, like *Nothung* ↔ *Nothung (broken)*, counts by its ID). Card stats can change in an update; replaying old actions on new data could diverge.
 
