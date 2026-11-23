@@ -21,6 +21,7 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 | `victory.svg` | Laurel crown | Lorc |
 | `achievements.svg` | Trophy | Lorc |
 | `xp.svg` | Rune stone | Lorc |
+| `remove.svg` | Cancel | Sbed |
 | `defeat.svg` | Broken shield | Lorc |
 | `faction_gods.svg` | Barbed spear | Lorc |
 | `faction_nibelungs.svg` | Anvil | Lorc |

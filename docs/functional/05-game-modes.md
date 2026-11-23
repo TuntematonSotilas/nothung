@@ -72,14 +72,14 @@ A Quest is a short gamebook-style sequence that breaks the rhythm between duels 
 - Only cards of the Leader's faction and Neutral cards can be added, up to the copy limit and the copies owned. A deck can be saved unfinished; only decks **ready to play** (20 cards, every rule met) are offered in Quick match.
 - The four starter decks are copied into the player's decks once; those are the decks the player edits.
 - Every change is saved at once; there is no Save button.
-- Cards are added by **tapping** them in the grid and taken out by **swiping** them sideways in the deck zone (a long press there shows the card; a tap does nothing) — no drag and drop. A vertical swipe scrolls the grid and never adds a card. Cards whose available copies are all in the deck are not offered in the grid.
+- Cards are added by **tapping** them in the grid and taken out with the **X** of their chip in the deck zone (a long press on the chip shows the card; a tap does nothing) — no drag and drop. A vertical swipe scrolls the grid and never adds a card. Cards whose available copies are all in the deck are not offered in the grid.
 - **Auto-fill** empties the deck, then builds one from the cards owned: the rarest first (then the strongest units, then the cheapest), 13 units and 7 spells / artifacts, and an Energy curve peaking at 2–3 (1: 3 · 2: 5 · 3: 4 · 4: 3 · 5: 2 · 6+: 3); with too few cards for that, it relaxes the curve, then the ratio. Cards that do nothing alone (*Nothung (broken)*) come only after every other card: a full collection leaves them out, the Wälsung starter cards need it as the 20th (Siegmund reforges it).
 - **Change the Leader's power** (under the deck name, with the power in use): the base ability or a power unlocked in Nibelheim ([Leader powers](06-progression.md#leader-powers)); locked powers are shown greyed with the level that unlocks them.
 - **Starter deck** puts back the starter deck of the deck's Leader (the copies owned) — the way to start a new deck from it, or to get the starter deck back.
 
 > **Decision (2026-10-30):** the deck editor is **one screen** (deck zone above the cards), not two tabs.
 
-> **Decision (2026-11-12, playtest):** **no drag and drop** in the deck editor: a tap adds a card, a tap on its chip takes it out (2026-11-23: a sideways swipe on the chip instead, a long press shows the card); the Energy chart is replaced by a count gauge; Auto-fill and Starter deck buttons are added.
+> **Decision (2026-11-12, playtest):** **no drag and drop** in the deck editor: a tap adds a card, a tap on its chip takes it out (2026-11-23: an X button on the chip instead — a swipe was tried first and dropped the same day; a long press shows the card); the Energy chart is replaced by a count gauge; Auto-fill and Starter deck buttons are added.
 
 > **Decision (2026-11-20, playtest):** an **Empty the deck** button (asks first), and leaving a deck that cannot be played asks first in a popup (Keep editing / Leave).
 

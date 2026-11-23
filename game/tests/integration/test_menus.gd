@@ -172,14 +172,14 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 
 	assert_float((editor.find_child("DeckGauge", true, false) as ProgressBar).value).is_equal(2.0)
 
-	# A tap on its chip does nothing; a long press shows the card; a swipe takes a copy out.
-	var chip: Button = editor.find_child("Chip_loge", true, false) as Button
-	chip.pressed.emit()
+	# A tap on its name does nothing; a long press shows the card; its X button takes a copy out.
+	var chip: Node = editor.find_child("Chip_loge", true, false)
+	(chip.find_child("ChipCard", true, false) as Button).pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
-	(chip.find_child("Gesture", true, false) as SwipeChip).long_pressed.emit()
+	(chip.find_child("Gesture", true, false) as LongPress).long_pressed.emit()
 	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
 	editor.find_child("CardDetail", true, false).free()
-	(chip.find_child("Gesture", true, false) as SwipeChip).swiped.emit()
+	(chip.find_child("RemoveButton", true, false) as Button).pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
 	assert_bool((editor.find_child("Card_loge", true, false) as Control).visible).is_true()
 	# The name is the faction's, fixed; no Duplicate or Delete.

@@ -4,7 +4,7 @@ extends Control
 ## Deck editor, one screen. Top: the deck's name (its faction's, fixed), the Leader and the deck's state
 ## (Ready, or what is missing). Then the deck zone: "Deck n / 20" with a gauge, the types and one chip
 ## per card. Below: the Leader's faction and Neutral cards, filtered. No drag and drop: a tap on a card
-## adds a copy (or shows the card with why it cannot be added); a tap on a chip takes a copy out. At the
+## adds a copy (or shows the card with why it cannot be added); the X on a chip takes a copy out (a long press on it shows the card). At the
 ## bottom: Auto-fill and Starter deck (both replace the deck, asking first when it is not empty), and
 ## Empty the deck (asks first). Every change is saved at once; leaving a deck that cannot be played
 ## (Back, or the Android back button) asks first in a popup. Under the name, the Leader's power in use
@@ -276,46 +276,67 @@ func _refresh() -> void:
 			_chips.add_child(_chip(card, DeckRules.count_of(_entry, card.id)))
 
 
-## Cost, name, copies, framed in the card's colour. A long press shows the card, a sideways swipe
-## takes one copy out; a tap does nothing (the chips still scroll).
-func _chip(card: CardData, copies: int) -> Button:
-	var chip: Button = MenuUI.button("", 64, 22)
+## Cost, name, copies, framed in the card's colour, and an X button that takes one copy out. A long
+## press on the name shows the card; a tap on it does nothing (the chips still scroll).
+func _chip(card: CardData, copies: int) -> PanelContainer:
+	var chip := PanelContainer.new()
 	chip.name = "Chip_%s" % card.id
 	chip.mouse_filter = Control.MOUSE_FILTER_PASS
-	chip.focus_mode = Control.FOCUS_NONE
-	chip.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	chip.text = "%d · %s%s" % [card.cost, tr("CARD_%s_NAME" % String(card.id).to_upper()), "  × %d" % copies if copies > 1 else ""]
 	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE_RAISED, CardPalette.colors_for(card)["frame"], 3)
 	style.content_margin_left = 14
-	style.content_margin_right = 14
-	for state: String in ["normal", "hover", "pressed"]:
-		chip.add_theme_stylebox_override(state, style)
-	var gesture: SwipeChip = SwipeChip.attach(chip)
+	style.content_margin_right = 6
+	style.content_margin_top = 4
+	style.content_margin_bottom = 4
+	chip.add_theme_stylebox_override("panel", style)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_PASS
+	row.add_theme_constant_override("separation", 6)
+	chip.add_child(row)
+	var name_button := Button.new()
+	name_button.name = "ChipCard"
+	name_button.flat = true
+	name_button.mouse_filter = Control.MOUSE_FILTER_PASS
+	name_button.focus_mode = Control.FOCUS_NONE
+	name_button.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	name_button.add_theme_font_size_override("font_size", 22)
+	name_button.text = "%d · %s%s" % [card.cost, tr("CARD_%s_NAME" % String(card.id).to_upper()), "  × %d" % copies if copies > 1 else ""]
+	name_button.custom_minimum_size.y = 56
+	for state: String in ["normal", "hover", "pressed", "focus"]:
+		name_button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	for state: String in ["font_color", "font_hover_color", "font_pressed_color"]:
+		name_button.add_theme_color_override(state, Palette.TEXT)
+	row.add_child(name_button)
+	var gesture: LongPress = LongPress.attach(name_button)
 	gesture.name = "Gesture"
 	gesture.long_pressed.connect(show_chip_card.bind(card))
-	gesture.swiped.connect(_swipe_out.bind(chip, card.id))
+	var remove := Button.new()
+	remove.name = "RemoveButton"
+	remove.focus_mode = Control.FOCUS_NONE
+	remove.mouse_filter = Control.MOUSE_FILTER_PASS
+	remove.icon = load("res://ui/icons/remove.svg") as Texture2D
+	remove.expand_icon = true
+	remove.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	remove.custom_minimum_size = Vector2(56, 56)
+	remove.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	remove.add_theme_constant_override("icon_max_width", 28)
+	for state: String in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]:
+		remove.add_theme_color_override(state, Palette.LIFE)
+	for state: String in ["normal", "hover", "pressed", "focus"]:
+		var disc := StyleBoxFlat.new()
+		disc.bg_color = Palette.SURFACE if state != "pressed" else Palette.BORDER
+		disc.set_corner_radius_all(28)
+		remove.add_theme_stylebox_override(state, disc)
+	PressPick.attach(remove, _chips_scroll).tapped.connect(remove_card.bind(card.id))
+	row.add_child(remove)
 	return chip
 
 
-## Long press on a chip: the card, large, with the copies in the deck and how to take one out.
+## Long press on a chip: the card, large, with the copies in the deck.
 func show_chip_card(card: CardData) -> void:
 	var owned: int = SaveManager.owned_count(card.id)
 	CardDetail.open(self, card, [
 		tr("UI_IN_DECK_COPIES").format({"count": DeckRules.count_of(_entry, card.id), "max": mini(owned, card.deck_limit())}),
-		tr("UI_SWIPE_TO_REMOVE"),
 	])
-
-
-## Swipe on a chip: it slides out and fades, then a copy leaves the deck.
-func _swipe_out(chip: Button, card_id: StringName) -> void:
-	if Settings.animation_speed <= 0.0:
-		remove_card(card_id)
-		return
-	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var tween: Tween = chip.create_tween().set_parallel()
-	tween.tween_property(chip, "position:x", chip.position.x + 240.0, 0.18 / Settings.animation_speed)
-	tween.tween_property(chip, "modulate:a", 0.0, 0.18 / Settings.animation_speed)
-	tween.chain().tween_callback(remove_card.bind(card_id))
 
 
 func add_card(card_id: StringName) -> bool:
