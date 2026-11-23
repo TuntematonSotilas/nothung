@@ -15,6 +15,8 @@ extends Control
 static var deck_id: String = ""
 
 const CHIPS_HEIGHT: int = 250
+## The X of a deck chip: Palette.LIFE, less saturated and darker, so it sits with the red texts.
+const REMOVE_ICON_COLOR: Color = Color(0.72, 0.42, 0.39) # #B86B63
 
 var _entry: Dictionary
 var _leader: LeaderData
@@ -319,8 +321,9 @@ func _chip(card: CardData, copies: int) -> PanelContainer:
 	remove.custom_minimum_size = Vector2(56, 56)
 	remove.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	remove.add_theme_constant_override("icon_max_width", 28)
+	# A filled icon looks brighter than red text: the same red, toned down.
 	for state: String in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]:
-		remove.add_theme_color_override(state, Palette.LIFE)
+		remove.add_theme_color_override(state, REMOVE_ICON_COLOR)
 	for state: String in ["normal", "hover", "pressed", "focus"]:
 		var disc := StyleBoxFlat.new()
 		disc.bg_color = Palette.SURFACE if state != "pressed" else Palette.BORDER
