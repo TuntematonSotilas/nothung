@@ -276,11 +276,13 @@ func _refresh() -> void:
 			_chips.add_child(_chip(card, DeckRules.count_of(_entry, card.id)))
 
 
-## Cost, name, copies, framed in the card's colour. A tap takes one copy out (the chips still scroll).
+## Cost, name, copies, framed in the card's colour. A long press shows the card, a sideways swipe
+## takes one copy out; a tap does nothing (the chips still scroll).
 func _chip(card: CardData, copies: int) -> Button:
 	var chip: Button = MenuUI.button("", 64, 22)
 	chip.name = "Chip_%s" % card.id
 	chip.mouse_filter = Control.MOUSE_FILTER_PASS
+	chip.focus_mode = Control.FOCUS_NONE
 	chip.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	chip.text = "%d · %s%s" % [card.cost, tr("CARD_%s_NAME" % String(card.id).to_upper()), "  × %d" % copies if copies > 1 else ""]
 	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE_RAISED, CardPalette.colors_for(card)["frame"], 3)
@@ -288,8 +290,32 @@ func _chip(card: CardData, copies: int) -> Button:
 	style.content_margin_right = 14
 	for state: String in ["normal", "hover", "pressed"]:
 		chip.add_theme_stylebox_override(state, style)
-	PressPick.attach(chip, _chips_scroll).tapped.connect(remove_card.bind(card.id))
+	var gesture: SwipeChip = SwipeChip.attach(chip)
+	gesture.name = "Gesture"
+	gesture.long_pressed.connect(show_chip_card.bind(card))
+	gesture.swiped.connect(_swipe_out.bind(chip, card.id))
 	return chip
+
+
+## Long press on a chip: the card, large, with the copies in the deck and how to take one out.
+func show_chip_card(card: CardData) -> void:
+	var owned: int = SaveManager.owned_count(card.id)
+	CardDetail.open(self, card, [
+		tr("UI_IN_DECK_COPIES").format({"count": DeckRules.count_of(_entry, card.id), "max": mini(owned, card.deck_limit())}),
+		tr("UI_SWIPE_TO_REMOVE"),
+	])
+
+
+## Swipe on a chip: it slides out and fades, then a copy leaves the deck.
+func _swipe_out(chip: Button, card_id: StringName) -> void:
+	if Settings.animation_speed <= 0.0:
+		remove_card(card_id)
+		return
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tween: Tween = chip.create_tween().set_parallel()
+	tween.tween_property(chip, "position:x", chip.position.x + 240.0, 0.18 / Settings.animation_speed)
+	tween.tween_property(chip, "modulate:a", 0.0, 0.18 / Settings.animation_speed)
+	tween.chain().tween_callback(remove_card.bind(card_id))
 
 
 func add_card(card_id: StringName) -> bool:
@@ -330,9 +356,13 @@ func why_not(data: CardData) -> String:
 	return tr("UI_CANNOT_ADD_FULL").format({"size": DeckRules.DECK_SIZE})
 
 
+## The filters, and no card whose available copies are all in the deck already (nothing to add).
 func _apply_filters() -> void:
 	var shown: int = _grid.show_only(func(data: CardData) -> bool:
-		return _filter_bar.accepts(data, SaveManager.owned_count(data.id)))
+		var owned: int = SaveManager.owned_count(data.id)
+		if owned > 0 and DeckRules.count_of(_entry, data.id) >= mini(owned, data.deck_limit()):
+			return false
+		return _filter_bar.accepts(data, owned))
 	_filter_bar.count_label.text = tr("UI_SHOWN_COUNT").format({"count": shown})
 
 

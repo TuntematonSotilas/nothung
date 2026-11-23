@@ -66,6 +66,8 @@ func test_redraw_shows_the_hand_with_new_hand_and_keep() -> void:
 	var cards: GridContainer = duel.find_child("RedrawCards", true, false) as GridContainer
 	assert_int(cards.get_child_count()).is_equal(before.size())
 	assert_object(duel.find_child("RefreshHandButton", true, false)).is_not_null()
+	# Two cards per row.
+	assert_int(cards.columns).is_equal(2)
 
 	# New hand, as many times as wanted: the whole hand changes, its size does not.
 	for attempt: int in 3:
@@ -241,7 +243,7 @@ func test_dragging_a_playable_card_to_the_empty_board_plays_it() -> void:
 	await get_tree().process_frame
 
 
-func test_undoing_a_play_restores_effects_and_returns_card_to_deck() -> void:
+func test_undoing_a_play_restores_effects_and_returns_card_to_hand() -> void:
 	var duel: Control = await _create_duel()
 	var current_match: Match = duel.get("_match") as Match
 	var state: GameState = current_match.get_state()
@@ -276,9 +278,9 @@ func test_undoing_a_play_restores_effects_and_returns_card_to_deck() -> void:
 	var restored_player: PlayerState = current_match.get_state().player(0)
 	assert_int(restored_player.energy).is_equal(2)
 	assert_int(restored_player.board.find(target.uid).attack).is_equal(1)
-	assert_int(restored_player.hand.size()).is_equal(0)
-	assert_int(restored_player.deck.size()).is_equal(original_deck_size + 1)
-	assert_int(restored_player.deck.cards.back().uid).is_equal(spell.uid)
+	assert_int(restored_player.hand.size()).is_equal(1)
+	assert_int(restored_player.hand.cards[0].uid).is_equal(spell.uid)
+	assert_int(restored_player.deck.size()).is_equal(original_deck_size)
 	assert_bool((duel.get("_undo_play_button") as Button).visible).is_false()
 	assert_bool((duel.get("_log_label") as Label).text.contains("played a card")).is_false()
 	duel.queue_free()
@@ -421,8 +423,12 @@ func test_leader_panels_share_layout_and_show_named_abilities() -> void:
 
 	var own_ability: Button = duel.get("_ability_button") as Button
 	var enemy_ability: Button = duel.get("_enemy_ability_button") as Button
-	assert_str(own_ability.text).contains(tr("LEADER_WOTAN_ABILITY_NAME"))
-	assert_str(enemy_ability.text).contains(tr("LEADER_ALBERICH_ABILITY_NAME"))
+	var own_title: Label = own_ability.find_child("AbilityTitle", true, false) as Label
+	assert_str(own_title.text).is_equal(tr("LEADER_WOTAN_ABILITY_NAME"))
+	assert_str((enemy_ability.find_child("AbilityTitle", true, false) as Label).text).is_equal(tr("LEADER_ALBERICH_ABILITY_NAME"))
+	# Name and effect are aligned to the right.
+	assert_int(own_title.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
+	assert_int((own_ability.find_child("AbilityAction", true, false) as Label).horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_RIGHT)
 	assert_bool(enemy_ability.disabled).is_true()
 	assert_str((duel.get("_enemy_leader_label") as Label).text).is_equal(tr("LEADER_ALBERICH_NAME"))
 	assert_str((duel.get("_own_leader_label") as Label).text).is_equal(tr("LEADER_WOTAN_NAME"))

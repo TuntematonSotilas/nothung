@@ -25,7 +25,7 @@
 | Campaign chapter complete | Legendary card + faction starter deck |
 | Quick match win | Rhinegold: 10 (Easy) / 20 (Normal) / 40 (Hard); nothing for a loss, a draw or leaving |
 | Achievements | Rhinegold and 25 XP (cosmetics later: card backs, frames…) |
-| Player level reached | 40 Rhinegold (cosmetics later); from level 5 and 10, Leader powers can be unlocked |
+| Player level reached | 40 Rhinegold, claimed in the main menu (cosmetics later); from level 5 and 10, Leader powers can be unlocked |
 
 ## Meta currency
 
@@ -62,7 +62,7 @@ Quick matches count (a duel without rewards does not), and crafting in Nibelheim
 
 ## Player level
 
-Every finished Quick match gives XP, and so does each achievement claimed (in a match or in Nibelheim); undoing the winning play from the results takes the match's XP back, with its levels. The level locks nothing: each level reached pays Rhinegold (cosmetics later).
+Every finished Quick match gives XP, and so does each achievement claimed (in a match or in Nibelheim); undoing the winning play from the results takes the match's XP back, with its levels. Each level reached gives Rhinegold (cosmetics later), **claimed by hand** from the level badge of the main menu, which glows while a reward waits.
 
 | Source | XP |
 |--------|----|
@@ -71,10 +71,12 @@ Every finished Quick match gives XP, and so does each achievement claimed (in a 
 | Achievement claimed | 25 |
 
 - From level *n* to *n* + 1: **20 + 10 × (*n* − 1)** XP — 20 for level 2 (one match), 110 from level 10 (about 5 matches), 300 for the last one; **level 30** is the cap (4,640 XP, about 230 matches).
-- Each level reached: **+40 Rhinegold**.
+- Each level reached: **+40 Rhinegold**, to claim (several levels are claimed together).
 - Shown in the main menu (level, XP bar) and on the results (XP gained, level reached).
 
 > **Decision (2026-11-20):** numbers above; cosmetic rewards come with their artwork, later in [milestone 6](../roadmap.md#6--progression--rewards).
+
+> **Decision (2026-11-23):** level rewards are **claimed by hand** in the main menu, like achievements in their screen; levels reached before were already paid (profile v5).
 
 ## Leader powers
 

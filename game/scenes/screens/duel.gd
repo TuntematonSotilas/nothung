@@ -14,6 +14,8 @@ const RESULT_PLAYS: int = 2
 ## Artifact column on the right of each play area: slots shown even when empty, cards at this share of
 ## a board card's size. The Ring and limit-exempt artifacts can make a 4th slot appear.
 const ARTIFACT_SLOTS: int = 3
+## Cards per row in the opening hand popup.
+const REDRAW_COLUMNS: int = 2
 ## The long-press zoom: the card at this scale (as CardDetail in the menus).
 const ZOOM_CARD_SCALE: float = 2.6
 const ARTIFACT_CARD_SCALE: float = 0.6
@@ -757,12 +759,10 @@ func _show_redraw_overlay(fade_in: bool = false) -> void:
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	content.add_child(prompt)
 
-	# Same card size as in the hand; as many columns as the panel width allows.
+	# Same card size as in the hand, two cards per row.
 	var separation: float = 16.0 * _ui_scale
-	var card_width: float = CardView.CARD_SIZE.x * _ui_scale
 	var hand: Array[CardInstance] = _match.get_state().player(HUMAN_PLAYER).hand.cards
-	var usable_width: float = panel.custom_minimum_size.x - 40.0 * _ui_scale
-	var columns: int = clampi(floori((usable_width + separation) / (card_width + separation)), 1, maxi(hand.size(), 1))
+	var columns: int = clampi(REDRAW_COLUMNS, 1, maxi(hand.size(), 1))
 	var grid_center: CenterContainer = CenterContainer.new()
 	content.add_child(grid_center)
 	var cards: GridContainer = GridContainer.new()
@@ -1544,23 +1544,21 @@ func _show_results() -> void:
 	center.add_child(content)
 	var status: Label = _label(_status_text(_match.get_state()), 42, Palette.ACCENT)
 	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var result_icon: Control = _result_icon(_match.get_state().winner)
-	if _match.get_state().winner == HUMAN_PLAYER:
-		var victory := PanelContainer.new()
-		victory.name = "VictoryPanel"
-		victory.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		var victory_style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, Palette.ACCENT, 3)
-		victory_style.set_content_margin_all(roundi(18 * _ui_scale))
-		victory.add_theme_stylebox_override("panel", victory_style)
-		var heading := VBoxContainer.new()
-		heading.add_theme_constant_override("separation", roundi(8 * _ui_scale))
-		heading.add_child(result_icon)
-		heading.add_child(status)
-		victory.add_child(heading)
-		content.add_child(victory)
-	else:
-		content.add_child(result_icon)
-		content.add_child(status)
+	# The result, unframed: its icon, then win / lose.
+	var heading := VBoxContainer.new()
+	heading.name = "ResultHeading"
+	heading.add_theme_constant_override("separation", roundi(8 * _ui_scale))
+	heading.add_child(_result_icon(_match.get_state().winner))
+	heading.add_child(status)
+	content.add_child(heading)
+	# The XP right under it, then the Rhinegold, then the achievements reached.
+	_settle_achievements()
+	var level_change: Dictionary = _achievements_change.get("level", {})
+	if int(level_change.get("xp", 0)) > 0:
+		var xp_panel: Control = _result_xp_panel(level_change)
+		content.add_child(xp_panel)
+		_appear(xp_panel, 0.4)
+		_animate_xp_gauge(xp_panel, level_change, 0.4)
 	if _reward > 0:
 		var reward: Label = _label("", 28, Palette.ACCENT)
 		reward.name = "RewardLabel"
@@ -1568,32 +1566,11 @@ func _show_results() -> void:
 		reward.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 		reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		content.add_child(reward)
-	_settle_achievements()
-	for achievement_id: Variant in _achievements_change.get("reached", []):
-		var unlocked: Label = _label("", 24, Palette.ACCENT)
-		unlocked.name = "Achievement_%s" % achievement_id
-		unlocked.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-		unlocked.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		unlocked.text = Achievements.ready_text(achievement_id)
-		content.add_child(unlocked)
-	var level_change: Dictionary = _achievements_change.get("level", {})
-	if int(level_change.get("xp", 0)) > 0:
-		var xp: Label = _label("", 26, Palette.TEXT)
-		xp.name = "XpLabel"
-		xp.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-		xp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		xp.text = tr("UI_XP_GAINED").format({"amount": level_change["xp"]})
-		content.add_child(xp)
-		var bar: Control = MenuUI.level_bar()
-		bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		content.add_child(bar)
-	for reached: Variant in level_change.get("levels", []):
-		var level_up: Label = _label("", 28, Palette.ACCENT)
-		level_up.name = "LevelUp_%d" % reached
-		level_up.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-		level_up.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		level_up.text = PlayerLevel.level_up_text(reached)
-		content.add_child(level_up)
+	var reached: Array = _achievements_change.get("reached", [])
+	if not reached.is_empty():
+		var achievements: PanelContainer = _result_achievements_panel(reached)
+		content.add_child(achievements)
+		_appear(achievements, 1.4)
 	_results_undo_button = _button("UI_UNDO_PLAY", 250)
 	_set_button_icon(_results_undo_button, "undo", Palette.TEXT)
 	_results_undo_button.visible = false
@@ -1614,6 +1591,145 @@ func _show_results() -> void:
 		_go_to_main_menu()
 	)
 	content.add_child(home)
+
+
+## The achievements reached by the match, in one gold frame: the trophy, "Achievement to claim", then
+## one line per achievement.
+func _result_achievements_panel(reached: Array) -> PanelContainer:
+	var panel: PanelContainer = _result_frame("ResultAchievements", Palette.ACCENT)
+	var row: HBoxContainer = panel.get_child(0) as HBoxContainer
+	row.add_child(_result_frame_icon("achievements", Palette.ACCENT))
+	var texts := VBoxContainer.new()
+	texts.add_theme_constant_override("separation", roundi(4 * _ui_scale))
+	texts.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(texts)
+	texts.add_child(_label("UI_ACHIEVEMENT_READY_TITLE", 16, Palette.TEXT_MUTED))
+	for achievement_id: Variant in reached:
+		var line: Label = _label("ACHIEVEMENT_%s_NAME" % str(achievement_id).to_upper(), 24, Palette.ACCENT)
+		line.name = "Achievement_%s" % achievement_id
+		texts.add_child(line)
+	return panel
+
+
+## The XP of the match, unframed: XP icon, "+30 XP" and the level bar (its gauge filled by
+## _animate_xp_gauge()).
+func _result_xp_panel(level_change: Dictionary) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.name = "XpPanel"
+	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	row.add_theme_constant_override("separation", roundi(16 * _ui_scale))
+	row.add_child(_result_frame_icon("xp", Palette.ENERGY))
+	var texts := VBoxContainer.new()
+	texts.add_theme_constant_override("separation", roundi(6 * _ui_scale))
+	texts.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(texts)
+	var xp: Label = _label("", 26, Palette.ENERGY)
+	xp.name = "XpLabel"
+	xp.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	xp.text = tr("UI_XP_GAINED").format({"amount": level_change["xp"]})
+	texts.add_child(xp)
+	texts.add_child(MenuUI.level_bar(roundi(300 * _ui_scale)))
+	return row
+
+
+## The gauge fills from the XP before the match to the XP after it: up to full and over again at each
+## level reached, the level and "xp / needed" following it, the level popping at each step.
+func _animate_xp_gauge(panel: Control, level_change: Dictionary, delay: float) -> void:
+	var speed: float = Settings.animation_speed
+	if speed <= 0.0:
+		return
+	var bar: ProgressBar = panel.find_child("XpBar", true, false) as ProgressBar
+	var level_label: Label = panel.find_child("LevelLabel", true, false) as Label
+	var amount: Label = panel.find_child("XpAmount", true, false) as Label
+	var before: int = int(level_change.get("before", PlayerLevel.total_xp() - int(level_change["xp"])))
+	var after: int = before + int(level_change["xp"])
+	var level: int = PlayerLevel.level_for(before)
+	var start: Vector2i = PlayerLevel.progress_of(before)
+	if start.y == 0:
+		return
+	bar.max_value = start.y
+	bar.value = start.x
+	level_label.text = tr("UI_LEVEL").format({"level": level})
+	amount.text = tr("UI_XP_PROGRESS").format({"xp": start.x, "needed": start.y})
+	var tween: Tween = bar.create_tween()
+	tween.tween_interval((delay + 0.3) / speed)
+	# One segment per level crossed, then the last one.
+	var xp: int = before
+	while xp < after:
+		var step: Vector2i = PlayerLevel.progress_of(xp)
+		if step.y == 0:
+			break
+		var level_end: int = xp - step.x + step.y
+		var target: int = mini(after, level_end)
+		var seconds: float = maxf(0.25, 0.8 * float(target - xp) / float(step.y)) / speed
+		tween.tween_method(func(value: float) -> void:
+			bar.value = value
+			amount.text = tr("UI_XP_PROGRESS").format({"xp": roundi(value), "needed": step.y}), float(step.x), float(step.x + target - xp), seconds)
+		if target == level_end:
+			var reached: int = PlayerLevel.level_for(level_end)
+			var next: Vector2i = PlayerLevel.progress_of(level_end)
+			tween.tween_callback(func() -> void:
+				level_label.text = tr("UI_LEVEL").format({"level": reached})
+				bar.max_value = maxi(1, next.y)
+				bar.value = 0 if next.y > 0 else bar.max_value
+				amount.text = tr("UI_XP_PROGRESS").format({"xp": 0, "needed": next.y}) if next.y > 0 else tr("UI_LEVEL_MAX")
+				level_label.pivot_offset = level_label.size / 2.0)
+			tween.tween_property(level_label, "scale", Vector2.ONE * 1.35, 0.15 / speed)
+			tween.tween_property(level_label, "scale", Vector2.ONE, 0.25 / speed)
+		xp = target
+
+
+## A results frame: dark surface, `color` border, an HBox inside for an icon and texts.
+func _result_frame(frame_name: String, color: Color) -> PanelContainer:
+	var panel := PanelContainer.new()
+	panel.name = frame_name
+	panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, color, 3)
+	style.set_content_margin_all(roundi(14 * _ui_scale))
+	style.content_margin_left = roundi(18 * _ui_scale)
+	style.content_margin_right = roundi(24 * _ui_scale)
+	panel.add_theme_stylebox_override("panel", style)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", roundi(16 * _ui_scale))
+	panel.add_child(row)
+	return panel
+
+
+## A results frame's icon; once shown, it glows twice (like the victory crown).
+func _result_frame_icon(icon_name: String, color: Color) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.name = "FrameIcon"
+	icon.texture = _icon(icon_name)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2.ONE * roundi(56 * _ui_scale)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	icon.modulate = color
+	return icon
+
+
+## Fades and grows `control` in after `delay` seconds, then makes its frame icon glow; shown at once
+## at animation speed 0. The tweens belong to the control, so they end with the results overlay.
+func _appear(control: Control, delay: float) -> void:
+	var speed: float = Settings.animation_speed
+	if speed <= 0.0:
+		return
+	control.modulate.a = 0.0
+	var tween: Tween = control.create_tween()
+	tween.tween_interval(delay / speed)
+	tween.tween_callback(func() -> void:
+		control.pivot_offset = control.size / 2.0
+		control.scale = Vector2.ONE * 0.8)
+	tween.set_parallel()
+	tween.tween_property(control, "modulate:a", 1.0, 0.25 / speed)
+	tween.tween_property(control, "scale", Vector2.ONE, 0.35 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var icon: TextureRect = control.find_child("FrameIcon", true, false) as TextureRect
+	if icon != null:
+		var base: Color = icon.modulate
+		tween.set_parallel(false)
+		for play: int in RESULT_PLAYS:
+			tween.tween_property(icon, "modulate", base.lightened(0.45), 0.25 / speed)
+			tween.tween_property(icon, "modulate", base, 0.35 / speed)
 
 
 ## The result's icon, animated, then still: a laurel crown that pops up then glows twice (victory), a
@@ -1912,12 +2028,14 @@ func _leader_panel(player_id: int) -> Dictionary:
 	ability_title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	ability_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ability_title.clip_text = true
+	ability_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	ability_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_heading.add_child(ability_title)
 	var ability_action: Label = _label("", 14, Palette.TEXT_MUTED)
 	ability_action.name = "AbilityAction"
 	ability_action.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	ability_action.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ability_action.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	ability_action.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_lines.add_child(ability_action)
 	if not is_human:

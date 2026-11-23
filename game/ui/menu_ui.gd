@@ -120,29 +120,64 @@ static func screen_column(screen: Control, separation: int = 28) -> VBoxContaine
 	return column
 
 
-## A short message over the bottom of the screen (an achievement ready to claim…), gone after a few seconds.
-static func toast(screen: Control, text: String) -> PanelContainer:
+## A short message at the top of the screen with an icon (an achievement claimed, a level reward…):
+## it slides down, stays a few seconds, then fades. `icon` names a file of res://ui/icons.
+static func toast(screen: Control, text: String, icon: String = "achievements") -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.name = "Toast"
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var style: StyleBoxFlat = _tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 3)
 	style.set_content_margin_all(24)
+	style.shadow_color = Color(0, 0, 0, 0.5)
+	style.shadow_size = 16
 	panel.add_theme_stylebox_override("panel", style)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 20)
+	panel.add_child(row)
+	var picture := TextureRect.new()
+	picture.name = "ToastIcon"
+	picture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var icon_path: String = "res://ui/icons/%s.svg" % icon
+	if ResourceLoader.exists(icon_path):
+		picture.texture = load(icon_path) as Texture2D
+	picture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	picture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	picture.custom_minimum_size = Vector2(72, 72)
+	picture.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	picture.modulate = Palette.ACCENT
+	row.add_child(picture)
 	var message: Label = label(text, 28, Palette.ACCENT)
 	message.name = "ToastText"
 	message.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
-	message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	panel.add_child(message)
+	message.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	message.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	# A wrapping label needs its width up front, or its first layout makes the toast very tall.
+	message.custom_minimum_size.x = maxf(200.0, screen.get_viewport_rect().size.x - 2 * SCREEN_MARGIN - 72 - 20 - 48 - 6)
+	row.add_child(message)
 	screen.add_child(panel)
-	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.offset_left = SCREEN_MARGIN
-	panel.offset_right = -SCREEN_MARGIN
+	# Full width within the margins, at the top; as tall as its text (offset_bottom = offset_top lets the
+	# container grow to its minimum height).
+	var top: float = SCREEN_MARGIN + float(SafeArea.insets(screen)["top"])
 	panel.anchor_left = 0.0
 	panel.anchor_right = 1.0
-	panel.offset_top = -260
-	panel.offset_bottom = -SCREEN_MARGIN - 40
+	panel.anchor_top = 0.0
+	panel.anchor_bottom = 0.0
+	panel.offset_left = SCREEN_MARGIN
+	panel.offset_right = -SCREEN_MARGIN
+	panel.offset_top = top
+	panel.offset_bottom = top
+	var speed: float = maxf(Settings.animation_speed, 0.0)
 	var tween: Tween = panel.create_tween()
+	if speed > 0.0:
+		# Slides down from above the screen.
+		panel.modulate.a = 0.0
+		panel.position.y = top - 160.0
+		tween.set_parallel()
+		tween.tween_property(panel, "position:y", top, 0.3 / speed).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(panel, "modulate:a", 1.0, 0.2 / speed)
+		tween.set_parallel(false)
 	tween.tween_interval(3.0)
 	tween.tween_property(panel, "modulate:a", 0.0, 0.5)
 	tween.tween_callback(panel.queue_free)

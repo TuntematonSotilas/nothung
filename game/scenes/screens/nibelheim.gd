@@ -116,8 +116,7 @@ func forge(data: CardData) -> bool:
 		lines.append(Achievements.ready_text(achievement_id))
 	_refresh()
 	if not lines.is_empty():
-		MenuUI.toast(self, "
-".join(lines))
+		MenuUI.toast(self, "\n".join(lines))
 	return true
 
 
@@ -126,7 +125,7 @@ func unlock_power(leader: LeaderData, index: int) -> bool:
 	if not LeaderPowers.unlock(leader, index):
 		return false
 	_refresh()
-	MenuUI.toast(self, tr("UI_POWER_UNLOCKED").format({"name": tr(leader.with_power(index).ability_key() + "_NAME")}))
+	MenuUI.toast(self, tr("UI_POWER_UNLOCKED").format({"name": tr(leader.with_power(index).ability_key() + "_NAME")}), "nibelheim")
 	return true
 
 

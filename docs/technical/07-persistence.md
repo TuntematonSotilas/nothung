@@ -46,6 +46,7 @@ On Android `user://` maps to the app's private internal storage.
 - On load error: fall back to `.bak`, then to a fresh profile (and log it). After a restore from `.bak`, the next save **deletes** the unreadable `profile.json` instead of rotating it into `.bak`, so the good backup is not lost.
 - `stats`: the counters achievements read (`Achievements.LIST`); a profile without it (before 2026-11-20) gets `{}` like any missing key, so no version change.
 - `xp`: total XP; the player level is derived from it (`PlayerLevel`). Missing in older profiles: `0`, no version change.
+- `level_rewards_claimed` (v5, 2026-11-23): the highest level whose Rhinegold was claimed (`PlayerLevel.claim_rewards()`); the levels above it up to the current one wait in the main menu. The v4 → v5 migration sets it to the level reached, since those levels were paid when reached.
 - `leader_powers`: the Leader powers unlocked in Nibelheim, per Leader (`LeaderPowers`); a deck's `power` is the version its Leader plays (0 or missing = base ability; a power not unlocked is played as the base one). Missing in older profiles: `{}`; the indices are turned back into ints on load.
 - A missing or wrongly typed key (hand-edited or damaged save) gets its default value. JSON reads numbers back as floats: `rhinegold` and the collection counts are turned back into ints on load.
 - Unknown card IDs in a save (card removed) are converted to Rhinegold instead of crashing: each owned copy is refunded at the Common crafting price (`SaveManager.REMOVED_CARD_VALUE` = 40; the rarity of a removed card is unknown). They are removed from decks; a deck whose Leader is gone is dropped.
@@ -96,7 +97,7 @@ Because the engine is deterministic, a match is saved as **seed + decks + list o
 }
 ```
 
-- `actions` are `Action.to_record()` entries, plus `undo_play` when the player undoes a card play (the screen restores the state before the play and puts the card on top of the deck: `MatchRecord.undo_play()`, used by the duel and the replay alike).
+- `actions` are `Action.to_record()` entries, plus `undo_play` when the player undoes a card play (the screen restores the state before the play, the card back in hand: `MatchRecord.undo_play()`; record `VERSION` 2 since 2026-11-23 — version 1 put the card on top of the deck, so such a file is not resumed;, used by the duel and the replay alike).
 - `player_deck` / `opponent_deck` / `difficulty` rebuild the Quick match setup, so **Rematch** after a resume plays the same decks. Campaign duels will add `campaign_duel`.
 
 - **Decks are snapshots** (card IDs, and the Leader's `power`: `LeaderData.with_power()`, 0 when missing), not references to the player's deck slots: editing a deck later can't change a saved match.

@@ -36,10 +36,10 @@ func test_replay_includes_undone_plays() -> void:
 	record.add_action(play)
 	assert_bool(MatchRecord.undo_play(engine, before, play.card_uid)).is_true()
 	record.add_undo_play(play.card_uid)
-	# The card went back on top of the deck.
+	# The card is back in hand.
 	var player: PlayerState = engine.get_state().player(play.player)
-	assert_object(player.hand.find(play.card_uid)).is_null()
-	assert_object(player.deck.find(play.card_uid)).is_not_null()
+	assert_object(player.hand.find(play.card_uid)).is_not_null()
+	assert_object(player.deck.find(play.card_uid)).is_null()
 
 	var replayed: Match = record.replay(CardDatabase)
 	assert_object(replayed).is_not_null()
@@ -80,7 +80,9 @@ func test_rejected_action_is_not_replayed() -> void:
 func test_malformed_save_is_refused() -> void:
 	assert_object(MatchRecord.from_dict({})).is_null()
 	assert_object(MatchRecord.from_dict({"version": 99, "decks": [], "actions": []})).is_null()
-	assert_object(MatchRecord.from_dict({"version": 1, "decks": [], "actions": ["x"]})).is_null()
+	assert_object(MatchRecord.from_dict({"version": MatchRecord.VERSION, "decks": [], "actions": ["x"]})).is_null()
+	# Version 1 put an undone card on top of the deck: it does not replay the same.
+	assert_object(MatchRecord.from_dict({"version": 1, "decks": [], "actions": []})).is_null()
 
 
 func test_content_hash_ignores_card_art_and_survives_cards_that_refer_to_each_other() -> void:

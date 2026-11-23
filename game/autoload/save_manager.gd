@@ -5,7 +5,7 @@ extends Node
 
 signal profile_changed
 
-const CURRENT_VERSION: int = 4
+const CURRENT_VERSION: int = 5
 const DEFAULT_PATH: String = "user://profile.json"
 const DEFAULT_MATCH_PATH: String = "user://current_match.json"
 ## Rhinegold refunded per copy of a card that no longer exists (its rarity is unknown): the Common
@@ -38,6 +38,8 @@ static func default_profile() -> Dictionary:
 		"stats": {},
 		# Total XP; the player level is derived from it (PlayerLevel).
 		"xp": 0,
+		# Highest level whose Rhinegold reward was claimed (PlayerLevel.claim_rewards()).
+		"level_rewards_claimed": 1,
 		# Leader powers unlocked in Nibelheim, per Leader: {"wotan": [1, 2]} (LeaderPowers).
 		"leader_powers": {},
 		# Until the campaign unlocks factions, a new player owns the four starter decks, and gets a
@@ -254,6 +256,8 @@ static func migrate(data: Dictionary) -> Dictionary:
 				_migrate_v2_to_v3(migrated)
 			3:
 				_migrate_v3_to_v4(migrated)
+			4:
+				_migrate_v4_to_v5(migrated)
 		version += 1
 	migrated["version"] = CURRENT_VERSION
 	# Missing or mistyped keys (a hand-edited or damaged save) get their default.
@@ -264,6 +268,7 @@ static func migrate(data: Dictionary) -> Dictionary:
 	# JSON reads every number back as a float: counts are ints again.
 	migrated["rhinegold"] = int(migrated["rhinegold"])
 	migrated["xp"] = int(migrated["xp"])
+	migrated["level_rewards_claimed"] = int(migrated["level_rewards_claimed"])
 	var powers: Dictionary = migrated["leader_powers"]
 	for leader_id: Variant in powers:
 		var indices: Array = []
@@ -323,6 +328,12 @@ static func _migrate_v2_to_v3(data: Dictionary) -> void:
 static func _migrate_v3_to_v4(data: Dictionary) -> void:
 	var achievements: Variant = data.get("achievements", [])
 	data["claimed_achievements"] = (achievements as Array).duplicate() if achievements is Array else []
+
+
+## v4 → v5: level rewards are claimed by hand; the levels already reached were paid.
+static func _migrate_v4_to_v5(data: Dictionary) -> void:
+	var xp: Variant = data.get("xp", 0)
+	data["level_rewards_claimed"] = PlayerLevel.level_for(int(xp) if xp is float or xp is int else 0)
 
 
 func _backup_path() -> String:

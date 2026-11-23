@@ -5,7 +5,9 @@ extends RefCounted
 ## resume an interrupted match. Replaying it rebuilds the exact state: the engine is deterministic and
 ## AI moves are recorded like the player's. See docs/technical/07-persistence.md#resume-an-interrupted-match.
 
-const VERSION: int = 1
+## 2 (2026-11-23): an undone play goes back to the hand, no longer on top of the deck; a version 1
+## file is not resumed.
+const VERSION: int = 2
 
 ## Where the decks came from (a player deck ID or a starter deck ID), for bug reports.
 var player_deck_id: StringName
@@ -46,18 +48,14 @@ func add_undo_play(card_uid: int) -> void:
 	entries.append({"type": "undo_play", "card_uid": card_uid})
 
 
-## Undoes the last card play: back to the state before it, with the card on top of the deck
+## Undoes the last card play: back to the state before it, the card in hand again
 ## (docs/functional/07-ui-ux.md). Shared by the duel screen and the replay.
 static func undo_play(engine: Match, snapshot: GameState, card_uid: int) -> bool:
-	if not engine.restore_snapshot(snapshot):
+	var player: PlayerState = snapshot.player(snapshot.active_player)
+	if player.hand.find(card_uid) == null:
+		push_error("Cannot undo the card play because the card is missing from the hand before it.")
 		return false
-	var player: PlayerState = engine.get_state().player(snapshot.active_player)
-	var card: CardInstance = player.hand.remove_uid(card_uid)
-	if card == null:
-		push_error("Cannot undo the card play because the card is missing from the restored hand.")
-		return false
-	player.deck.add(card)
-	return true
+	return engine.restore_snapshot(snapshot)
 
 
 ## Rebuilds the match, or returns null when it cannot be resumed: unknown card, card data changed

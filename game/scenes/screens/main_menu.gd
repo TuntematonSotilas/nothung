@@ -45,12 +45,12 @@ func _build() -> void:
 	rhinegold.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	rhinegold.text = "%d %s" % [SaveManager.rhinegold(), tr("UI_RHINEGOLD")]
 	forge.add_child(rhinegold)
-	# The player level in the middle of the top bar.
+	# The player level in the middle of the top bar; it glows while a level reward waits to be claimed.
 	var level := CenterContainer.new()
 	level.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	level.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	top.add_child(level)
-	level.add_child(MenuUI.level_bar(220))
+	level.add_child(_level_button())
 	var achievements: Button = _icon_button("", "achievements", Palette.ACCENT)
 	achievements.name = "AchievementsButton"
 	achievements.tooltip_text = "UI_ACHIEVEMENTS"
@@ -221,6 +221,60 @@ func _portrait(leader: LeaderData, colors: Dictionary) -> Control:
 	border.add_theme_stylebox_override("panel", line)
 	frame.add_child(border)
 	return frame
+
+
+## The level bar; with rewards waiting, a gold frame that pulses and "Reward to claim!", and the whole
+## badge is a button (LevelButton, over it) that claims them (claim_level_rewards()).
+func _level_button() -> PanelContainer:
+	var badge := PanelContainer.new()
+	badge.name = "LevelBadge"
+	var pending: bool = not PlayerLevel.pending_rewards().is_empty()
+	var style := StyleBoxFlat.new()
+	style.bg_color = Palette.SURFACE if pending else Color(0, 0, 0, 0)
+	style.border_color = Palette.ACCENT
+	style.set_border_width_all(3 if pending else 0)
+	style.set_corner_radius_all(14)
+	style.content_margin_left = 14
+	style.content_margin_right = 14
+	style.content_margin_top = 8
+	style.content_margin_bottom = 8
+	badge.add_theme_stylebox_override("panel", style)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 4)
+	badge.add_child(box)
+	box.add_child(MenuUI.level_bar(220))
+	if pending:
+		var ready: Label = MenuUI.label("UI_LEVEL_REWARD_READY", 20, Palette.ACCENT)
+		ready.name = "LevelRewardReady"
+		ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		box.add_child(ready)
+	for child: Node in box.find_children("*", "Control", true, false):
+		(child as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# Transparent, over the badge (a PanelContainer gives every child its whole rect).
+	var button := Button.new()
+	button.name = "LevelButton"
+	button.focus_mode = Control.FOCUS_NONE
+	button.flat = true
+	for state: String in ["normal", "hover", "pressed", "disabled", "focus"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.disabled = not pending
+	badge.add_child(button)
+	if pending:
+		button.pressed.connect(claim_level_rewards)
+		if Settings.animation_speed > 0.0:
+			var tween: Tween = badge.create_tween().set_loops()
+			tween.tween_property(badge, "modulate", Color(1.25, 1.2, 1.0), 0.7)
+			tween.tween_property(badge, "modulate", Color.WHITE, 0.7)
+	return badge
+
+
+## Claims the level rewards waiting: their Rhinegold, a message at the top, the menu rebuilt.
+func claim_level_rewards() -> void:
+	var claim: Dictionary = PlayerLevel.claim_rewards()
+	if (claim["levels"] as Array).is_empty():
+		return
+	_rebuild()
+	MenuUI.toast(self, PlayerLevel.claimed_text(claim), "xp")
 
 
 func _rebuild() -> void:

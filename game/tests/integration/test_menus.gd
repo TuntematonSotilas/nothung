@@ -162,10 +162,8 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	assert_object(editor.find_child("CardDetail", true, false)).is_null()
 	loge_view.pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
-	# Rare: at most 2 copies; a third tap shows the card with why instead.
-	loge_view.pressed.emit()
-	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
-	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
+	# Both copies owned are in the deck: the card leaves the list below.
+	assert_bool((editor.find_child("Card_loge", true, false) as Control).visible).is_false()
 	# Saved at once.
 	var saved: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SaveManager.path))
 	var saved_deck: Dictionary = (saved["decks"] as Array).filter(func(d: Dictionary) -> bool: return d["id"] == entry["id"])[0]
@@ -174,9 +172,16 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 
 	assert_float((editor.find_child("DeckGauge", true, false) as ProgressBar).value).is_equal(2.0)
 
-	# A tap on its chip takes a copy out.
-	(editor.find_child("Chip_loge", true, false) as Button).pressed.emit()
+	# A tap on its chip does nothing; a long press shows the card; a swipe takes a copy out.
+	var chip: Button = editor.find_child("Chip_loge", true, false) as Button
+	chip.pressed.emit()
+	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(2)
+	(chip.find_child("Gesture", true, false) as SwipeChip).long_pressed.emit()
+	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
+	editor.find_child("CardDetail", true, false).free()
+	(chip.find_child("Gesture", true, false) as SwipeChip).swiped.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
+	assert_bool((editor.find_child("Card_loge", true, false) as Control).visible).is_true()
 	# The name is the faction's, fixed; no Duplicate or Delete.
 	var deck_name: Node = editor.find_child("DeckName", true, false)
 	assert_bool(deck_name is Label).is_true()
@@ -309,14 +314,25 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 	assert_that(ability_action.get_theme_color("font_color")).is_equal(Palette.TEXT_MUTED)
 	assert_int(PlayerLevel.total_xp()).is_equal(level["xp"])
 	assert_array(level["levels"]).contains([2])
-	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD) + int(level["rhinegold"]))
-	# The results list claimable achievements, match XP and the levels reached.
+	# Level rewards wait to be claimed in the main menu.
+	assert_int(SaveManager.rhinegold()).is_equal(Progression.quick_match_reward(AIProfile.Difficulty.HARD))
+	assert_array(PlayerLevel.pending_rewards()).contains([2])
+	# The results: the result unframed, the XP right under it (icon, gauge), then the achievements in one
+	# frame with one icon and a line each.
 	duel.call("_show_results")
-	assert_object(duel.find_child("Achievement_first_victory", true, false)).is_not_null()
-	assert_object(duel.find_child("VictoryPanel", true, false)).is_not_null()
+	var content: Node = duel.find_child("ResultHeading", true, false).get_parent()
+	var xp_panel: Node = duel.find_child("XpPanel", true, false)
+	var achievements: Node = duel.find_child("ResultAchievements", true, false)
+	assert_int(xp_panel.get_index()).is_equal(duel.find_child("ResultHeading", true, false).get_index() + 1)
+	assert_bool(achievements.get_index() > xp_panel.get_index()).is_true()
+	assert_object(content).is_not_null()
 	assert_str((duel.find_child("XpLabel", true, false) as Label).text).is_equal(tr("UI_XP_GAINED").format({"amount": level["xp"]}))
-	assert_object(duel.find_child("LevelBar", true, false)).is_not_null()
-	assert_object(duel.find_child("LevelUp_2", true, false)).is_not_null()
+	assert_object(xp_panel.find_child("XpBar", true, false)).is_not_null()
+	assert_object(xp_panel.find_child("FrameIcon", true, false)).is_not_null()
+	assert_object(duel.find_child("LevelUp_2", true, false)).is_null()
+	assert_int(achievements.find_children("FrameIcon", "", true, false).size()).is_equal(1)
+	assert_object(achievements.find_child("Achievement_first_victory", true, false)).is_not_null()
+	assert_object(achievements.find_child("Achievement_gotterdammerung", true, false)).is_not_null()
 	# Undoing the winning play takes it all back.
 	state.phase = GameState.Phase.MAIN
 	state.winner = -1
@@ -347,13 +363,33 @@ func test_achievements_screen_lists_progress_and_the_main_menu_opens_it() -> voi
 	claim.pressed.emit()
 	assert_bool(Achievements.is_unlocked("first_victory")).is_true()
 	assert_int(PlayerLevel.total_xp()).is_equal(PlayerLevel.XP_ACHIEVEMENT)
-	assert_int(SaveManager.rhinegold()).is_equal(20 + PlayerLevel.RHINEGOLD_PER_LEVEL)
+	assert_int(SaveManager.rhinegold()).is_equal(20)
+	assert_str((screen.find_child("ToastText", true, false) as Label).text).contains(Achievements.claimed_text("first_victory"))
+	assert_object(screen.find_child("ToastIcon", true, false)).is_not_null()
 	assert_object(screen.find_child("Achievement_first_victory", true, false).find_child("ClaimButton", true, false)).is_null()
 	var done: Node = screen.find_child("Achievement_first_victory", true, false)
 	assert_str((done.find_child("Progress", true, false) as Label).text).is_equal(tr("UI_ACHIEVEMENT_DONE"))
 	var counting: Node = screen.find_child("Achievement_einherjar", true, false)
 	assert_str((counting.find_child("Progress", true, false) as Label).text).is_equal("3 / 10")
 	screen.queue_free()
+
+
+func test_main_menu_claims_the_level_rewards() -> void:
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_bool((menu.find_child("LevelButton", true, false) as Button).disabled).is_true()
+	assert_object(menu.find_child("LevelRewardReady", true, false)).is_null()
+	menu.queue_free()
+	PlayerLevel.add_xp(55)
+	menu = await _open("res://scenes/screens/main_menu.tscn")
+	var level: Button = menu.find_child("LevelButton", true, false) as Button
+	assert_bool(level.disabled).is_false()
+	assert_object(menu.find_child("LevelRewardReady", true, false)).is_not_null()
+	level.pressed.emit()
+	assert_int(SaveManager.rhinegold()).is_equal(2 * PlayerLevel.RHINEGOLD_PER_LEVEL)
+	assert_object(menu.find_child("Toast", true, false)).is_not_null()
+	assert_bool((menu.find_child("LevelButton", true, false) as Button).disabled).is_true()
+	assert_str((menu.find_child("RhinegoldLabel", true, false) as Label).text).contains("80")
+	menu.queue_free()
 
 
 func test_forging_in_nibelheim_makes_mimes_apprentice_claimable() -> void:
