@@ -14,8 +14,6 @@ const RESULT_PLAYS: int = 2
 ## Artifact column on the right of each play area: slots shown even when empty, cards at this share of
 ## a board card's size. The Ring and limit-exempt artifacts can make a 4th slot appear.
 const ARTIFACT_SLOTS: int = 3
-## Cards per row in the opening hand popup.
-const REDRAW_COLUMNS: int = 2
 ## The long-press zoom: the card at this scale (as CardDetail in the menus).
 const ZOOM_CARD_SCALE: float = 2.6
 const ARTIFACT_CARD_SCALE: float = 0.6
@@ -759,22 +757,25 @@ func _show_redraw_overlay(fade_in: bool = false) -> void:
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	content.add_child(prompt)
 
-	# Same card size as in the hand, two cards per row.
+	# Same card size as in the hand, on two centred rows: 2 + 2 for four cards, 3 + 2 for five.
 	var separation: float = 16.0 * _ui_scale
 	var hand: Array[CardInstance] = _match.get_state().player(HUMAN_PLAYER).hand.cards
-	var columns: int = clampi(REDRAW_COLUMNS, 1, maxi(hand.size(), 1))
-	var grid_center: CenterContainer = CenterContainer.new()
-	content.add_child(grid_center)
-	var cards: GridContainer = GridContainer.new()
+	var cards: VBoxContainer = VBoxContainer.new()
 	cards.name = "RedrawCards"
-	cards.columns = columns
-	cards.add_theme_constant_override("h_separation", roundi(separation))
-	cards.add_theme_constant_override("v_separation", roundi(separation))
-	grid_center.add_child(cards)
+	cards.add_theme_constant_override("separation", roundi(separation))
+	content.add_child(cards)
+	var first_row: int = ceili(hand.size() / 2.0)
+	var row: HBoxContainer = null
 	# The hand is only shown (long press still zooms): New hand redraws all of it, as often as wanted.
-	for instance: CardInstance in hand:
-		var view: CardView = _card_view(instance)
-		cards.add_child(view)
+	for index: int in hand.size():
+		if index == 0 or index == first_row:
+			row = HBoxContainer.new()
+			row.name = "RedrawRow%d" % cards.get_child_count()
+			row.alignment = BoxContainer.ALIGNMENT_CENTER
+			row.add_theme_constant_override("separation", roundi(separation))
+			cards.add_child(row)
+		var view: CardView = _card_view(hand[index])
+		row.add_child(view)
 		if fade_in and Settings.animation_speed > 0.0:
 			view.modulate.a = 0.0
 			create_tween().tween_property(view, "modulate:a", 1.0, 0.3 / Settings.animation_speed)

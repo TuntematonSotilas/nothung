@@ -67,7 +67,7 @@
 ## Input
 
 - The current interaction uses touch-friendly button targets: tap a card, then tap a legal unit/Leader target; tap an attacking unit, then its target. End Turn and Leader ability have dedicated buttons.
-- The opening hand overlay shows the hand two cards per row (`REDRAW_COLUMNS`), with New hand and Keep this hand.
+- The opening hand overlay shows the hand on two centred rows (`RedrawCards` → `RedrawRow0`, `RedrawRow1`: half the hand each, the extra card on the first), with New hand and Keep this hand.
 - Drag-and-drop targeting arrows remain future work.
 - Android back button: `NOTIFICATION_WM_GO_BACK_REQUEST` handled by `SceneRouter`: a screen may handle it first with `handle_back() -> bool` (duel: pause panel; deck editor: incomplete deck popup) — the header's Back button goes through the same check (`SceneRouter.request_back()`) —, else back to the previous screen (`SceneRouter.go_to()` keeps a history), or quit when there is none. `application/config/quit_on_go_back=false` so Godot does not quit on its own.
 

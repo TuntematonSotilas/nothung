@@ -63,11 +63,14 @@ func test_redraw_shows_the_hand_with_new_hand_and_keep() -> void:
 	var current_match: Match = duel.get("_match") as Match
 	var player: PlayerState = current_match.get_state().player(0)
 	var before: Array[int] = _uids(player.hand.cards)
-	var cards: GridContainer = duel.find_child("RedrawCards", true, false) as GridContainer
-	assert_int(cards.get_child_count()).is_equal(before.size())
+	var cards: Node = duel.find_child("RedrawCards", true, false)
+	assert_int(_redraw_views(cards).size()).is_equal(before.size())
 	assert_object(duel.find_child("RefreshHandButton", true, false)).is_not_null()
-	# Two cards per row.
-	assert_int(cards.columns).is_equal(2)
+	# Two centred rows: half the hand on each, the extra card on the first.
+	var first: int = ceili(before.size() / 2.0)
+	assert_int(cards.get_child_count()).is_equal(2)
+	assert_int(cards.get_child(0).get_child_count()).is_equal(first)
+	assert_int(cards.get_child(1).get_child_count()).is_equal(before.size() - first)
 
 	# New hand, as many times as wanted: the whole hand changes, its size does not.
 	for attempt: int in 3:
@@ -76,8 +79,8 @@ func test_redraw_shows_the_hand_with_new_hand_and_keep() -> void:
 	assert_int(player.hand.size()).is_equal(before.size())
 	assert_array(_uids(player.hand.cards)).is_not_equal(before)
 	assert_bool(player.redraw_done).is_false()
-	cards = duel.find_child("RedrawCards", true, false) as GridContainer
-	assert_int((cards.get_child(0) as CardView).card_instance.uid).is_equal(player.hand.cards[0].uid)
+	cards = duel.find_child("RedrawCards", true, false)
+	assert_int(_redraw_views(cards)[0].card_instance.uid).is_equal(player.hand.cards[0].uid)
 	var record: MatchRecord = duel.get("_record") as MatchRecord
 	assert_int(record.entries.filter(func(e: Dictionary) -> bool: return e["type"] == "refresh_hand").size()).is_equal(3)
 
@@ -810,3 +813,11 @@ func test_invisible_units_are_drawn_see_through_until_they_attack() -> void:
 	assert_float(view.modulate.a).is_equal(1.0)
 	duel.queue_free()
 	await get_tree().process_frame
+
+
+func _redraw_views(cards: Node) -> Array[CardView]:
+	var views: Array[CardView] = []
+	for row: Node in cards.get_children():
+		for view: Node in row.get_children():
+			views.append(view as CardView)
+	return views
