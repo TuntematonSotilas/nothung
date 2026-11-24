@@ -1418,6 +1418,8 @@ func _show_doom_popup() -> void:
 	var panel: PanelContainer = _framed_panel(Palette.SURFACE, Palette.LIFE)
 	panel.name = "DoomPanel"
 	panel.custom_minimum_size.x = roundi(760 * _ui_scale)
+	# More room inside than the board frames.
+	(panel.get_theme_stylebox("panel") as StyleBoxFlat).set_content_margin_all(roundi(32 * _ui_scale))
 	center.add_child(panel)
 	var content: VBoxContainer = VBoxContainer.new()
 	content.add_theme_constant_override("separation", roundi(18 * _ui_scale))
@@ -1425,10 +1427,13 @@ func _show_doom_popup() -> void:
 	var title: Label = _label("UI_DOOM_TITLE", 30, Palette.LIFE)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(title)
-	var text: Label = _label("UI_DOOM_TEXT", 20, Palette.TEXT)
-	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	text.custom_minimum_size.x = roundi(700 * _ui_scale)
-	content.add_child(text)
+	# Two paragraphs: what happens, then the rule.
+	for key: String in ["UI_DOOM_TEXT", "UI_DOOM_RULE"]:
+		var text: Label = _label(key, 20, Palette.TEXT)
+		text.name = "DoomText" if key == "UI_DOOM_TEXT" else "DoomRule"
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.custom_minimum_size.x = roundi(696 * _ui_scale)
+		content.add_child(text)
 	var close: Button = _button("UI_DOOM_CLOSE", 420)
 	close.name = "DoomCloseButton"
 	close.theme_type_variation = &"ButtonPrimary"
