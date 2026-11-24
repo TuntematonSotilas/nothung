@@ -58,6 +58,13 @@ func _build() -> void:
 	achievements.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	achievements.pressed.connect(func() -> void: SceneRouter.go_to(ACHIEVEMENTS_SCENE))
 	top.add_child(achievements)
+	# An achievement to claim: a gold frame that glows and swells.
+	if Achievements.has_claimable():
+		var frame: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 3)
+		for state: String in ["normal", "hover", "pressed"]:
+			achievements.add_theme_stylebox_override(state, frame)
+		achievements.set_meta(&"claimable", true)
+		MenuUI.attention(achievements, frame)
 	var settings: Button = _icon_button("", "settings", Palette.TEXT)
 	settings.name = "SettingsButton"
 	settings.tooltip_text = "UI_SETTINGS"
@@ -223,7 +230,8 @@ func _portrait(leader: LeaderData, colors: Dictionary) -> Control:
 	return frame
 
 
-## The level bar; with rewards waiting, a gold frame that pulses and "Reward to claim!", and the whole
+## The level bar; with rewards waiting, a gold frame that glows and swells (MenuUI.attention()) and
+## "Reward to claim!", and the whole
 ## badge is a button (LevelButton, over it) that claims them (claim_level_rewards()).
 func _level_button() -> PanelContainer:
 	var badge := PanelContainer.new()
@@ -261,10 +269,7 @@ func _level_button() -> PanelContainer:
 	badge.add_child(button)
 	if pending:
 		button.pressed.connect(claim_level_rewards)
-		if Settings.animation_speed > 0.0:
-			var tween: Tween = badge.create_tween().set_loops()
-			tween.tween_property(badge, "modulate", Color(1.25, 1.2, 1.0), 0.7)
-			tween.tween_property(badge, "modulate", Color.WHITE, 0.7)
+		MenuUI.attention(badge, style)
 	return badge
 
 

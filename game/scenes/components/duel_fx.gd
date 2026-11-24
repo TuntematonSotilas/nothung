@@ -8,6 +8,11 @@ signal idle
 
 const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
 
+## Shown under the Götterdämmerung damage at the start of a turn (the same name in every language).
+const DOOM_CAPTION: String = "Götterdämmerung"
+## Flames of Valhalla: the caption and the flash on the Leader.
+const DOOM_COLOR: Color = Color(0.91, 0.52, 0.23) # #E8853A
+
 var ui_scale: float = 1.0
 var _running: int = 0
 
@@ -80,22 +85,46 @@ func play_attack(data: CardData, instance: CardInstance, from: Rect2, target: Re
 
 
 ## Floating "-N" over a damaged unit or Leader; not awaited, it fades on its own.
-func play_damage(target: Rect2, amount: int) -> void:
+## "-2" rising from the target; with a `caption` (Götterdämmerung) the caption shows under it, the target
+## flashes in flame orange and both stay longer.
+func play_damage(target: Rect2, amount: int, caption: String = "") -> void:
 	if amount <= 0 or not target.has_area():
 		return
+	var box := VBoxContainer.new()
+	box.name = "DamageText"
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 0)
 	var label: Label = Label.new()
+	label.name = "DamageAmount"
 	label.text = "-%d" % amount
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_font_size_override("font_size", roundi(48 * ui_scale))
 	label.add_theme_color_override("font_color", Palette.LIFE)
 	label.add_theme_color_override("font_outline_color", Palette.BG)
 	label.add_theme_constant_override("outline_size", roundi(10 * ui_scale))
-	add_child(label)
-	label.position = target.get_center() - label.get_combined_minimum_size() * 0.5
+	box.add_child(label)
+	if not caption.is_empty():
+		var name_label: Label = Label.new()
+		name_label.name = "DamageCaption"
+		name_label.text = caption
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		name_label.add_theme_font_size_override("font_size", roundi(24 * ui_scale))
+		name_label.add_theme_color_override("font_color", DOOM_COLOR)
+		name_label.add_theme_color_override("font_outline_color", Palette.BG)
+		name_label.add_theme_constant_override("outline_size", roundi(8 * ui_scale))
+		box.add_child(name_label)
+		_flash(target, DOOM_COLOR)
+	add_child(box)
+	box.size = box.get_combined_minimum_size()
+	box.position = target.get_center() - box.size * 0.5
+	var hold: float = 0.6 if not caption.is_empty() else 0.0
 	var tween: Tween = _tween()
-	tween.tween_property(label, "position:y", label.position.y - 70.0 * ui_scale, _d(0.7))
-	tween.parallel().tween_property(label, "modulate:a", 0.0, _d(0.7)).set_delay(_d(0.3))
-	tween.finished.connect(label.queue_free)
+	tween.tween_property(box, "position:y", box.position.y - 70.0 * ui_scale, _d(0.7 + hold))
+	tween.parallel().tween_property(box, "modulate:a", 0.0, _d(0.7)).set_delay(_d(0.3 + hold))
+	tween.finished.connect(box.queue_free)
 
 
 ## Destroyed unit: red tint and shake, then it shrinks, sinks and fades.

@@ -132,3 +132,14 @@ func _main_phase_duel_with_hand(card_ids: Array[StringName], energy: int) -> Con
 	await get_tree().process_frame
 	await get_tree().process_frame
 	return duel
+
+
+func test_gotterdammerung_damage_shows_its_name_under_the_amount() -> void:
+	var fx: DuelFx = auto_free(DuelFx.new())
+	add_child(fx)
+	fx.size = Vector2(1080, 1920)
+	fx.play_damage(Rect2(100, 100, 300, 200), 2, DuelFx.DOOM_CAPTION)
+	assert_str((fx.find_child("DamageAmount", true, false) as Label).text).is_equal("-2")
+	assert_str((fx.find_child("DamageCaption", true, false) as Label).text).is_equal("Götterdämmerung")
+	fx.play_damage(Rect2(100, 400, 300, 200), 1)
+	assert_int(fx.find_children("DamageCaption", "", true, false).size()).is_equal(1)

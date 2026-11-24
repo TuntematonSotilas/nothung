@@ -222,6 +222,25 @@ static func level_bar(width: int = 300) -> VBoxContainer:
 	return box
 
 
+## Calls for attention on `control` (something to claim): its gold frame `style` glows and thickens,
+## and the control swells a little, in a loop. Nothing at animation speed 0. Returns the tween.
+static func attention(control: Control, style: StyleBoxFlat) -> Tween:
+	if Settings.animation_speed <= 0.0:
+		return null
+	# Swell from the centre, whatever the size the container gives it.
+	control.resized.connect(func() -> void: control.pivot_offset = control.size / 2.0)
+	var glow: Color = Palette.ACCENT.lightened(0.45)
+	var tween: Tween = control.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(style, "border_color", glow, 0.6)
+	tween.parallel().tween_method(func(width: float) -> void: style.set_border_width_all(roundi(width)), 3.0, 6.0, 0.6)
+	tween.parallel().tween_property(control, "scale", Vector2.ONE * 1.07, 0.6)
+	tween.tween_property(style, "border_color", Palette.ACCENT, 0.6)
+	tween.parallel().tween_method(func(width: float) -> void: style.set_border_width_all(roundi(width)), 6.0, 3.0, 0.6)
+	tween.parallel().tween_property(control, "scale", Vector2.ONE, 0.6)
+	tween.tween_interval(0.5)
+	return tween
+
+
 ## A selectable tile (toggle button): border in `color`, gold and thicker when selected.
 static func choice_tile(text: String, color: Color, height: int, icon_path: String = "") -> Button:
 	var tile := Button.new()

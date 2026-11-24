@@ -700,3 +700,14 @@ func _open(scene_path: String) -> Control:
 
 func _tile(screen: Control, tile_name: String) -> Button:
 	return screen.find_child(tile_name, true, false) as Button
+
+
+func test_main_menu_trophy_calls_for_attention_while_an_achievement_waits() -> void:
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_bool((menu.find_child("AchievementsButton", true, false) as Button).has_meta(&"claimable")).is_false()
+	menu.queue_free()
+	SaveManager.profile["achievements"] = ["first_victory"]
+	menu = await _open("res://scenes/screens/main_menu.tscn")
+	assert_bool(Achievements.has_claimable()).is_true()
+	assert_bool((menu.find_child("AchievementsButton", true, false) as Button).has_meta(&"claimable")).is_true()
+	menu.queue_free()

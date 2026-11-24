@@ -116,6 +116,14 @@ static func is_reached(achievement_id: String) -> bool:
 	return (SaveManager.profile["achievements"] as Array).has(achievement_id)
 
 
+## Whether any achievement waits to be claimed (the main menu's trophy then calls for attention).
+static func has_claimable() -> bool:
+	for achievement: Dictionary in LIST:
+		if is_claimable(achievement["id"]):
+			return true
+	return false
+
+
 static func is_claimable(achievement_id: String) -> bool:
 	return is_reached(achievement_id) and not is_unlocked(achievement_id)
 

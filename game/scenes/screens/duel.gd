@@ -1371,7 +1371,7 @@ func _play_fx(action: Action) -> void:
 			&"damage_dealt":
 				_fx.play_damage(_unit_or_leader_rect(event.target_uid, 1 - event.player), event.amount)
 			&"gotterdammerung_damage":
-				_fx.play_damage(_unit_or_leader_rect(-1, event.player), event.amount)
+				_fx.play_damage(_unit_or_leader_rect(-1, event.player), event.amount, DuelFx.DOOM_CAPTION)
 			&"unit_destroyed":
 				var dead: CardView = _find_view(event.card_uid)
 				if dead != null:
@@ -2000,7 +2000,7 @@ func _leader_panel(player_id: int) -> Dictionary:
 	ability.add_child(ability_content)
 	var ability_cost: Label = _label("", 15, Palette.ENERGY)
 	ability_cost.name = "AbilityCost"
-	ability_cost.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ability_cost.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	ability_cost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_content.add_child(ability_cost)
 	var ability_icon := TextureRect.new()
@@ -2009,14 +2009,14 @@ func _leader_panel(player_id: int) -> Dictionary:
 	ability_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	ability_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	ability_icon.custom_minimum_size = Vector2.ONE * roundi(22 * _ui_scale)
-	ability_icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ability_icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	ability_icon.modulate = Palette.ENERGY
 	ability_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_content.add_child(ability_icon)
 	var ability_lines := VBoxContainer.new()
 	ability_lines.name = "AbilityLines"
 	ability_lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ability_lines.alignment = BoxContainer.ALIGNMENT_CENTER
+	ability_lines.alignment = BoxContainer.ALIGNMENT_BEGIN
 	ability_lines.add_theme_constant_override("separation", roundi(2 * _ui_scale))
 	ability_lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_content.add_child(ability_lines)
@@ -2029,14 +2029,14 @@ func _leader_panel(player_id: int) -> Dictionary:
 	ability_title.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	ability_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	ability_title.clip_text = true
-	ability_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	ability_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ability_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_heading.add_child(ability_title)
 	var ability_action: Label = _label("", 14, Palette.TEXT_MUTED)
 	ability_action.name = "AbilityAction"
 	ability_action.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	ability_action.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	ability_action.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	ability_action.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	ability_action.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_lines.add_child(ability_action)
 	if not is_human:
