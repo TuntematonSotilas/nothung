@@ -1387,8 +1387,10 @@ func _play_fx(action: Action) -> void:
 		await get_tree().process_frame
 		for event: GameEvent in drawn:
 			await _fx_draw(event)
-	# The match waits (input and AI) until the player closes the explanation.
+	# The match waits (input and AI) until the player closes the explanation — opened once the damage
+	# ("-1 Götterdämmerung") has been seen, not over it.
 	if _doom_popup_due(events):
+		await get_tree().create_timer(_fx.doom_damage_seconds()).timeout
 		await _show_doom_popup()
 	_fx.end()
 
@@ -2021,7 +2023,8 @@ func _leader_panel(player_id: int) -> Dictionary:
 	var ability_lines := VBoxContainer.new()
 	ability_lines.name = "AbilityLines"
 	ability_lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ability_lines.alignment = BoxContainer.ALIGNMENT_BEGIN
+	# Name and effect centred vertically; the cost and Energy icon stay at the top left.
+	ability_lines.alignment = BoxContainer.ALIGNMENT_CENTER
 	ability_lines.add_theme_constant_override("separation", roundi(2 * _ui_scale))
 	ability_lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ability_content.add_child(ability_lines)

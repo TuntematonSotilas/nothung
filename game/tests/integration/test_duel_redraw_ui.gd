@@ -429,10 +429,12 @@ func test_leader_panels_share_layout_and_show_named_abilities() -> void:
 	var own_title: Label = own_ability.find_child("AbilityTitle", true, false) as Label
 	assert_str(own_title.text).is_equal(tr("LEADER_WOTAN_ABILITY_NAME"))
 	assert_str((enemy_ability.find_child("AbilityTitle", true, false) as Label).text).is_equal(tr("LEADER_ALBERICH_ABILITY_NAME"))
-	# Name and effect at the top left.
+	# Name and effect left-aligned and centred vertically; cost and Energy icon at the top.
 	assert_int(own_title.horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_LEFT)
 	assert_int((own_ability.find_child("AbilityAction", true, false) as Label).horizontal_alignment).is_equal(HORIZONTAL_ALIGNMENT_LEFT)
-	assert_int((own_ability.find_child("AbilityLines", true, false) as VBoxContainer).alignment).is_equal(BoxContainer.ALIGNMENT_BEGIN)
+	assert_int((own_ability.find_child("AbilityLines", true, false) as VBoxContainer).alignment).is_equal(BoxContainer.ALIGNMENT_CENTER)
+	assert_int((own_ability.find_child("AbilityCost", true, false) as Label).size_flags_vertical).is_equal(Control.SIZE_SHRINK_BEGIN)
+	assert_int((own_ability.find_child("EnergyIcon", true, false) as Control).size_flags_vertical).is_equal(Control.SIZE_SHRINK_BEGIN)
 	assert_bool(enemy_ability.disabled).is_true()
 	assert_str((duel.get("_enemy_leader_label") as Label).text).is_equal(tr("LEADER_ALBERICH_NAME"))
 	assert_str((duel.get("_own_leader_label") as Label).text).is_equal(tr("LEADER_WOTAN_NAME"))

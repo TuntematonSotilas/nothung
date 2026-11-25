@@ -12,6 +12,8 @@ const CARD_VIEW_SCRIPT: Script = preload("res://scenes/components/card_view.gd")
 const DOOM_CAPTION: String = "Götterdämmerung"
 ## Flames of Valhalla: the caption and the flash on the Leader.
 const DOOM_COLOR: Color = Color(0.91, 0.52, 0.23) # #E8853A
+## Extra time the Götterdämmerung damage stays readable before it rises away (at animation speed 1).
+const DOOM_HOLD: float = 1.0
 
 var ui_scale: float = 1.0
 var _running: int = 0
@@ -120,11 +122,16 @@ func play_damage(target: Rect2, amount: int, caption: String = "") -> void:
 	add_child(box)
 	box.size = box.get_combined_minimum_size()
 	box.position = target.get_center() - box.size * 0.5
-	var hold: float = 0.6 if not caption.is_empty() else 0.0
+	var hold: float = DOOM_HOLD if not caption.is_empty() else 0.0
 	var tween: Tween = _tween()
 	tween.tween_property(box, "position:y", box.position.y - 70.0 * ui_scale, _d(0.7 + hold))
 	tween.parallel().tween_property(box, "modulate:a", 0.0, _d(0.7)).set_delay(_d(0.3 + hold))
 	tween.finished.connect(box.queue_free)
+
+
+## How long a damage with a caption (Götterdämmerung) stays on screen, for what must wait for it.
+func doom_damage_seconds() -> float:
+	return _d(1.0 + DOOM_HOLD)
 
 
 ## Destroyed unit: red tint and shake, then it shrinks, sinks and fades.
