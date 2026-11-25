@@ -185,7 +185,8 @@ static func toast(screen: Control, text: String, icon: String = "achievements") 
 
 
 ## The player level: "Level 7", a gold XP bar and "45 / 80 XP" ("Max level" at the last one).
-static func level_bar(width: int = 300) -> VBoxContainer:
+## `leading` (optional, e.g. the XP rune of the main menu) sits on the left of the bar, centred on it.
+static func level_bar(width: int = 300, leading: Control = null) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.name = "LevelBar"
 	box.add_theme_constant_override("separation", 6)
@@ -209,7 +210,18 @@ static func level_bar(width: int = 300) -> VBoxContainer:
 		style.bg_color = Palette.SURFACE_RAISED if part == "background" else Palette.ACCENT
 		style.set_corner_radius_all(7)
 		bar.add_theme_stylebox_override(part, style)
-	box.add_child(bar)
+	if leading == null:
+		box.add_child(bar)
+	else:
+		var row := HBoxContainer.new()
+		row.name = "XpRow"
+		row.add_theme_constant_override("separation", 10)
+		box.add_child(row)
+		leading.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(leading)
+		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(bar)
 	var amount: Label = label("", 20, Palette.TEXT_MUTED)
 	amount.name = "XpAmount"
 	amount.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -222,19 +234,36 @@ static func level_bar(width: int = 300) -> VBoxContainer:
 	return box
 
 
-## Calls for attention on `control` (something to claim): only its gold frame `style` moves — it glows
-## and thickens, in a loop. Nothing at animation speed 0. Returns the tween.
-static func attention(control: Control, style: StyleBoxFlat) -> Tween:
+## Calls for attention with an icon that wiggles (rotates left and right a few times), then rests,
+## in a loop; the rest of the button stays still. Nothing at animation speed 0. Returns the tween.
+static func wiggle(icon: Control) -> Tween:
 	if Settings.animation_speed <= 0.0:
 		return null
-	var glow: Color = Palette.ACCENT.lightened(0.45)
-	var tween: Tween = control.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	tween.tween_property(style, "border_color", glow, 0.6)
-	tween.parallel().tween_method(func(width: float) -> void: style.set_border_width_all(roundi(width)), 3.0, 6.0, 0.6)
-	tween.tween_property(style, "border_color", Palette.ACCENT, 0.6)
-	tween.parallel().tween_method(func(width: float) -> void: style.set_border_width_all(roundi(width)), 6.0, 3.0, 0.6)
-	tween.tween_interval(0.5)
+	# Turn around the centre, whatever the size the container gives it.
+	icon.resized.connect(func() -> void: icon.pivot_offset = icon.size / 2.0)
+	var tween: Tween = icon.create_tween().set_loops().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	for angle: float in [-14.0, 12.0, -9.0, 6.0, -3.0, 0.0]:
+		tween.tween_property(icon, "rotation_degrees", angle, 0.09)
+	tween.tween_interval(1.4)
 	return tween
+
+
+## A centred icon over a button (instead of Button.icon), so it can move on its own (wiggle()).
+static func button_icon(button: Button, icon_name: String, tint: Color, icon_size: float) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.name = "Icon"
+	icon.texture = load("res://ui/icons/%s.svg" % icon_name) as Texture2D
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.modulate = tint
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.set_anchors_preset(Control.PRESET_CENTER)
+	icon.offset_left = -icon_size / 2.0
+	icon.offset_top = -icon_size / 2.0
+	icon.offset_right = icon_size / 2.0
+	icon.offset_bottom = icon_size / 2.0
+	button.add_child(icon)
+	return icon
 
 
 ## A selectable tile (toggle button): border in `color`, gold and thicker when selected.

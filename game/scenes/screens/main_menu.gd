@@ -58,13 +58,11 @@ func _build() -> void:
 	achievements.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	achievements.pressed.connect(func() -> void: SceneRouter.go_to(ACHIEVEMENTS_SCENE))
 	top.add_child(achievements)
-	# An achievement to claim: a gold frame that glows and swells.
+	# An achievement to claim: the trophy wiggles (the button stays still).
 	if Achievements.has_claimable():
-		var frame: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE_RAISED, Palette.ACCENT, 3)
-		for state: String in ["normal", "hover", "pressed"]:
-			achievements.add_theme_stylebox_override(state, frame)
 		achievements.set_meta(&"claimable", true)
-		MenuUI.attention(achievements, frame)
+		achievements.icon = null
+		MenuUI.wiggle(MenuUI.button_icon(achievements, "achievements", Palette.ACCENT, 52))
 	var settings: Button = _icon_button("", "settings", Palette.TEXT)
 	settings.name = "SettingsButton"
 	settings.tooltip_text = "UI_SETTINGS"
@@ -230,7 +228,7 @@ func _portrait(leader: LeaderData, colors: Dictionary) -> Control:
 	return frame
 
 
-## The level bar; with rewards waiting, a gold frame that glows and swells (MenuUI.attention()) and
+## The level bar; with rewards waiting, the XP rune wiggling (MenuUI.wiggle()) and
 ## "Reward to claim!", and the whole
 ## badge is a button (LevelButton, over it) that claims them (claim_level_rewards()).
 func _level_button() -> PanelContainer:
@@ -238,10 +236,7 @@ func _level_button() -> PanelContainer:
 	badge.name = "LevelBadge"
 	var pending: bool = not PlayerLevel.pending_rewards().is_empty()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Palette.SURFACE if pending else Color(0, 0, 0, 0)
-	style.border_color = Palette.ACCENT
-	style.set_border_width_all(3 if pending else 0)
-	style.set_corner_radius_all(14)
+	style.bg_color = Color(0, 0, 0, 0)
 	style.content_margin_left = 14
 	style.content_margin_right = 14
 	style.content_margin_top = 8
@@ -250,7 +245,18 @@ func _level_button() -> PanelContainer:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 4)
 	badge.add_child(box)
-	box.add_child(MenuUI.level_bar(220))
+	# A reward to claim: the XP rune, left of the bar and centred on it, wiggles.
+	var rune: TextureRect = null
+	if pending:
+		rune = TextureRect.new()
+		rune.name = "LevelRewardIcon"
+		rune.texture = load("res://ui/icons/xp.svg") as Texture2D
+		rune.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rune.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rune.custom_minimum_size = Vector2(40, 40)
+		rune.modulate = Palette.ACCENT
+		MenuUI.wiggle(rune)
+	box.add_child(MenuUI.level_bar(220, rune))
 	if pending:
 		var ready: Label = MenuUI.label("UI_LEVEL_REWARD_READY", 20, Palette.ACCENT)
 		ready.name = "LevelRewardReady"
@@ -269,7 +275,6 @@ func _level_button() -> PanelContainer:
 	badge.add_child(button)
 	if pending:
 		button.pressed.connect(claim_level_rewards)
-		MenuUI.attention(badge, style)
 	return badge
 
 
