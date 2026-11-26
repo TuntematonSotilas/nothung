@@ -8,7 +8,8 @@ extends Control
 ## bottom: Auto-fill and Starter deck (both replace the deck, asking first when it is not empty), and
 ## Empty the deck (asks first). Every change is saved at once; leaving a deck that cannot be played
 ## (Back, or the Android back button) asks first in a popup. Under the name, the Leader's power in use
-## and Change the Leader's power (the versions unlocked in Nibelheim).
+## and Change the Leader's power (the versions unlocked in Nibelheim), then the deck's board (the
+## background of the player's play area in a match) and Change the board (the boards bought in Nibelheim).
 ## See docs/functional/05-game-modes.md#deck-builder.
 
 ## The deck to edit (a player deck ID), set before opening the screen.
@@ -31,6 +32,7 @@ var _filter_bar: CardFilterBar
 var _grid: CardGrid
 var _actions: VBoxContainer
 var _power_label: Label
+var _board_label: Label
 
 
 func _ready() -> void:
@@ -43,6 +45,7 @@ func _ready() -> void:
 	column.add_child(_identity_row())
 	if not _leader.powers.is_empty():
 		column.add_child(_power_row())
+	column.add_child(_board_row())
 	_status = MenuUI.label("", 24)
 	_status.name = "DeckStatus"
 	_status.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
@@ -110,7 +113,7 @@ func _power_row() -> HBoxContainer:
 	row.add_child(_power_label)
 	var change: Button = MenuUI.button("UI_CHANGE_POWER", 72, 22)
 	change.name = "ChangePowerButton"
-	change.custom_minimum_size.x = 300
+	change.custom_minimum_size.x = 430
 	change.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	change.pressed.connect(open_power_picker)
 	row.add_child(change)
@@ -124,6 +127,85 @@ func _update_power_label() -> void:
 		"power": LeaderPowers.title(_leader, index),
 		"cost": _leader.with_power(index).ability.cost,
 	})
+
+
+## The board in use ("Board: Valhalla") and the button that changes it.
+func _board_row() -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 16)
+	_board_label = MenuUI.label("", 22, Palette.TEXT_MUTED)
+	_board_label.name = "DeckBoard"
+	_board_label.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	_board_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_board_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(_board_label)
+	var change: Button = MenuUI.button("UI_CHANGE_BOARD", 72, 22)
+	change.name = "ChangeBoardButton"
+	change.custom_minimum_size.x = 430
+	change.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	change.pressed.connect(open_board_picker)
+	row.add_child(change)
+	_update_board_label()
+	return row
+
+
+func _update_board_label() -> void:
+	var board: String = Cosmetics.board_of(_entry)
+	_board_label.text = tr("UI_DECK_BOARD").format({"board": tr(Cosmetics.name_key(board)) if not board.is_empty() else tr("UI_DEFAULT")})
+
+
+## Default and each board owned, as pictures; choosing one saves it with the deck. Without any, a line
+## says where to buy them.
+func open_board_picker() -> ColorRect:
+	var overlay := ColorRect.new()
+	overlay.name = "BoardPicker"
+	overlay.color = Color(Palette.BG, 0.98)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(overlay)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var content := VBoxContainer.new()
+	content.custom_minimum_size.x = get_viewport_rect().size.x - 2 * MenuUI.SCREEN_MARGIN
+	content.add_theme_constant_override("separation", 24)
+	center.add_child(content)
+	var title: Label = MenuUI.label("UI_CHOOSE_BOARD", 36, Palette.ACCENT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	content.add_child(title)
+	var owned: Array[String] = Cosmetics.owned(Cosmetics.BOARD)
+	if owned.is_empty():
+		var hint: Label = MenuUI.label("UI_BACKGROUNDS_HINT", 26, Palette.TEXT_MUTED)
+		hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(hint)
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", 20)
+	grid.add_theme_constant_override("v_separation", 20)
+	content.add_child(grid)
+	var current: String = Cosmetics.board_of(_entry)
+	for cosmetic_id: String in [""] + owned:
+		var tile: Button = BackgroundTile.create(cosmetic_id, Vector2(470, 280))
+		tile.name = "Board_%s" % (cosmetic_id if not cosmetic_id.is_empty() else "default")
+		tile.button_pressed = cosmetic_id == current
+		tile.pressed.connect(func() -> void:
+			choose_board(cosmetic_id)
+			overlay.queue_free())
+		grid.add_child(tile)
+	var cancel: Button = MenuUI.button("UI_CANCEL")
+	cancel.name = "CancelBoardButton"
+	cancel.pressed.connect(overlay.queue_free)
+	content.add_child(cancel)
+	return overlay
+
+
+## Saves the deck's board; one not owned (or not a board) is refused.
+func choose_board(cosmetic_id: String) -> bool:
+	if not Cosmetics.set_board(_entry, cosmetic_id):
+		return false
+	_update_board_label()
+	return true
 
 
 ## A popup listing the base ability and each power: the unlocked ones can be chosen, the others say

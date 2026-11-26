@@ -141,7 +141,7 @@ Backgrounds are **bought in Nibelheim** (Backgrounds tab), like Leader powers: e
 | *The Ring* | Board | 30 | 600 |
 
 - **Home background**: behind the main menu; chosen in **Settings** (Default or one owned).
-- **Board**: behind the player's own play area in a match; chosen **per deck** in **My decks**. The opponent's area keeps the plain background.
+- **Board**: behind the player's own play area in a match; chosen **per deck** in the deck editor (**Change the board**, under the Leader's power). The opponent's area keeps the plain background.
 - The pictures are **generated placeholders** (gradients and shapes) until the author draws them ([art](08-art-and-audio.md#duel-backgrounds)).
 
 > **Decision (2026-11-26):** 3 home backgrounds and 3 boards, alternating every 5 levels, bought with Rhinegold in a Nibelheim tab once the level is reached; the board shows only behind the player's units. Prices are draft values.

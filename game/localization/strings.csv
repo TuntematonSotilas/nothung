@@ -508,3 +508,5 @@ Al jugarse: Roba 1 carta.","À la pose : Prend l’Anneau.
 "COSMETIC_HOME_VALHALLA_BURNING_NAME","Valhalla in Flames","Walhall in Flammen","Valhalla en llamas","Le Walhalla en flammes"
 "COSMETIC_BOARD_RING_NAME","The Ring","Der Ring","El Anillo","L’Anneau"
 "UI_HOME_BACKGROUND_SECTION","HOME BACKGROUND","STARTHINTERGRUND","FONDO DE INICIO","FOND D’ACCUEIL"
+"UI_CHANGE_BOARD","CHANGE THE BOARD","SPIELFELD ÄNDERN","CAMBIAR EL TABLERO","CHANGER LE PLATEAU"
+"UI_DECK_BOARD","Board: {board}","Spielfeld: {board}","Tablero: {board}","Plateau : {board}"

@@ -713,7 +713,7 @@ func test_main_menu_trophy_calls_for_attention_while_an_achievement_waits() -> v
 	menu.queue_free()
 
 
-func test_backgrounds_are_bought_in_nibelheim_and_chosen_in_settings_and_my_decks() -> void:
+func test_backgrounds_are_bought_in_nibelheim_and_chosen_in_settings_and_the_deck_editor() -> void:
 	SaveManager.profile["xp"] = 10000
 	SaveManager.add_rhinegold(400)
 	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
@@ -739,15 +739,20 @@ func test_backgrounds_are_bought_in_nibelheim_and_chosen_in_settings_and_my_deck
 	assert_object(menu.find_child("HomeBackdrop", true, false)).is_not_null()
 	menu.queue_free()
 
-	# My decks: the board of a deck; Quick match plays it behind the player's units.
-	var decks: Control = await _open("res://scenes/screens/deck_list.tscn")
+	# The deck editor: the board of the deck; Quick match plays it behind the player's units.
 	var entry: Dictionary = SaveManager.decks()[0]
-	(decks.find_child("Board_%s" % entry["id"], true, false) as Button).pressed.emit()
-	var picker: Node = decks.find_child("BoardPicker", true, false)
+	DeckEditor.deck_id = str(entry["id"])
+	var editor: DeckEditor = await _open("res://scenes/screens/deck_editor.tscn") as DeckEditor
+	var board_label: Label = editor.find_child("DeckBoard", true, false) as Label
+	assert_str(board_label.text).contains(tr("UI_DEFAULT"))
+	(editor.find_child("ChangeBoardButton", true, false) as Button).pressed.emit()
+	var picker: Node = editor.find_child("BoardPicker", true, false)
 	assert_object(picker.find_child("Board_board_ring", true, false)).is_null()
 	(picker.find_child("Board_board_valhalla", true, false) as Button).pressed.emit()
 	assert_str(Cosmetics.board_of(entry)).is_equal("board_valhalla")
-	decks.queue_free()
+	assert_str(board_label.text).contains(tr("COSMETIC_BOARD_VALHALLA_NAME"))
+	assert_bool(editor.choose_board("board_ring")).is_false()
+	editor.queue_free()
 	Settings.quick_match_deck = str(entry["id"])
 	var quick: Control = await _open("res://scenes/screens/quick_match.tscn")
 	var setup: DuelSetup = quick.call("build_setup")
