@@ -22,6 +22,7 @@ Licence: [Creative Commons Attribution 3.0](https://creativecommons.org/licenses
 | `achievements.svg` | Trophy | Lorc |
 | `xp.svg` | Rune stone | Lorc |
 | `remove.svg` | Cancel | Sbed |
+| `my_decks.svg` | Card exchange | Delapouite |
 | `defeat.svg` | Broken shield | Lorc |
 | `faction_gods.svg` | Barbed spear | Lorc |
 | `faction_nibelungs.svg` | Anvil | Lorc |

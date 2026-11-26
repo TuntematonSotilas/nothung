@@ -2,7 +2,7 @@ extends Control
 
 ## Main menu, from top to bottom: Nibelheim (forge icon, with the Rhinegold) on the left, the player
 ## level (level, XP bar) in the middle, Achievements (trophy) and Settings (cog) on the right; the title; in the middle, the current deck (Leader portrait, name, Leader) with
-## Change deck and My decks under it, then Campaign (greyed out until it exists) and Quick match side by
+## My decks and Change deck under it (with their icons), then Campaign (greyed out until it exists) and Quick match side by
 ## side; Collection, smaller, at the bottom.
 ## The Android back button quits from here (the menu is the root of the history).
 ## An interrupted match (SaveManager) is offered first: Resume or Abandon.
@@ -88,17 +88,17 @@ func _build() -> void:
 	deck_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	deck_buttons.add_theme_constant_override("separation", 16)
 	middle.add_child(deck_buttons)
-	var change: Button = MenuUI.button("UI_CHANGE_DECK", 88, 26)
-	change.name = "ChangeDeckButton"
-	change.custom_minimum_size.x = 340
-	change.disabled = MenuUI.playable_decks().is_empty()
-	change.pressed.connect(func() -> void: DeckPicker.open(self, _rebuild))
-	deck_buttons.add_child(change)
-	var decks: Button = MenuUI.button("UI_MY_DECKS", 88, 26)
+	# My decks first, then Change deck; each with its icon next to the text, centred.
+	var decks: Button = _deck_button("UI_MY_DECKS", "my_decks")
 	decks.name = "MyDecksButton"
-	decks.custom_minimum_size.x = 340
 	decks.pressed.connect(func() -> void: SceneRouter.go_to(DECKS_SCENE))
 	deck_buttons.add_child(decks)
+	var change: Button = _deck_button("UI_CHANGE_DECK", "refresh")
+	change.name = "ChangeDeckButton"
+	change.disabled = MenuUI.playable_decks().is_empty()
+	_dim_content(change)
+	change.pressed.connect(func() -> void: DeckPicker.open(self, _rebuild))
+	deck_buttons.add_child(change)
 
 	# The game modes sit with the deck, in the middle of the screen.
 	var gap := Control.new()
@@ -276,6 +276,44 @@ func _level_button() -> PanelContainer:
 	if pending:
 		button.pressed.connect(claim_level_rewards)
 	return badge
+
+
+## A deck button (My decks, Change deck): icon then text, centred together (a Button lays its own icon
+## out at the edge).
+func _deck_button(text_key: String, icon_name: String) -> Button:
+	var button: Button = MenuUI.button("", 88, 26)
+	button.custom_minimum_size.x = 340
+	var center := CenterContainer.new()
+	center.name = "Content"
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	button.add_child(center)
+	var row := HBoxContainer.new()
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 12)
+	center.add_child(row)
+	var icon := TextureRect.new()
+	icon.name = "Icon"
+	icon.texture = load("res://ui/icons/%s.svg" % icon_name) as Texture2D
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(40, 40)
+	icon.modulate = Palette.TEXT
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(icon)
+	var label: Label = MenuUI.label(text_key, 26, Palette.TEXT)
+	label.name = "Text"
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(label)
+	return button
+
+
+## A disabled deck button greys its icon and text like a plain button's.
+func _dim_content(button: Button) -> void:
+	if not button.disabled:
+		return
+	(button.find_child("Icon", true, false) as Control).modulate = Palette.TEXT_DISABLED
+	(button.find_child("Text", true, false) as Label).add_theme_color_override("font_color", Palette.TEXT_DISABLED)
 
 
 ## Claims the level rewards waiting: their Rhinegold, a message at the top, the menu rebuilt.

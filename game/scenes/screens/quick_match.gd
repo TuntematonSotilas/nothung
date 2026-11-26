@@ -171,19 +171,30 @@ func _rebuild() -> void:
 	_build()
 
 
-## Two columns of deck tiles: faction icon, faction and Leader, border in the faction colour.
+## The four factions on one row: tall tiles with the faction icon on top, then faction and Leader,
+## centred, border in the faction colour.
 func _deck_grid(tiles: Dictionary, on_chosen: Callable, selected: StringName) -> GridContainer:
 	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 16)
-	grid.add_theme_constant_override("v_separation", 16)
+	grid.name = "OpponentDecks"
+	grid.columns = maxi(1, _deck_ids.size())
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 12)
 	for deck_id: StringName in _deck_ids:
 		var deck: DeckData = CardDatabase.get_deck(deck_id)
 		var faction: StringName = deck.leader.faction
 		var colors: Dictionary = CardPalette.FACTIONS.get(faction, CardPalette.FACTIONS[&"neutral"])
 		var text: String = "%s\n%s" % [MenuUI.faction_name(faction), tr("LEADER_%s_NAME" % String(deck.leader.id).to_upper())]
-		var tile: Button = MenuUI.choice_tile(text, colors["frame"], 150, "res://ui/icons/faction_%s.svg" % faction)
+		var tile: Button = MenuUI.choice_tile(text, colors["frame"], 190, "res://ui/icons/faction_%s.svg" % faction)
 		tile.name = "Opponent_%s" % deck_id
+		tile.alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tile.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tile.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+		tile.add_theme_font_size_override("font_size", 22)
+		tile.add_theme_constant_override("icon_max_width", 56)
+		tile.add_theme_constant_override("h_separation", 8)
+		# A quarter of the row each, whatever the names' length.
+		tile.custom_minimum_size.x = 0
+		tile.clip_text = true
 		tile.button_pressed = deck_id == selected
 		tile.pressed.connect(on_chosen.bind(deck_id))
 		tiles[deck_id] = tile
