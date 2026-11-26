@@ -138,8 +138,23 @@ func test_gotterdammerung_damage_shows_its_name_under_the_amount() -> void:
 	var fx: DuelFx = auto_free(DuelFx.new())
 	add_child(fx)
 	fx.size = Vector2(1080, 1920)
-	fx.play_damage(Rect2(100, 100, 300, 200), 2, DuelFx.DOOM_CAPTION)
+	fx.play_damage(Rect2(100, 100, 300, 200), 2, DuelFx.DOOM_CAPTION, true)
 	assert_str((fx.find_child("DamageAmount", true, false) as Label).text).is_equal("-2")
 	assert_str((fx.find_child("DamageCaption", true, false) as Label).text).is_equal("Götterdämmerung")
 	fx.play_damage(Rect2(100, 400, 300, 200), 1)
 	assert_int(fx.find_children("DamageCaption", "", true, false).size()).is_equal(1)
+
+
+func test_an_artifact_names_itself_on_the_damage_it_deals_at_the_start_of_a_turn() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 0)
+	var current_match: Match = duel.get("_match") as Match
+	var state: GameState = current_match.get_state()
+	state.player(0).artifacts.add(CardInstance.new(CardDatabase.get_card(&"wotans_spear"), 0, 960))
+	var events: Array[GameEvent] = [GameEvent.new(&"damage_dealt", 0, 960, -1, 1)]
+	var end_turn := EndTurnAction.new(1)
+	assert_str(duel.call("_automatic_source_name", events[0], end_turn)).is_equal(tr("CARD_WOTANS_SPEAR_NAME"))
+	# Not for an attack, nor for the card just played.
+	assert_str(duel.call("_automatic_source_name", events[0], AttackAction.new(0, 960, -1, 1))).is_empty()
+	assert_str(duel.call("_automatic_source_name", events[0], PlayCardAction.new(0, 960))).is_empty()
+	duel.queue_free()
+	await get_tree().process_frame

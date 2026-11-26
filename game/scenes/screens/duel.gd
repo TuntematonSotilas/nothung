@@ -1376,9 +1376,9 @@ func _play_fx(action: Action) -> void:
 			&"attack_declared":
 				await _fx_attack(event)
 			&"damage_dealt":
-				_fx.play_damage(_unit_or_leader_rect(event.target_uid, 1 - event.player), event.amount)
+				_fx.play_damage(_unit_or_leader_rect(event.target_uid, 1 - event.player), event.amount, _automatic_source_name(event, action))
 			&"gotterdammerung_damage":
-				_fx.play_damage(_unit_or_leader_rect(-1, event.player), event.amount, DuelFx.DOOM_CAPTION)
+				_fx.play_damage(_unit_or_leader_rect(-1, event.player), event.amount, DuelFx.DOOM_CAPTION, true)
 			&"unit_destroyed":
 				var dead: CardView = _find_view(event.card_uid)
 				if dead != null:
@@ -1400,6 +1400,30 @@ func _play_fx(action: Action) -> void:
 		await get_tree().create_timer(_fx.doom_damage_seconds()).timeout
 		await _show_doom_popup()
 	_fx.end()
+
+
+## The name of the card whose automatic effect dealt a damage (an artifact at the start of a turn, a
+## unit's death…), shown with the damage; "" for an attack, the card just played or the Leader ability.
+func _automatic_source_name(event: GameEvent, action: Action) -> String:
+	if event.card_uid < 0 or action is AttackAction:
+		return ""
+	if action is PlayCardAction and (action as PlayCardAction).card_uid == event.card_uid:
+		return ""
+	var source: CardInstance = _card_anywhere(event.card_uid)
+	return tr("CARD_%s_NAME" % String(source.data.id).to_upper()) if source != null else ""
+
+
+## A card of either player by its uid, wherever it is (board, artifacts, graveyard, a unit's relic…).
+func _card_anywhere(uid: int) -> CardInstance:
+	for player: PlayerState in _match.get_state().players:
+		for zone: Zone in [player.board, player.artifacts, player.graveyard, player.banished, player.hand, player.deck]:
+			var found: CardInstance = zone.find(uid)
+			if found != null:
+				return found
+		for unit: CardInstance in player.board.cards:
+			if unit.relic != null and unit.relic.uid == uid:
+				return unit.relic
+	return null
 
 
 ## The first Götterdämmerung damage of the match opens the explanation, unless that damage ended the match.

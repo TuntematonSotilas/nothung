@@ -14,6 +14,8 @@ const DOOM_CAPTION: String = "Götterdämmerung"
 const DOOM_COLOR: Color = Color(0.91, 0.52, 0.23) # #E8853A
 ## Extra time the Götterdämmerung damage stays readable before it rises away (at animation speed 1).
 const DOOM_HOLD: float = 1.0
+## Extra time a damage named after its source (an artifact's automatic effect…) stays readable.
+const SOURCE_HOLD: float = 0.5
 
 var ui_scale: float = 1.0
 var _running: int = 0
@@ -87,9 +89,10 @@ func play_attack(data: CardData, instance: CardInstance, from: Rect2, target: Re
 
 
 ## Floating "-N" over a damaged unit or Leader; not awaited, it fades on its own.
-## "-2" rising from the target; with a `caption` (Götterdämmerung) the caption shows under it, the target
-## flashes in flame orange and both stay longer.
-func play_damage(target: Rect2, amount: int, caption: String = "") -> void:
+## "-2" rising from the target; with a `caption` it shows under the number and both stay longer:
+## the name of the artifact or card whose automatic effect dealt it (red, like the number), or Götterdämmerung (`doom`:
+## flame orange, and the target flashes).
+func play_damage(target: Rect2, amount: int, caption: String = "", doom: bool = false) -> void:
 	if amount <= 0 or not target.has_area():
 		return
 	var box := VBoxContainer.new()
@@ -114,15 +117,16 @@ func play_damage(target: Rect2, amount: int, caption: String = "") -> void:
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		name_label.add_theme_font_size_override("font_size", roundi(24 * ui_scale))
-		name_label.add_theme_color_override("font_color", DOOM_COLOR)
+		name_label.add_theme_color_override("font_color", DOOM_COLOR if doom else Palette.LIFE)
 		name_label.add_theme_color_override("font_outline_color", Palette.BG)
 		name_label.add_theme_constant_override("outline_size", roundi(8 * ui_scale))
 		box.add_child(name_label)
-		_flash(target, DOOM_COLOR)
+		if doom:
+			_flash(target, DOOM_COLOR)
 	add_child(box)
 	box.size = box.get_combined_minimum_size()
 	box.position = target.get_center() - box.size * 0.5
-	var hold: float = DOOM_HOLD if not caption.is_empty() else 0.0
+	var hold: float = (DOOM_HOLD if doom else SOURCE_HOLD) if not caption.is_empty() else 0.0
 	var tween: Tween = _tween()
 	tween.tween_property(box, "position:y", box.position.y - 70.0 * ui_scale, _d(0.7 + hold))
 	tween.parallel().tween_property(box, "modulate:a", 0.0, _d(0.7)).set_delay(_d(0.3 + hold))

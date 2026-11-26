@@ -58,7 +58,7 @@ Quick matches count (a duel without rewards does not), and crafting in Nibelheim
 | *Mime's Apprentice* | Forge a card in Nibelheim | 20 |
 | *The Forging Song* | Forge 10 cards in Nibelheim | 60 |
 
-> **Decision (2026-11-20):** first set of 13 achievements paying Rhinegold (and, since the [player level](#player-level), 25 XP each); *Renunciation of Love* becomes "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). Tiers and cosmetic rewards wait for the rest of [milestone 6](../roadmap.md#6--progression--rewards).
+> **Decision (2026-11-20):** first set of 13 achievements paying Rhinegold (and, since the [player level](#player-level), 25 XP each); *Renunciation of Love* becomes "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). No tiers (bronze / silver / gold): dropped on 2026-11-26.
 
 ## Player level
 
@@ -124,7 +124,7 @@ Each Leader has its base ability and **two powers**: other versions of it, a lit
 - Cards: play 20 artifacts, reforge Nothung 10 times (*Notung! Notung!*), hold the Ring at the end of a won match.
 - Challenge: *Twilight*, *Renunciation of Love*, win on Hard, win without losing a unit.
 - Collection: craft a first card in Nibelheim, own every card.
-- Tiers (bronze / silver / gold) for the counters; rewards: Rhinegold, XP, cosmetics.
+- Rewards: Rhinegold and XP (tiers were dropped on 2026-11-26).
 - Reached achievements are shown on the results screen and listed with progress in the Achievements screen; Rhinegold and XP require a manual claim.
 
 ## Cosmetics
