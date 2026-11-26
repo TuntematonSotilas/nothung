@@ -45,12 +45,39 @@ func _build() -> void:
 		languages.add_child(tile)
 	body.add_child(languages)
 
+	body.add_child(_section("UI_HOME_BACKGROUND_SECTION"))
+	body.add_child(_home_backgrounds())
+
 	body.add_child(_section("UI_PROGRESS"))
 	var progress := VBoxContainer.new()
 	progress.name = "Progress"
 	progress.add_theme_constant_override("separation", 16)
 	body.add_child(progress)
 	_show_reset_button(progress, false)
+
+
+## Default and each home background owned (a thumbnail each); the one in use is selected. Without
+## any, a line says where to buy them.
+func _home_backgrounds() -> Control:
+	var owned: Array[String] = Cosmetics.owned(Cosmetics.HOME)
+	if owned.is_empty():
+		var hint: Label = MenuUI.label("UI_BACKGROUNDS_HINT", 24, Palette.TEXT_MUTED)
+		hint.name = "HomeBackgroundsHint"
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		return hint
+	var row := HBoxContainer.new()
+	row.name = "HomeBackgrounds"
+	row.add_theme_constant_override("separation", 16)
+	var group := ButtonGroup.new()
+	var current: String = Cosmetics.home_background()
+	for cosmetic_id: String in [""] + owned:
+		var tile: Button = BackgroundTile.create(cosmetic_id, Vector2(200, 356))
+		tile.name = "Home_%s" % (cosmetic_id if not cosmetic_id.is_empty() else "default")
+		tile.button_group = group
+		tile.button_pressed = cosmetic_id == current
+		tile.pressed.connect(func() -> void: Cosmetics.set_home_background(cosmetic_id))
+		row.add_child(tile)
+	return row
 
 
 func _section(key: String) -> Label:

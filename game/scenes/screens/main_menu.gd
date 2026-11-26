@@ -27,6 +27,14 @@ func _ready() -> void:
 
 func _build() -> void:
 	var column: VBoxContainer = MenuUI.screen_column(self, 28)
+	# The home background chosen in Settings (bought in Nibelheim), over the plain background.
+	var home: Texture2D = Cosmetics.texture(Cosmetics.home_background())
+	if home != null:
+		var backdrop: TextureRect = Cosmetics.backdrop(home)
+		backdrop.name = "HomeBackdrop"
+		backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		add_child(backdrop)
+		move_child(backdrop, 1)
 
 	var top := HBoxContainer.new()
 	top.name = "TopBar"
@@ -351,6 +359,7 @@ func _resume(record: MatchRecord) -> void:
 	var decks: Array[DeckData] = record.rebuild_decks(CardDatabase)
 	var setup := DuelSetup.new(decks[0], decks[1], record.difficulty as AIProfile.Difficulty)
 	setup.resume = record
+	setup.player_board = Cosmetics.board_of(SaveManager.find_deck(String(record.player_deck_id)))
 	# Only Quick matches are saved for now.
 	setup.rewards = true
 	DuelSetup.next = setup

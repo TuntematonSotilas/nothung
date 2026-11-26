@@ -211,6 +211,13 @@ func _build_ui() -> void:
 
 	# Player: play area, then leader panel.
 	_own_zone_frame = _zone_frame("UI_YOUR_UNITS")
+	# The deck's board (a background bought in Nibelheim) behind the player's units.
+	var board: Texture2D = Cosmetics.texture(_setup.player_board)
+	if board != null:
+		var backdrop: TextureRect = Cosmetics.backdrop(board, 0.15)
+		backdrop.name = "OwnBoardBackdrop"
+		_own_zone_frame.add_child(backdrop)
+		_own_zone_frame.move_child(backdrop, 0)
 	_own_zone_frame.set_drag_forwarding(Callable(), _can_drop_on_own_board, _drop_on_own_board)
 	_own_zone_frame.gui_input.connect(_on_own_zone_input)
 	_main_layout.add_child(_own_zone_frame)
@@ -1861,7 +1868,7 @@ func _zone_body(frame: PanelContainer, units: HFlowContainer, artifacts: VBoxCon
 	body.name = "ZoneBody"
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", roundi(8 * _ui_scale))
-	frame.get_child(0).add_child(body)
+	frame.get_node("ZoneContent").add_child(body)
 	body.add_child(units)
 	var line: ColorRect = ColorRect.new()
 	line.color = Color(Palette.BORDER, 0.8)
@@ -1920,6 +1927,7 @@ func _zone_frame(title: String) -> PanelContainer:
 	frame.name = title.to_pascal_case() + "Zone"
 	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var box: VBoxContainer = VBoxContainer.new()
+	box.name = "ZoneContent"
 	box.add_theme_constant_override("separation", roundi(6 * _ui_scale))
 	frame.add_child(box)
 	box.add_child(_section_label(title))

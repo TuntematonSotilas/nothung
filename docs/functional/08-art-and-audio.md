@@ -148,7 +148,10 @@ Buttons can get a painted frame instead of the flat theme colours:
 
 > **Decision (2026-10-21):** Duel backgrounds are **visual** boards (Valhalla, Nibelheim, Rhine depths, Gibichung hall…). Bonuses or penalties tied to a place exist only as [campaign duel special rules](05-game-modes.md#campaign).
 
-- File: `game/assets/art/boards/<board_id>.png`, **1080 × 1920** (portrait), shown dimmed behind the duel; `default.png` is used for quick matches.
+- File: `game/assets/art/boards/<board_id>.png`, **1080 × 640** (landscape), shown slightly dimmed behind the **player's own play area** only, when the deck uses that board ([cosmetics](06-progression.md#cosmetics)); without one, the plain background. Home backgrounds: `game/assets/art/backgrounds/<id>.png`, **1080 × 1920**, behind the main menu.
+- The current files are **generated placeholders** (gradients and shapes made by a script — not drawn, not AI): to be replaced by the author's artwork before release.
+
+> **Decision (2026-11-26):** a board covers only the player's play area (not the whole duel); boards and home backgrounds are cosmetics bought in Nibelheim.
 - Composition: interest at the **top and bottom edges**; keep the two play areas (roughly the middle 60 % of the height) **calm and low in contrast**, since cards sit on them.
 - Muted tones from the Romantic palette; no text.
 

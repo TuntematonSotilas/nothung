@@ -14,6 +14,8 @@ var difficulty: AIProfile.Difficulty = AIProfile.Difficulty.NORMAL
 var resume: MatchRecord
 ## Whether a win pays Rhinegold (Quick match: Progression.quick_match_reward()).
 var rewards: bool = false
+## The background of the player's play area (a Cosmetics board ID, "" = none): the deck's board.
+var player_board: String = ""
 
 
 func _init(deck: DeckData = null, opponent: DeckData = null, level: AIProfile.Difficulty = AIProfile.Difficulty.NORMAL) -> void:

@@ -129,6 +129,23 @@ Each Leader has its base ability and **two powers**: other versions of it, a lit
 
 ## Cosmetics
 
-- Card backs, board skins (Rhine depths, Valhalla, Nibelheim, Gibichung hall), Leader portraits.
+Backgrounds are **bought in Nibelheim** (Backgrounds tab), like Leader powers: each one from a player level, for Rhinegold.
+
+| Background | Kind | Level | Rhinegold |
+|------------|------|-------|-----------|
+| *The Rhine Depths* | Home | 5 | 150 |
+| *Valhalla* | Board | 10 | 200 |
+| *Nibelheim* | Home | 15 | 300 |
+| *The Valkyrie Rock* | Board | 20 | 400 |
+| *Valhalla in Flames* | Home | 25 | 500 |
+| *The Ring* | Board | 30 | 600 |
+
+- **Home background**: behind the main menu; chosen in **Settings** (Default or one owned).
+- **Board**: behind the player's own play area in a match; chosen **per deck** in **My decks**. The opponent's area keeps the plain background.
+- The pictures are **generated placeholders** (gradients and shapes) until the author draws them ([art](08-art-and-audio.md#duel-backgrounds)).
+
+> **Decision (2026-11-26):** 3 home backgrounds and 3 boards, alternating every 5 levels, bought with Rhinegold in a Nibelheim tab once the level is reached; the board shows only behind the player's units. Prices are draft values.
+
+Later ideas: card backs, Leader portraits, more boards (Gibichung hall).
 
 > **Decision (2026-10-09):** Cosmetics are not sold — the game is entirely free ([01-vision](01-vision.md#scope)). They are unlocked through achievements, campaign progress or Rhinegold.

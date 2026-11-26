@@ -104,7 +104,9 @@ func build_setup(rng: RandomNumberGenerator = null) -> DuelSetup:
 			rng = RandomNumberGenerator.new()
 			rng.randomize()
 		opponent = candidates[rng.randi_range(0, candidates.size() - 1)]
-	return DuelSetup.new(player, with_random_power(CardDatabase.get_deck(opponent), rng), _difficulty)
+	var setup := DuelSetup.new(player, with_random_power(CardDatabase.get_deck(opponent), rng), _difficulty)
+	setup.player_board = Cosmetics.board_of(_player_entry)
+	return setup
 
 
 ## The AI's deck with one of its Leader's versions (base ability or a power), drawn at random.

@@ -42,6 +42,9 @@ static func default_profile() -> Dictionary:
 		"level_rewards_claimed": 1,
 		# Leader powers unlocked in Nibelheim, per Leader: {"wotan": [1, 2]} (LeaderPowers).
 		"leader_powers": {},
+		# Backgrounds bought in Nibelheim, and the home background in use ("" = default) (Cosmetics).
+		"cosmetics": [],
+		"home_background": "",
 		# Until the campaign unlocks factions, a new player owns the four starter decks, and gets a
 		# copy of each as an editable deck.
 		"starter_collection_granted": false,

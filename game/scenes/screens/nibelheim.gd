@@ -3,8 +3,8 @@ extends Control
 ## Nibelheim, two tabs. Cards: forge cards with Rhinegold — the cards the player can still add copies of
 ## (up to the copies a deck can hold), each with its price; a tap shows the card large with Forge (greyed
 ## with what is missing when the Rhinegold is short). Leaders: each Leader's ability and its two powers,
-## unlocked from a player level for Rhinegold. See docs/functional/06-progression.md#meta-currency and
-## #leader-powers.
+## unlocked from a player level for Rhinegold. Backgrounds: home backgrounds and boards, bought the same
+## way. See docs/functional/06-progression.md#meta-currency, #leader-powers and #cosmetics.
 
 const FACTIONS: Array[StringName] = [&"gods", &"nibelungs", &"walsungs", &"valkyries", &"neutral"]
 
@@ -14,6 +14,8 @@ var _header: HBoxContainer
 var _cards_tab: VBoxContainer
 var _leaders_tab: ScrollContainer
 var _leader_list: VBoxContainer
+var _backgrounds_tab: ScrollContainer
+var _background_list: GridContainer
 
 
 func _ready() -> void:
@@ -27,12 +29,12 @@ func _ready() -> void:
 	tabs.add_theme_constant_override("separation", 16)
 	column.add_child(tabs)
 	var group := ButtonGroup.new()
-	for tab: Array in [["CardsTab", "UI_TAB_CARDS"], ["LeadersTab", "UI_TAB_LEADERS"]]:
+	for tab: Array in [["CardsTab", "UI_TAB_CARDS"], ["LeadersTab", "UI_TAB_LEADERS"], ["BackgroundsTab", "UI_TAB_BACKGROUNDS"]]:
 		var chip: Button = MenuUI.chip(tab[1])
 		chip.name = tab[0]
 		chip.button_group = group
 		chip.add_theme_font_size_override("font_size", 26)
-		chip.pressed.connect(show_tab.bind(tab[0] == "LeadersTab"))
+		chip.pressed.connect(show_tab.bind(tabs.get_child_count()))
 		tabs.add_child(chip)
 	(tabs.get_child(0) as Button).button_pressed = true
 
@@ -59,19 +61,34 @@ func _ready() -> void:
 	_leader_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_leader_list.add_theme_constant_override("separation", 28)
 	_leaders_tab.add_child(_leader_list)
+
+	_backgrounds_tab = ScrollContainer.new()
+	_backgrounds_tab.name = "Backgrounds"
+	_backgrounds_tab.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_backgrounds_tab.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_backgrounds_tab.visible = false
+	column.add_child(_backgrounds_tab)
+	_background_list = GridContainer.new()
+	_background_list.columns = 2
+	_background_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_background_list.add_theme_constant_override("h_separation", 24)
+	_background_list.add_theme_constant_override("v_separation", 28)
+	_backgrounds_tab.add_child(_background_list)
 	_refresh()
 
 
-## Cards (false) or Leaders (true).
-func show_tab(leaders: bool) -> void:
-	_cards_tab.visible = not leaders
-	_leaders_tab.visible = leaders
+## Cards (0), Leaders (1) or Backgrounds (2).
+func show_tab(tab: int) -> void:
+	_cards_tab.visible = tab == 0
+	_leaders_tab.visible = tab == 1
+	_backgrounds_tab.visible = tab == 2
 
 
 ## Captions (price, or "Complete" when a deck's worth is owned), the Leaders tab and the Rhinegold counter.
 func _refresh() -> void:
 	(_header.find_child("RhinegoldValue", true, false) as Label).text = str(SaveManager.rhinegold())
 	_build_leaders()
+	_build_backgrounds()
 	for cell: Node in _grid.cells():
 		var data: CardData = (cell.get_child(0) as CardView).card_data
 		var owned: int = SaveManager.owned_count(data.id)
@@ -218,3 +235,72 @@ func _power_row(leader: LeaderData, index: int) -> HBoxContainer:
 			reason.text = tr("UI_FORGE_SHORT").format({"missing": short["rhinegold"]})
 		side.add_child(reason)
 	return row
+
+
+## Buys a background (Cosmetics.buy()); false when it cannot be bought yet.
+func buy_background(cosmetic_id: String) -> bool:
+	if not Cosmetics.buy(cosmetic_id):
+		return false
+	_refresh()
+	MenuUI.toast(self, tr("UI_BACKGROUND_BOUGHT").format({"name": tr(Cosmetics.name_key(cosmetic_id))}), "nibelheim")
+	return true
+
+
+## One card per background: its picture, name and kind, then Owned or its price (greyed with the level
+## needed or the Rhinegold missing).
+func _build_backgrounds() -> void:
+	for child: Node in _background_list.get_children():
+		_background_list.remove_child(child)
+		child.queue_free()
+	for cosmetic: Dictionary in Cosmetics.LIST:
+		_background_list.add_child(_background_card(cosmetic))
+
+
+func _background_card(cosmetic: Dictionary) -> VBoxContainer:
+	var cosmetic_id: String = cosmetic["id"]
+	var home: bool = cosmetic["kind"] == Cosmetics.HOME
+	var card := VBoxContainer.new()
+	card.name = "Background_%s" % cosmetic_id
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.add_theme_constant_override("separation", 8)
+	var frame := PanelContainer.new()
+	var style: StyleBoxFlat = MenuUI._tile_style(Palette.SURFACE, Palette.ACCENT if Cosmetics.is_owned(cosmetic_id) else Palette.BORDER, 3)
+	style.set_content_margin_all(6)
+	frame.add_theme_stylebox_override("panel", style)
+	card.add_child(frame)
+	var picture: TextureRect = Cosmetics.backdrop(Cosmetics.texture(cosmetic_id))
+	picture.custom_minimum_size = Vector2(0, 420 if home else 240)
+	frame.add_child(picture)
+	var title: Label = MenuUI.label(Cosmetics.name_key(cosmetic_id), 26, Palette.ACCENT)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(title)
+	var kind: Label = MenuUI.label("UI_HOME_BACKGROUND" if home else "UI_BOARD", 20, Palette.TEXT_MUTED)
+	kind.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	card.add_child(kind)
+	if Cosmetics.is_owned(cosmetic_id):
+		var owned: Label = MenuUI.label("UI_BACKGROUND_OWNED", 22, Palette.ACCENT)
+		owned.name = "State"
+		owned.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		card.add_child(owned)
+		return card
+	var buy: Button = MenuUI.button("", 72, 22)
+	buy.name = "BuyButton"
+	buy.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+	buy.text = tr("UI_PRICE").format({"price": cosmetic["price"]})
+	buy.disabled = not Cosmetics.can_buy(cosmetic_id)
+	if not buy.disabled:
+		buy.theme_type_variation = &"ButtonPrimary"
+	buy.pressed.connect(func() -> void: buy_background(cosmetic_id))
+	card.add_child(buy)
+	var short: Dictionary = Cosmetics.missing(cosmetic_id)
+	if int(short["level"]) > 0 or int(short["rhinegold"]) > 0:
+		var reason: Label = MenuUI.label("", 18, Palette.TEXT_MUTED)
+		reason.name = "Reason"
+		reason.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
+		reason.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		if int(short["level"]) > 0:
+			reason.text = tr("UI_POWER_LEVEL_NEEDED").format({"level": short["level"]})
+		else:
+			reason.text = tr("UI_FORGE_SHORT").format({"missing": short["rhinegold"]})
+		card.add_child(reason)
+	return card

@@ -114,13 +114,13 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 Achievements, the player level and Leader powers are done; the rest is still to refine ([progression ideas](functional/06-progression.md#ideas-to-refine-2026-11-20)).
 
 - [x] Decide the scope: achievements, a player level that locks nothing (Rhinegold, then cosmetics), campaign chapters story-gated (decided 2026-11-20); Leader powers decided the same day (upgrades, level + Rhinegold); cosmetics keep their open questions in their own item below
-- [x] Achievements, first set: 13 achievements paying Rhinegold, counted on Quick matches and crafting, taken back with an undone winning play; Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
+- [x] Achievements, first set: 13 achievements paying Rhinegold once claimed in their screen, counted on Quick matches and crafting, taken back with an undone winning play; Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
 - [ ] Achievements, next: tiers and cosmetic rewards (each one already gives 25 XP)
-- [x] Player level: XP from every finished Quick match (10, or 20 / 30 / 40 for a win) and from achievements (25); 20 + 10 × (n − 1) XP a level, up to level 30; +40 Rhinegold a level; shown in the main menu and on the results; chapters stay story-gated ([player level](functional/06-progression.md#player-level))
-- [ ] Level rewards: cosmetics every 5 levels, once their artwork exists
-- [ ] Cosmetic rewards: home background, deck backgrounds, …
+- [x] Player level: XP from every finished Quick match (10, or 20 / 30 / 40 for a win) and from achievements (25); 20 + 10 × (n − 1) XP a level, up to level 30; +40 Rhinegold a level, claimed in the main menu; shown in the main menu and on the results; chapters stay story-gated ([player level](functional/06-progression.md#player-level))
+- [x] Cosmetics: 3 home backgrounds and 3 boards, from levels 5 to 30, bought with Rhinegold in Nibelheim (Backgrounds tab); home background chosen in Settings, board per deck in My decks, shown behind the player's play area ([cosmetics](functional/06-progression.md#cosmetics))
+- [ ] Cosmetics artwork: replace the generated placeholder backgrounds ([art & audio track](#art--audio-track-in-parallel))
 - [x] Leader powers: two upgraded versions of each Leader's ability, unlocked in Nibelheim (Leaders tab) with a level and Rhinegold (5 / 300, 10 / 600), chosen per deck in the deck editor; the AI draws one at random; tuned with the soak to about +10 points ([Leader powers](functional/06-progression.md#leader-powers))
-- [ ] Profile v4: unlocked cosmetics, if they need a migration (XP, achievement progress and Leader powers are new keys with defaults: no version change)
+- [x] Profile v4 (achievements claimed by hand) and v5 (level rewards claimed by hand in the main menu); unlocked cosmetics will add their own keys
 
 ## 7 — Test matches
 
@@ -158,5 +158,12 @@ No code dependency: can start now ([art & audio](functional/08-art-and-audio.md)
 - [x] Card frames drawn by the game: rectangles, double border with a motif by type (spell / artifact / relic), faction colour on border + name banner, rarity letter badge ([card frames](functional/08-art-and-audio.md#card-frames))
 - [x] Faction icons (game-icons.net)
 - [ ] Card-type and trait icons
+- [ ] Backgrounds to draw, replacing the generated placeholders ([cosmetics](functional/06-progression.md#cosmetics), [formats](functional/08-art-and-audio.md#duel-backgrounds)):
+  - [ ] Home background *The Rhine Depths* — `backgrounds/home_rhine_depths.png`, 1080 × 1920
+  - [ ] Home background *Nibelheim* — `backgrounds/home_nibelheim.png`, 1080 × 1920
+  - [ ] Home background *Valhalla in Flames* — `backgrounds/home_valhalla_burning.png`, 1080 × 1920
+  - [ ] Board *Valhalla* — `boards/board_valhalla.png`, 1080 × 640
+  - [ ] Board *The Valkyrie Rock* — `boards/board_valkyrie_rock.png`, 1080 × 640
+  - [ ] Board *The Ring* — `boards/board_ring.png`, 1080 × 640
 - [ ] Leitmotif stingers and first music loop ([audio tools](tools/audio-tools.md))
 - [ ] Sound effects: draw, play, attack, damage, death, end turn

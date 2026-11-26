@@ -711,3 +711,50 @@ func test_main_menu_trophy_calls_for_attention_while_an_achievement_waits() -> v
 	assert_bool(Achievements.has_claimable()).is_true()
 	assert_bool((menu.find_child("AchievementsButton", true, false) as Button).has_meta(&"claimable")).is_true()
 	menu.queue_free()
+
+
+func test_backgrounds_are_bought_in_nibelheim_and_chosen_in_settings_and_my_decks() -> void:
+	SaveManager.profile["xp"] = 10000
+	SaveManager.add_rhinegold(400)
+	var screen: Control = await _open("res://scenes/screens/nibelheim.tscn")
+	(screen.find_child("BackgroundsTab", true, false) as Button).pressed.emit()
+	assert_bool((screen.find_child("Backgrounds", true, false) as Control).visible).is_true()
+	var card: Node = screen.find_child("Background_home_rhine_depths", true, false)
+	(card.find_child("BuyButton", true, false) as Button).pressed.emit()
+	assert_bool(Cosmetics.is_owned("home_rhine_depths")).is_true()
+	assert_object(screen.find_child("Background_home_rhine_depths", true, false).find_child("State", true, false)).is_not_null()
+	(screen.find_child("Background_board_valhalla", true, false).find_child("BuyButton", true, false) as Button).pressed.emit()
+	assert_int(SaveManager.rhinegold()).is_equal(50)
+	# Too expensive now: greyed with what is missing.
+	var ring: Node = screen.find_child("Background_board_ring", true, false)
+	assert_bool((ring.find_child("BuyButton", true, false) as Button).disabled).is_true()
+	screen.queue_free()
+
+	# Settings: the home background; the main menu shows it.
+	var settings: Control = await _open("res://scenes/screens/settings_menu.tscn")
+	(settings.find_child("Home_home_rhine_depths", true, false) as Button).pressed.emit()
+	assert_str(Cosmetics.home_background()).is_equal("home_rhine_depths")
+	settings.queue_free()
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_object(menu.find_child("HomeBackdrop", true, false)).is_not_null()
+	menu.queue_free()
+
+	# My decks: the board of a deck; Quick match plays it behind the player's units.
+	var decks: Control = await _open("res://scenes/screens/deck_list.tscn")
+	var entry: Dictionary = SaveManager.decks()[0]
+	(decks.find_child("Board_%s" % entry["id"], true, false) as Button).pressed.emit()
+	var picker: Node = decks.find_child("BoardPicker", true, false)
+	assert_object(picker.find_child("Board_board_ring", true, false)).is_null()
+	(picker.find_child("Board_board_valhalla", true, false) as Button).pressed.emit()
+	assert_str(Cosmetics.board_of(entry)).is_equal("board_valhalla")
+	decks.queue_free()
+	Settings.quick_match_deck = str(entry["id"])
+	var quick: Control = await _open("res://scenes/screens/quick_match.tscn")
+	var setup: DuelSetup = quick.call("build_setup")
+	assert_str(setup.player_board).is_equal("board_valhalla")
+	quick.queue_free()
+	DuelSetup.next = setup
+	var duel: Control = await _open("res://scenes/screens/duel.tscn")
+	assert_object(duel.find_child("OwnBoardBackdrop", true, false)).is_not_null()
+	duel.queue_free()
+	await get_tree().process_frame
