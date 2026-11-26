@@ -110,3 +110,19 @@ func _mouse_motion(position: Vector2) -> InputEventMouseMotion:
 	var event: InputEventMouseMotion = InputEventMouseMotion.new()
 	event.position = position
 	return event
+
+
+func test_an_invisible_unit_shows_its_trait_struck_through_once_revealed() -> void:
+	var toad := CardInstance.new(CardDatabase.get_card(&"alberich_toad"), 1, 600)
+	var view: CardView = auto_free(CardView.new())
+	add_child(view)
+	view.set_card(toad.data, toad)
+	var label: Label = view.find_child("RulesLabel", true, false) as Label
+	var invisible: String = tr("UI_TRAIT_INVISIBLE")
+	assert_str(label.text).contains(invisible)
+	assert_str(label.text).not_contains(String.chr(0x0336))
+	# It attacked: revealed.
+	toad.statuses.append(&"revealed")
+	view.set_card(toad.data, toad)
+	assert_bool(view.is_revealed()).is_true()
+	assert_str(label.text).contains(CardView.struck_through(invisible))

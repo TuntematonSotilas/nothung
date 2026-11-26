@@ -120,7 +120,7 @@ flowchart TD
 - The own-side drop zone spans the artifact and unit rows and is visibly highlighted while dragging a card.
 - A complete card preview follows the pointer during a drag; Godot's platform-native drag preview is disabled to keep Android rendering consistent.
 - Valid targets glow; invalid ones dim.
-- **Invisible** units (Tarnhelm) are drawn see-through (45 % opacity) on both boards until they attack; the opponent can never select them as a target meanwhile.
+- **Invisible** units (Tarnhelm) are drawn see-through (45 % opacity) on both boards until they attack; the opponent can never select them as a target meanwhile. Once revealed by their attack they are drawn normally, and the **Invisible** trait in their rules text is struck through (they can be attacked and targeted from then on).
 - **Undo play** is available after the most recent card play and disappears after the next action or turn end. Undo restores the state before the play, including any resolved play effects; the card is back in hand.
 
 > **Decision (2026-11-23, playtest):** an undone card goes back to the **hand**, not on top of the deck (undoing *Siegmund* seemed to lose him).

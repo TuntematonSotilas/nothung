@@ -270,6 +270,10 @@ func _refresh_text() -> void:
 	_rarity_label.text = CardPalette.rarity_letter(card_data.rarity)
 	_set_icon(_type_icon, "res://ui/icons/type_%s.svg" % type_id)
 	_name_label.text = card_name
+	# Once an invisible unit has attacked (revealed), its Invisible trait is struck through.
+	var invisible: String = tr("UI_TRAIT_INVISIBLE")
+	if is_revealed() and rules.contains(invisible):
+		rules = rules.replace(invisible, struck_through(invisible))
 	_rules_label.text = rules
 	var is_unit: bool = card_data.type == CardData.Type.UNIT
 	_attack_stone.visible = is_unit
@@ -290,6 +294,20 @@ func _refresh_text() -> void:
 	tooltip_text = "%s\n%s" % [card_name, rules]
 	if relic != null:
 		tooltip_text += "\n" + _relic_label.text
+
+
+## `text` struck through with a combining stroke after each letter (U+0336): the game font has no
+## strikethrough line of its own, so RichTextLabel's [s] would not show.
+static func struck_through(text: String) -> String:
+	var out: String = ""
+	for character: String in text:
+		out += character + String.chr(0x0336)
+	return out
+
+
+## An Invisible unit that has attacked: revealed, its Invisible trait is shown struck through.
+func is_revealed() -> bool:
+	return card_instance != null and card_instance.statuses.has(&"revealed") and card_instance.has_keyword(&"invisible")
 
 
 ## Card face: cost, faction icon and rarity badge; name banner; illustration (when drawn); rules text;
