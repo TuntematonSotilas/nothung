@@ -1,7 +1,7 @@
 # Roadmap
 
 > Development milestones from the spec to the first Google Play release, with progress tracking.
-> Status: Draft · Last updated: 2026-11-20
+> Status: Draft · Last updated: 2026-11-27
 
 Principle: reach a **playable match on the phone** as early as possible (milestone 3), then measure match length to validate the rules (Götterdämmerung at turn 10, Ring curse) before building the meta and the campaign.
 
@@ -114,7 +114,7 @@ No `Node` dependency; everything tested ([game engine](technical/04-game-engine.
 Achievements, the player level, Leader powers and cosmetics are done; the background artwork is in the [art & audio track](#art--audio-track-in-parallel). Later ideas: [progression ideas](functional/06-progression.md#ideas-to-refine-2026-11-20).
 
 - [x] Decide the scope: achievements, a player level that locks nothing (Rhinegold, then cosmetics), campaign chapters story-gated (decided 2026-11-20); Leader powers decided the same day (upgrades, level + Rhinegold); cosmetics keep their open questions in their own item below
-- [x] Achievements, first set: 13 achievements paying Rhinegold once claimed in their screen, counted on Quick matches and crafting, taken back with an undone winning play; Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
+- [x] Achievements: 33 achievements paying Rhinegold and XP once claimed in their screen, with cumulative milestones for wins, match actions, crafting, Leader powers and backgrounds; Quick-match progress is taken back with an undone winning play. Achievements screen (trophy in the main menu), shown on the results and in Nibelheim ([achievements](functional/06-progression.md#achievements))
 - [x] Player level: XP from every finished Quick match (10, or 20 / 30 / 40 for a win) and from achievements (25); 20 + 10 × (n − 1) XP a level, up to level 30; +40 Rhinegold a level, claimed in the main menu; shown in the main menu and on the results; chapters stay story-gated ([player level](functional/06-progression.md#player-level))
 - [x] Cosmetics: 3 home backgrounds and 3 boards, from levels 5 to 30, bought with Rhinegold in Nibelheim (Backgrounds tab); home background chosen in Settings, board per deck in the deck editor, shown behind the player's play area ([cosmetics](functional/06-progression.md#cosmetics))
 - [x] Leader powers: two upgraded versions of each Leader's ability, unlocked in Nibelheim (Leaders tab) with a level and Rhinegold (5 / 300, 10 / 600), chosen per deck in the deck editor; the AI draws one at random; tuned with the soak to about +10 points ([Leader powers](functional/06-progression.md#leader-powers))
@@ -160,8 +160,8 @@ No code dependency: can start now ([art & audio](functional/08-art-and-audio.md)
   - [ ] Home background *The Rhine Depths* — `backgrounds/home_rhine_depths.png`, 1080 × 1920
   - [ ] Home background *Nibelheim* — `backgrounds/home_nibelheim.png`, 1080 × 1920
   - [ ] Home background *Valhalla in Flames* — `backgrounds/home_valhalla_burning.png`, 1080 × 1920
-  - [ ] Board *Valhalla* — `boards/board_valhalla.png`, 1080 × 640
-  - [ ] Board *The Valkyrie Rock* — `boards/board_valkyrie_rock.png`, 1080 × 640
+  - [ ] Board *The Gibichung Hall* — `boards/board_valhalla.png`, 1080 × 640
+  - [ ] Board *Fafnir's Forest* — `boards/board_valkyrie_rock.png`, 1080 × 640
   - [ ] Board *The Ring* — `boards/board_ring.png`, 1080 × 640
 - [ ] Leitmotif stingers and first music loop ([audio tools](tools/audio-tools.md))
 - [ ] Sound effects: draw, play, attack, damage, death, end turn

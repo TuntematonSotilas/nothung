@@ -8,19 +8,40 @@ extends RefCounted
 ## id, statistic counted, target, Rhinegold reward. Order = order on the Achievements screen.
 const LIST: Array[Dictionary] = [
 	{"id": "first_victory", "stat": "wins", "target": 1, "reward": 20},
+	{"id": "five_wins", "stat": "wins", "target": 5, "reward": 30},
 	{"id": "einherjar", "stat": "wins", "target": 10, "reward": 50},
+	{"id": "twenty_wins", "stat": "wins", "target": 20, "reward": 80},
 	{"id": "valhalla", "stat": "wins", "target": 50, "reward": 150},
+	{"id": "normal_victory", "stat": "normal_wins", "target": 1, "reward": 30},
 	{"id": "ring_cycle", "stat": "matches", "target": 100, "reward": 100},
 	{"id": "four_evenings", "stat": "leaders_won", "target": 4, "reward": 100},
 	{"id": "gotterdammerung", "stat": "hard_wins", "target": 1, "reward": 60},
 	{"id": "twilight", "stat": "twilight_wins", "target": 1, "reward": 40},
 	{"id": "renunciation_of_love", "stat": "ring_wins", "target": 1, "reward": 40},
 	{"id": "notung", "stat": "reforge_matches", "target": 10, "reward": 80},
+	{"id": "artifacts_10", "stat": "artifacts_played", "target": 10, "reward": 20},
 	{"id": "nibelung_hoard", "stat": "artifacts_played", "target": 20, "reward": 40},
+	{"id": "artifacts_50", "stat": "artifacts_played", "target": 50, "reward": 100},
+	{"id": "spells_10", "stat": "spells_played", "target": 10, "reward": 20},
+	{"id": "spells_20", "stat": "spells_played", "target": 20, "reward": 40},
+	{"id": "spells_50", "stat": "spells_played", "target": 50, "reward": 100},
+	{"id": "leader_ability_10", "stat": "leader_abilities_used", "target": 10, "reward": 20},
+	{"id": "leader_ability_20", "stat": "leader_abilities_used", "target": 20, "reward": 40},
+	{"id": "leader_ability_50", "stat": "leader_abilities_used", "target": 50, "reward": 100},
 	{"id": "invulnerable", "stat": "flawless_wins", "target": 1, "reward": 60},
 	{"id": "mimes_apprentice", "stat": "cards_crafted", "target": 1, "reward": 20},
+	{"id": "craft_two", "stat": "cards_crafted", "target": 2, "reward": 20},
+	{"id": "craft_five", "stat": "cards_crafted", "target": 5, "reward": 40},
 	{"id": "forging_song", "stat": "cards_crafted", "target": 10, "reward": 60},
+	{"id": "power_unlock_1", "stat": "powers_unlocked", "target": 1, "reward": 20},
+	{"id": "power_unlock_2", "stat": "powers_unlocked", "target": 2, "reward": 40},
+	{"id": "power_unlock_4", "stat": "powers_unlocked", "target": 4, "reward": 80},
+	{"id": "all_powers", "stat": "powers_unlocked", "all": true, "reward": 150},
+	{"id": "background_unlock_1", "stat": "backgrounds_unlocked", "target": 1, "reward": 20},
+	{"id": "background_unlock_2", "stat": "backgrounds_unlocked", "target": 2, "reward": 40},
+	{"id": "all_backgrounds", "stat": "backgrounds_unlocked", "all": true, "reward": 100},
 ]
+const NORMAL: int = 1
 const HARD: int = 2
 
 
@@ -36,6 +57,8 @@ static func summarize(state: GameState, stats: MatchStats, difficulty: int) -> D
 		"opponent_held_ring": stats.opponent_held_ring,
 		"reforged": stats.reforged,
 		"artifacts_played": stats.artifacts_played,
+		"spells_played": stats.spells_played,
+		"leader_abilities_used": stats.leader_abilities_used,
 		"units_lost": stats.units_lost,
 	}
 
@@ -47,12 +70,15 @@ static func record_match(summary: Dictionary) -> Dictionary:
 	var counts: Dictionary = {
 		"matches": 1,
 		"wins": 1 if won else 0,
+		"normal_wins": 1 if won and int(summary["difficulty"]) == NORMAL else 0,
 		"hard_wins": 1 if won and int(summary["difficulty"]) == HARD else 0,
 		"twilight_wins": 1 if won and int(summary["life"]) == 1 else 0,
 		"ring_wins": 1 if won and summary["holds_ring"] and not summary["opponent_held_ring"] else 0,
 		"flawless_wins": 1 if won and int(summary["units_lost"]) == 0 else 0,
 		"reforge_matches": 1 if summary["reforged"] else 0,
 		"artifacts_played": int(summary["artifacts_played"]),
+		"spells_played": int(summary["spells_played"]),
+		"leader_abilities_used": int(summary["leader_abilities_used"]),
 	}
 	var leader: String = ""
 	var leaders: Array = _leaders_won()
@@ -70,6 +96,11 @@ static func record_match(summary: Dictionary) -> Dictionary:
 ## A card forged in Nibelheim: newly reached achievements are claimable, with no automatic reward.
 static func record_craft() -> Dictionary:
 	_add_counts({"cards_crafted": 1}, 1)
+	return _mark_reached()
+
+
+## Checks achievements based on unlocks stored in the profile (Leader powers and backgrounds).
+static func refresh_reached() -> Dictionary:
 	return _mark_reached()
 
 
@@ -99,12 +130,40 @@ static func revert(change: Dictionary) -> void:
 
 ## Current value of an achievement's statistic, capped at its target.
 static func progress(achievement: Dictionary) -> int:
-	return mini(stat(achievement["stat"]), int(achievement["target"]))
+	return mini(stat(achievement["stat"]), target(achievement))
+
+
+static func target(achievement: Dictionary) -> int:
+	if achievement.get("all", false):
+		match achievement["stat"]:
+			"powers_unlocked":
+				var total: int = 0
+				for leader_id: StringName in CardDatabase.leader_ids():
+					var leader: LeaderData = CardDatabase.get_leader(leader_id)
+					total += leader.powers.size()
+				return total
+			"backgrounds_unlocked":
+				return Cosmetics.LIST.size()
+	return int(achievement.get("target", 0))
 
 
 static func stat(stat_id: String) -> int:
 	if stat_id == "leaders_won":
 		return _leaders_won().size()
+	if stat_id == "powers_unlocked":
+		var total: int = 0
+		var powers: Dictionary = SaveManager.profile.get("leader_powers", {})
+		for unlocked: Variant in powers.values():
+			if unlocked is Array:
+				total += unlocked.size()
+		return total
+	if stat_id == "backgrounds_unlocked":
+		var owned: Array = SaveManager.profile.get("cosmetics", [])
+		var total: int = 0
+		for cosmetic: Dictionary in Cosmetics.LIST:
+			if owned.has(cosmetic["id"]):
+				total += 1
+		return total
 	return int(_stats().get(stat_id, 0))
 
 
@@ -176,7 +235,7 @@ static func _mark_reached() -> Dictionary:
 	var reached: Array = []
 	for achievement: Dictionary in LIST:
 		var achievement_id: String = achievement["id"]
-		if is_reached(achievement_id) or stat(achievement["stat"]) < int(achievement["target"]):
+		if is_reached(achievement_id) or stat(achievement["stat"]) < target(achievement):
 			continue
 		(SaveManager.profile["achievements"] as Array).append(achievement_id)
 		reached.append(achievement_id)

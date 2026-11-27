@@ -8,19 +8,30 @@ extends RefCounted
 const PLAYER: int = 0
 
 var artifacts_played: int = 0
+var spells_played: int = 0
+var leader_abilities_used: int = 0
 var reforged: bool = false
 var opponent_held_ring: bool = false
 var units_lost: int = 0
 var _saved: Array = []
 
 
-## Before an action is applied: counts the artifacts the player plays from the hand.
+## Before an action is applied: counts the player's cards and Leader abilities.
 func before_action(engine: Match, action: Action) -> void:
+	if action is UseLeaderAbilityAction:
+		if action.player == PLAYER:
+			leader_abilities_used += 1
+		return
 	if not action is PlayCardAction or action.player != PLAYER:
 		return
 	var card: CardInstance = engine.get_state().player(PLAYER).hand.find((action as PlayCardAction).card_uid)
-	if card != null and card.data.type == CardData.Type.ARTIFACT:
-		artifacts_played += 1
+	if card == null:
+		return
+	match card.data.type:
+		CardData.Type.ARTIFACT:
+			artifacts_played += 1
+		CardData.Type.SPELL:
+			spells_played += 1
 
 
 func on_event(event: GameEvent) -> void:
@@ -38,12 +49,14 @@ func on_event(event: GameEvent) -> void:
 
 ## Saved before each card play, restored when that play is undone.
 func checkpoint() -> void:
-	_saved = [artifacts_played, reforged, opponent_held_ring, units_lost]
+	_saved = [artifacts_played, spells_played, leader_abilities_used, reforged, opponent_held_ring, units_lost]
 
 
 func rollback() -> void:
-	if _saved.size() == 4:
+	if _saved.size() == 6:
 		artifacts_played = _saved[0]
-		reforged = _saved[1]
-		opponent_held_ring = _saved[2]
-		units_lost = _saved[3]
+		spells_played = _saved[1]
+		leader_abilities_used = _saved[2]
+		reforged = _saved[3]
+		opponent_held_ring = _saved[4]
+		units_lost = _saved[5]

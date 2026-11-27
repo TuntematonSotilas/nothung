@@ -154,6 +154,7 @@ Buttons can get a painted frame instead of the flat theme colours:
 > **Decision (2026-11-26):** a board covers only the player's play area (not the whole duel); boards and home backgrounds are cosmetics bought in Nibelheim.
 - Composition: interest at the **top and bottom edges**; keep the two play areas (roughly the middle 60 % of the height) **calm and low in contrast**, since cards sit on them.
 - Muted tones from the Romantic palette; no text.
+- Board themes: the Gibichung hall (the Burgundian court of the *Nibelungenlied*) and Fáfnir's forest (inspired by the dragon episode in the *Völsunga saga*).
 
 ## Audio
 

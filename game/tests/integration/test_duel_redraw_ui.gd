@@ -705,6 +705,28 @@ func test_leader_ability_is_greyed_when_unusable_and_selected_by_tap_tap() -> vo
 	await get_tree().process_frame
 
 
+func test_energy_counter_hides_remaining_energy_outside_own_turn() -> void:
+	var duel: Control = await _main_phase_duel_with_hand([], 3)
+	var state: GameState = (duel.get("_match") as Match).get_state()
+	var own_energy: Label = duel.get("_energy_label") as Label
+	var enemy_energy: Label = duel.get("_enemy_energy_label") as Label
+	var own: PlayerState = state.player(0)
+	var enemy: PlayerState = state.player(1)
+	enemy.energy = 2
+
+	state.active_player = 1
+	duel.call("_refresh")
+	assert_str(own_energy.text).is_equal("- / %d" % own.max_energy)
+	assert_str(enemy_energy.text).is_equal("2 / %d" % enemy.max_energy)
+
+	state.active_player = 0
+	duel.call("_refresh")
+	assert_str(own_energy.text).is_equal("3 / %d" % own.max_energy)
+	assert_str(enemy_energy.text).is_equal("- / %d" % enemy.max_energy)
+	duel.queue_free()
+	await get_tree().process_frame
+
+
 func test_first_gotterdammerung_opens_an_explanation_closed_by_a_tap_only_once() -> void:
 	var duel: Control = await _main_phase_duel_with_hand([], 2)
 	var fx: DuelFx = duel.get("_fx") as DuelFx

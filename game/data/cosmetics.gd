@@ -5,7 +5,8 @@ extends RefCounted
 ## (main menu, chosen in Settings) and boards (the player's play area in a match, chosen per deck in
 ## My decks). Each one is offered from a player level, for Rhinegold. Owned IDs are kept in
 ## profile["cosmetics"], the home background in profile["home_background"] and a deck's board in its
-## entry ("board"); "" is the default. The PNGs are placeholders until the artwork exists.
+## entry ("board"); "" is the default. Cosmetic IDs are persisted, so keep them stable when their
+## displayed names or artwork change.
 
 const HOME: String = "home"
 const BOARD: String = "board"

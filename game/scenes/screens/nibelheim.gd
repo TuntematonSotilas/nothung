@@ -142,7 +142,12 @@ func unlock_power(leader: LeaderData, index: int) -> bool:
 	if not LeaderPowers.unlock(leader, index):
 		return false
 	_refresh()
-	MenuUI.toast(self, tr("UI_POWER_UNLOCKED").format({"name": tr(leader.with_power(index).ability_key() + "_NAME")}), "nibelheim")
+	var lines: PackedStringArray = [
+		tr("UI_POWER_UNLOCKED").format({"name": tr(leader.with_power(index).ability_key() + "_NAME")}),
+	]
+	for achievement_id: Variant in Achievements.refresh_reached()["reached"]:
+		lines.append(Achievements.ready_text(achievement_id))
+	MenuUI.toast(self, "\n".join(lines), "nibelheim")
 	return true
 
 
@@ -242,7 +247,12 @@ func buy_background(cosmetic_id: String) -> bool:
 	if not Cosmetics.buy(cosmetic_id):
 		return false
 	_refresh()
-	MenuUI.toast(self, tr("UI_BACKGROUND_BOUGHT").format({"name": tr(Cosmetics.name_key(cosmetic_id))}), "nibelheim")
+	var lines: PackedStringArray = [
+		tr("UI_BACKGROUND_BOUGHT").format({"name": tr(Cosmetics.name_key(cosmetic_id))}),
+	]
+	for achievement_id: Variant in Achievements.refresh_reached()["reached"]:
+		lines.append(Achievements.ready_text(achievement_id))
+	MenuUI.toast(self, "\n".join(lines), "nibelheim")
 	return true
 
 

@@ -19,6 +19,8 @@ func after_test() -> void:
 
 
 func test_three_home_backgrounds_and_three_boards_each_with_its_picture_and_name() -> void:
+	var previous_locale: String = TranslationServer.get_locale()
+	TranslationServer.set_locale("en")
 	var kinds: Dictionary = {Cosmetics.HOME: 0, Cosmetics.BOARD: 0}
 	var levels: Array[int] = []
 	for cosmetic: Dictionary in Cosmetics.LIST:
@@ -28,7 +30,10 @@ func test_three_home_backgrounds_and_three_boards_each_with_its_picture_and_name
 		assert_str(tr(Cosmetics.name_key(cosmetic["id"]))).is_not_equal(Cosmetics.name_key(cosmetic["id"]))
 	assert_dict(kinds).is_equal({Cosmetics.HOME: 3, Cosmetics.BOARD: 3})
 	assert_array(levels).contains_exactly([5, 10, 15, 20, 25, 30])
+	assert_str(tr(Cosmetics.name_key("board_valhalla"))).is_equal("The Gibichung Hall")
+	assert_str(tr(Cosmetics.name_key("board_valkyrie_rock"))).is_equal("Fafnir's Forest")
 	assert_object(Cosmetics.texture("")).is_null()
+	TranslationServer.set_locale(previous_locale)
 
 
 func test_buying_needs_the_level_then_the_rhinegold_and_happens_once() -> void:

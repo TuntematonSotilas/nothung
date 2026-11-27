@@ -20,6 +20,7 @@ const PORTRAIT_RADIUS: int = 18
 
 
 func _ready() -> void:
+	Achievements.refresh_reached()
 	_build()
 	if SaveManager.has_match():
 		_offer_resume()

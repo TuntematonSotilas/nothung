@@ -83,6 +83,17 @@ func test_main_menu_without_a_playable_deck_points_to_my_decks() -> void:
 	menu.queue_free()
 
 
+func test_main_menu_reconciles_new_achievement_milestones_for_existing_profiles() -> void:
+	SaveManager.profile["stats"] = {"wins": 5, "normal_wins": 1}
+	var menu: Control = await _open("res://scenes/screens/main_menu.tscn")
+	assert_array(SaveManager.profile["achievements"]).contains_exactly_in_any_order([
+		"first_victory", "five_wins", "normal_victory",
+	])
+	assert_bool(Achievements.is_claimable("five_wins")).is_true()
+	assert_int(SaveManager.rhinegold()).is_equal(0)
+	menu.queue_free()
+
+
 func test_collection_shows_every_card_with_the_copies_owned() -> void:
 	SaveManager.profile = SaveManager.default_profile()
 	SaveManager.profile["collection"] = {"loge": 2, "wotans_spear": 1}
@@ -438,6 +449,7 @@ func test_nibelheim_unlocks_a_leader_power_from_its_level() -> void:
 	power = screen.find_child("Leader_wotan", true, false).find_child("Power1", true, false)
 	(power.find_child("UnlockButton", true, false) as Button).pressed.emit()
 	assert_bool(LeaderPowers.is_unlocked(&"wotan", 1)).is_true()
+	assert_bool(Achievements.is_claimable("power_unlock_1")).is_true()
 	assert_int(SaveManager.rhinegold()).is_equal(100)
 	power = screen.find_child("Leader_wotan", true, false).find_child("Power1", true, false)
 	assert_object(power.find_child("UnlockButton", true, false)).is_null()
@@ -722,8 +734,10 @@ func test_backgrounds_are_bought_in_nibelheim_and_chosen_in_settings_and_the_dec
 	var card: Node = screen.find_child("Background_home_rhine_depths", true, false)
 	(card.find_child("BuyButton", true, false) as Button).pressed.emit()
 	assert_bool(Cosmetics.is_owned("home_rhine_depths")).is_true()
+	assert_bool(Achievements.is_claimable("background_unlock_1")).is_true()
 	assert_object(screen.find_child("Background_home_rhine_depths", true, false).find_child("State", true, false)).is_not_null()
 	(screen.find_child("Background_board_valhalla", true, false).find_child("BuyButton", true, false) as Button).pressed.emit()
+	assert_bool(Achievements.is_claimable("background_unlock_2")).is_true()
 	assert_int(SaveManager.rhinegold()).is_equal(50)
 	# Too expensive now: greyed with what is missing.
 	var ring: Node = screen.find_child("Background_board_ring", true, false)

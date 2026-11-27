@@ -40,25 +40,45 @@
 
 ## Achievements
 
-Quick matches count (a duel without rewards does not), and crafting in Nibelheim. Reaching a target makes an achievement available to claim in the Achievements screen; its Rhinegold and 25 XP are paid only after the player claims it. Undoing the winning play from the results takes back the match's statistics and any achievements it newly made available.
+Quick matches count (a duel without rewards does not): wins, artifacts, spells and Leader ability uses. Crafting, unlocking Leader powers and unlocking backgrounds in Nibelheim count too. Reaching a target makes an achievement available to claim in the Achievements screen; its Rhinegold and 25 XP are paid only after the player claims it. Undoing the winning play from the results takes back the match's statistics and any achievements it newly made available.
 
 | Achievement | To do | Rhinegold |
 |-------------|-------|-----------|
 | *Hojotoho!* | Win a Quick match | 20 |
-| *Einherjar* | Win 10 matches | 50 |
-| *Valhalla* | Win 50 matches | 150 |
+| *Battle-tested* | Win 5 Quick matches | 30 |
+| *Einherjar* | Win 10 Quick matches | 50 |
+| *Legend of Midgard* | Win 20 Quick matches | 80 |
+| *Valhalla* | Win 50 Quick matches | 150 |
+| *Balanced Victory* | Win a Quick match on Normal difficulty | 30 |
 | *The Ring Cycle* | Play 100 matches | 100 |
 | *Four Evenings* | Win with each of the four Leaders | 100 |
 | *Götterdämmerung* | Win a match on Hard | 60 |
 | *Twilight* | Win with your Leader at 1 Life | 40 |
 | *Renunciation of Love* | Win holding the Ring, the opponent never having had it | 40 |
 | *Notung! Notung!* | Reforge Nothung in 10 matches | 80 |
-| *The Nibelung Hoard* | Play 20 artifacts | 40 |
+| *Relic Seeker* | Play 10 artifacts in Quick matches | 20 |
+| *The Nibelung Hoard* | Play 20 artifacts in Quick matches | 40 |
+| *Hoard Keeper* | Play 50 artifacts in Quick matches | 100 |
+| *Rune Reader* | Play 10 spells in Quick matches | 20 |
+| *Rune Singer* | Play 20 spells in Quick matches | 40 |
+| *Master of Runes* | Play 50 spells in Quick matches | 100 |
+| *Call of the Leader* | Use your Leader's ability 10 times in Quick matches | 20 |
+| *Leader's Command* | Use your Leader's ability 20 times in Quick matches | 40 |
+| *Master of the Leader's Power* | Use your Leader's ability 50 times in Quick matches | 100 |
 | *Invulnerable* | Win without losing a unit | 60 |
 | *Mime's Apprentice* | Forge a card in Nibelheim | 20 |
+| *Craftsman's Hand* | Forge 2 cards in Nibelheim | 20 |
+| *Master Smith* | Forge 5 cards in Nibelheim | 40 |
 | *The Forging Song* | Forge 10 cards in Nibelheim | 60 |
+| *Power Awakened* | Unlock a Leader power in Nibelheim | 20 |
+| *Double Power* | Unlock 2 Leader powers in Nibelheim | 40 |
+| *Power Collector* | Unlock 4 Leader powers in Nibelheim | 80 |
+| *Master of All Powers* | Unlock every available Leader power in Nibelheim | 150 |
+| *World Wanderer* | Unlock a background in Nibelheim | 20 |
+| *Realm Explorer* | Unlock 2 backgrounds in Nibelheim | 40 |
+| *Across All Realms* | Unlock every available background in Nibelheim | 100 |
 
-> **Decision (2026-11-20):** first set of 13 achievements paying Rhinegold (and, since the [player level](#player-level), 25 XP each); *Renunciation of Love* becomes "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). No tiers (bronze / silver / gold): dropped on 2026-11-26.
+> **Decision (2026-11-20):** the initial set paid Rhinegold (and, since the [player level](#player-level), 25 XP each); *Renunciation of Love* means "win holding the Ring, the opponent never having had it" (the Ring does not exist at the start of a match). Bronze / silver / gold badges were dropped on 2026-11-26; cumulative milestone achievements were added on 2026-11-27.
 
 ## Player level
 
@@ -134,9 +154,9 @@ Backgrounds are **bought in Nibelheim** (Backgrounds tab), like Leader powers: e
 | Background | Kind | Level | Rhinegold |
 |------------|------|-------|-----------|
 | *The Rhine Depths* | Home | 5 | 150 |
-| *Valhalla* | Board | 10 | 200 |
+| *The Gibichung Hall* | Board | 10 | 200 |
 | *Nibelheim* | Home | 15 | 300 |
-| *The Valkyrie Rock* | Board | 20 | 400 |
+| *Fafnir's Forest* | Board | 20 | 400 |
 | *Valhalla in Flames* | Home | 25 | 500 |
 | *The Ring* | Board | 30 | 600 |
 

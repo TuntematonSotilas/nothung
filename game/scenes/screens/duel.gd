@@ -380,11 +380,13 @@ func _refresh() -> void:
 	var opponent: PlayerState = state.player(AI_PLAYER)
 	_update_leader_panel(
 		opponent, _enemy_leader_label, _enemy_life_label, _enemy_energy_label,
-		_enemy_artwork, _enemy_portrait_initial, _enemy_ability_button
+		_enemy_artwork, _enemy_portrait_initial, _enemy_ability_button,
+		state.phase == GameState.Phase.MAIN and state.active_player == AI_PLAYER
 	)
 	_update_leader_panel(
 		human, _own_leader_label, _own_life_label, _energy_label,
-		_own_leader_artwork, _own_portrait_initial, _ability_button
+		_own_leader_artwork, _own_portrait_initial, _ability_button,
+		state.phase == GameState.Phase.MAIN and state.active_player == HUMAN_PLAYER
 	)
 	_turn_label.text = _turn_text(state)
 	# Greyed out when the ability cannot be used now (Energy, already used, no target): no message needed.
@@ -2136,12 +2138,12 @@ func _leader_panel(player_id: int) -> Dictionary:
 	}
 
 
-func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, artwork: TextureRect, initial: Label, ability_button: Button) -> void:
+func _update_leader_panel(player: PlayerState, name_label: Label, life_label: Label, energy_label: Label, artwork: TextureRect, initial: Label, ability_button: Button, is_active_player: bool) -> void:
 	var key: String = String(player.leader.id).to_upper()
 	var leader_name: String = tr("LEADER_%s_NAME" % key)
 	name_label.text = leader_name
 	life_label.text = str(player.life)
-	energy_label.text = "%d / %d" % [player.energy, player.max_energy]
+	energy_label.text = "%d / %d" % [player.energy, player.max_energy] if is_active_player else "- / %d" % player.max_energy
 	artwork.texture = player.leader.art
 	artwork.visible = player.leader.art != null
 	initial.text = leader_name.left(1)

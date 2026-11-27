@@ -44,7 +44,7 @@ On Android `user://` maps to the app's private internal storage.
 
 - Atomic writes: write to `profile.json.tmp`, then rename over `profile.json`; keep `profile.json.bak`.
 - On load error: fall back to `.bak`, then to a fresh profile (and log it). After a restore from `.bak`, the next save **deletes** the unreadable `profile.json` instead of rotating it into `.bak`, so the good backup is not lost.
-- `stats`: the counters achievements read (`Achievements.LIST`); a profile without it (before 2026-11-20) gets `{}` like any missing key, so no version change.
+- `stats`: the counters achievements read (`Achievements.LIST`), including match counts such as spells and Leader ability uses; a profile without it gets `{}` like any missing key. Unlock counts are derived from the existing `leader_powers` and `cosmetics` fields, so adding achievement milestones needs no save migration.
 - `xp`: total XP; the player level is derived from it (`PlayerLevel`). Missing in older profiles: `0`, no version change.
 - `level_rewards_claimed` (v5, 2026-11-23): the highest level whose Rhinegold was claimed (`PlayerLevel.claim_rewards()`); the levels above it up to the current one wait in the main menu. The v4 → v5 migration sets it to the level reached, since those levels were paid when reached.
 - `cosmetics` (backgrounds bought in Nibelheim), `home_background` (the one used by the main menu, `""` = default) and a deck's `board`: `Cosmetics`. Missing in older profiles: their defaults, no version change.

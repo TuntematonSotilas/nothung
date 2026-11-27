@@ -6,6 +6,7 @@ var _count: Label
 var _list: VBoxContainer
 
 func _ready() -> void:
+	Achievements.refresh_reached()
 	var column: VBoxContainer = MenuUI.screen_column(self, 24)
 	column.add_child(MenuUI.header("UI_ACHIEVEMENTS", MenuUI.rhinegold_counter()))
 	_count = MenuUI.label("", 26, Palette.TEXT_MUTED)
@@ -97,7 +98,7 @@ func _row(achievement: Dictionary) -> PanelContainer:
 	elif claimable:
 		state.text = tr("UI_ACHIEVEMENT_CLAIMABLE")
 	else:
-		state.text = "%d / %d" % [Achievements.progress(achievement), int(achievement["target"])]
+		state.text = "%d / %d" % [Achievements.progress(achievement), Achievements.target(achievement)]
 	right.add_child(state)
 	var reward: Label = MenuUI.label("", 22, Palette.TEXT_MUTED)
 	reward.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
