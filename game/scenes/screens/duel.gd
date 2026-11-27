@@ -21,6 +21,11 @@ const ARTIFACT_CARD_SCALE: float = 0.6
 ## Board art to show behind the duel (campaign duels will set it; see assets/art/boards/).
 @export var board_id: String = "default"
 
+## The player left from the opening hand (leave_before_start()).
+signal left_before_start
+
+## Leaving from the opening hand goes back to the previous screen; tests turn it off.
+var navigates_on_leave: bool = true
 var _match: Match
 ## What happened in this match, saved after every change to resume it if the app is killed.
 var _record: MatchRecord
@@ -756,9 +761,21 @@ func _show_redraw_overlay(fade_in: bool = false) -> void:
 	var content: VBoxContainer = VBoxContainer.new()
 	content.add_theme_constant_override("separation", roundi(18 * _ui_scale))
 	panel.add_child(content)
+	# Back (top left): the match has not started yet, leaving it costs nothing.
+	var heading := HBoxContainer.new()
+	content.add_child(heading)
+	var back: Button = _button("UI_BACK", 150)
+	back.name = "RedrawBackButton"
+	back.pressed.connect(leave_before_start)
+	heading.add_child(back)
 	var title: Label = _label("UI_REDRAW_TITLE", 28, Palette.ACCENT)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	content.add_child(title)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	heading.add_child(title)
+	# As wide as Back, so the title stays centred.
+	var balance := Control.new()
+	balance.custom_minimum_size.x = back.custom_minimum_size.x
+	heading.add_child(balance)
 	var prompt: Label = _label("UI_REDRAW_PROMPT", 18, Palette.TEXT_MUTED)
 	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1162,8 +1179,30 @@ func _on_pause_pressed() -> void:
 
 ## Back button: opens or closes the pause panel instead of leaving the match.
 func handle_back() -> bool:
+	# Before the match starts (choosing the opening hand), Back leaves like the popup's Back button;
+	# an open pause menu is closed first.
+	var paused: bool = _pause_overlay != null and is_instance_valid(_pause_overlay)
+	if _is_choosing_opening_hand() and not paused:
+		leave_before_start()
+		return true
 	_on_pause_pressed()
 	return true
+
+
+func _is_choosing_opening_hand() -> bool:
+	var state: GameState = _match.get_state()
+	return state.phase == GameState.Phase.REDRAW and state.redraw_player == HUMAN_PLAYER
+
+
+## Back from the opening hand: the match is dropped (nothing to resume, nothing counted) and the
+## previous screen comes back (Quick match, or the main menu after a resume).
+func leave_before_start() -> void:
+	SaveManager.delete_match()
+	left_before_start.emit()
+	if not navigates_on_leave:
+		return
+	if not SceneRouter.go_back():
+		_go_to_main_menu()
 
 
 func _show_pause_menu(panel: PanelContainer) -> void:

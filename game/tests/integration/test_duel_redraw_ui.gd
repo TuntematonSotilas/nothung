@@ -824,3 +824,20 @@ func _redraw_views(cards: Node) -> Array[CardView]:
 		for view: Node in row.get_children():
 			views.append(view as CardView)
 	return views
+
+
+func test_back_from_the_opening_hand_leaves_the_match() -> void:
+	var duel: Control = await _create_duel()
+	assert_object(duel.find_child("RedrawBackButton", true, false)).is_not_null()
+	assert_bool(duel.call("_is_choosing_opening_hand")).is_true()
+	duel.set("navigates_on_leave", false)
+	var left: Array[bool] = [false]
+	duel.connect("left_before_start", func() -> void: left[0] = true)
+	SaveManager.save_match((duel.get("_record") as MatchRecord).to_dict())
+	assert_bool(SaveManager.has_match()).is_true()
+	# The Android back button does the same as the popup's Back.
+	assert_bool(duel.call("handle_back")).is_true()
+	assert_bool(left[0]).is_true()
+	assert_bool(SaveManager.has_match()).is_false()
+	duel.queue_free()
+	await get_tree().process_frame
