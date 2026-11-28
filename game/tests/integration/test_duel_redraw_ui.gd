@@ -35,6 +35,12 @@ func test_wotan_portrait_is_loaded_and_displayed_in_duel() -> void:
 	var frame_style: StyleBoxFlat = frame.get_theme_stylebox("panel") as StyleBoxFlat
 	assert_int(frame_style.border_width_left).is_greater_equal(2)
 	assert_int(frame_style.corner_radius_top_left).is_greater_equal(8)
+	var enemy_frame: Panel = duel.get("_enemy_portrait_frame") as Panel
+	var enemy_style: StyleBoxFlat = enemy_frame.get_theme_stylebox("panel") as StyleBoxFlat
+	assert_that(enemy_style.border_color).is_equal(Palette.LIFE)
+	assert_int(enemy_style.border_width_left).is_greater_equal(2)
+	var enemy_artwork: TextureRect = duel.get("_enemy_artwork") as TextureRect
+	assert_int(enemy_artwork.stretch_mode).is_equal(TextureRect.STRETCH_KEEP_ASPECT_COVERED)
 	duel.queue_free()
 	await get_tree().process_frame
 

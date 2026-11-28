@@ -2043,7 +2043,7 @@ func _leader_panel(player_id: int) -> Dictionary:
 	portrait_frame.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var portrait_style: StyleBoxFlat = StyleBoxFlat.new()
 	portrait_style.bg_color = Palette.ACCENT.darkened(0.3) if is_human else Palette.SURFACE_RAISED
-	portrait_style.border_color = Palette.ACCENT if is_human else Palette.BORDER
+	portrait_style.border_color = Palette.ACCENT if is_human else Palette.LIFE
 	portrait_style.set_border_width_all(maxi(2, roundi(2 * _ui_scale)))
 	portrait_style.set_corner_radius_all(maxi(8, roundi(8 * _ui_scale)))
 	portrait_frame.add_theme_stylebox_override("panel", portrait_style)
@@ -2062,7 +2062,7 @@ func _leader_panel(player_id: int) -> Dictionary:
 	artwork.offset_right = roundi(-2 * _ui_scale)
 	artwork.offset_bottom = roundi(-2 * _ui_scale)
 	artwork.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	artwork.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	portrait_frame.add_child(artwork)
 
