@@ -15,6 +15,7 @@ func _ready() -> void:
 	_count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	column.add_child(_count)
 	var scroll := ScrollContainer.new()
+	scroll.name = "AchievementScroll"
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(scroll)
@@ -48,8 +49,6 @@ func _claim(achievement_id: String) -> void:
 		return
 	var lines: PackedStringArray = [Achievements.claimed_text(achievement_id)]
 	lines.append(tr("UI_XP_GAINED").format({"amount": change["level"]["xp"]}))
-	for reached: Variant in change["level"]["levels"]:
-		lines.append(PlayerLevel.level_up_text(reached))
 	MenuUI.toast(self, "\n".join(lines))
 	_refresh()
 
@@ -114,4 +113,13 @@ func _row(achievement: Dictionary) -> PanelContainer:
 		claim.theme_type_variation = &"ButtonPrimary"
 		claim.pressed.connect(_claim.bind(achievement_id))
 		right.add_child(claim)
+	_allow_scroll_gestures(row)
 	return row
+
+
+func _allow_scroll_gestures(control: Control) -> void:
+	if not control is BaseButton:
+		control.mouse_filter = Control.MOUSE_FILTER_PASS
+	for child: Node in control.get_children():
+		if child is Control:
+			_allow_scroll_gestures(child)

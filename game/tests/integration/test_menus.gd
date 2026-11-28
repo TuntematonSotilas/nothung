@@ -162,9 +162,21 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	DeckEditor.deck_id = str(entry["id"])
 	var editor: DeckEditor = await _open("res://scenes/screens/deck_editor.tscn") as DeckEditor
 	assert_str((editor.find_child("DeckStatus", true, false) as Label).text).contains("0 / 20")
+	var filters: CardFilterBar = editor.find_child("CardFilterBar", true, false) as CardFilterBar
+	assert_str((filters.find_child("FiltersButton", true, false) as Button).text).is_equal(tr("UI_FILTERS"))
+	assert_str(filters.filters["owned"]).is_equal("owned")
+	assert_object(filters.find_child("OwnedChips", true, false)).is_null()
 	# Only Gods and Neutral cards.
 	assert_object(editor.find_child("Card_loge", true, false)).is_not_null()
 	assert_object(editor.find_child("Card_mime", true, false)).is_null()
+	var unowned_id: StringName
+	for card_id: StringName in CardDatabase.card_ids():
+		var data: CardData = CardDatabase.get_card(card_id)
+		if DeckRules.eligible(data, CardDatabase.get_leader(&"wotan")) and SaveManager.owned_count(card_id) == 0:
+			unowned_id = card_id
+			break
+	assert_bool(unowned_id != &"").is_true()
+	assert_bool((editor.find_child("Card_%s" % unowned_id, true, false) as Control).visible).is_false()
 
 	# No drag and drop: a tap on a card adds a copy.
 	var loge_view: CardView = editor.find_child("Card_loge", true, false).get_child(0) as CardView
@@ -190,7 +202,9 @@ func test_deck_editor_adds_and_removes_cards_and_saves() -> void:
 	(chip.find_child("Gesture", true, false) as LongPress).long_pressed.emit()
 	assert_object(editor.find_child("CardDetail", true, false)).is_not_null()
 	editor.find_child("CardDetail", true, false).free()
-	(chip.find_child("RemoveButton", true, false) as Button).pressed.emit()
+	var remove: Button = chip.find_child("RemoveButton", true, false) as Button
+	assert_that(remove.custom_minimum_size).is_equal(Vector2(72, 72))
+	remove.pressed.emit()
 	assert_int(DeckRules.count_of(entry, &"loge")).is_equal(1)
 	assert_bool((editor.find_child("Card_loge", true, false) as Control).visible).is_true()
 	# The name is the faction's, fixed; no Duplicate or Delete.
@@ -344,6 +358,13 @@ func test_quick_match_win_pays_rhinegold_once() -> void:
 	assert_int(achievements.find_children("FrameIcon", "", true, false).size()).is_equal(1)
 	assert_object(achievements.find_child("Achievement_first_victory", true, false)).is_not_null()
 	assert_object(achievements.find_child("Achievement_gotterdammerung", true, false)).is_not_null()
+	assert_str((achievements.find_child("AchievementReadyTitle", true, false) as Label).text).is_equal(
+		tr("UI_ACHIEVEMENT_READY_TITLE").format({"count": 2})
+	)
+	for achievement_id: String in ["first_victory", "gotterdammerung"]:
+		var achievement_row: HBoxContainer = achievements.find_child("AchievementRow_%s" % achievement_id, true, false) as HBoxContainer
+		assert_object(achievement_row).is_not_null()
+		assert_object(achievement_row.find_child("Bullet", true, false)).is_not_null()
 	# Undoing the winning play takes it all back.
 	state.phase = GameState.Phase.MAIN
 	state.winner = -1
@@ -367,15 +388,24 @@ func test_achievements_screen_lists_progress_and_the_main_menu_opens_it() -> voi
 	SaveManager.profile["claimed_achievements"] = []
 	var screen: Control = await _open("res://scenes/screens/achievements.tscn")
 	assert_int(screen.find_child("AchievementList", true, false).get_child_count()).is_equal(Achievements.LIST.size())
+	var scroll: ScrollContainer = screen.find_child("AchievementScroll", true, false) as ScrollContainer
+	assert_bool(scroll.get_v_scroll_bar().max_value > scroll.get_v_scroll_bar().page).is_true()
 	var pending: Node = screen.find_child("Achievement_first_victory", true, false)
+	assert_int((pending as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
+	for label: Node in pending.find_children("*", "Label", true, false):
+		assert_int((label as Control).mouse_filter).is_equal(Control.MOUSE_FILTER_PASS)
 	assert_str((pending.find_child("Progress", true, false) as Label).text).is_equal(tr("UI_ACHIEVEMENT_CLAIMABLE"))
 	var claim: Button = pending.find_child("ClaimButton", true, false) as Button
 	assert_bool(claim.disabled).is_false()
+	assert_int(claim.mouse_filter).is_equal(Control.MOUSE_FILTER_STOP)
 	claim.pressed.emit()
 	assert_bool(Achievements.is_unlocked("first_victory")).is_true()
 	assert_int(PlayerLevel.total_xp()).is_equal(PlayerLevel.XP_ACHIEVEMENT)
 	assert_int(SaveManager.rhinegold()).is_equal(20)
-	assert_str((screen.find_child("ToastText", true, false) as Label).text).contains(Achievements.claimed_text("first_victory"))
+	assert_str((screen.find_child("ToastText", true, false) as Label).text).is_equal("\n".join([
+		Achievements.claimed_text("first_victory"),
+		tr("UI_XP_GAINED").format({"amount": PlayerLevel.XP_ACHIEVEMENT}),
+	]))
 	assert_object(screen.find_child("ToastIcon", true, false)).is_not_null()
 	assert_object(screen.find_child("Achievement_first_victory", true, false).find_child("ClaimButton", true, false)).is_null()
 	var done: Node = screen.find_child("Achievement_first_victory", true, false)

@@ -7,6 +7,7 @@
 [ext_resource type="Resource" path="res://data/cards/nibelungs/nibelung_host.tres" id="5_lscwt"]
 [ext_resource type="Resource" path="res://data/cards/nibelungs/alberich_toad.tres" id="6_ky1mn"]
 [ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="7_valdg"]
+[ext_resource type="Texture2D" path="res://assets/art/cards/alberich_leader.png" id="8_art"]
 
 [sub_resource type="Resource" id="Resource_da4ai"]
 script = ExtResource("1_sh62w")
@@ -56,3 +57,4 @@ id = &"alberich"
 faction = &"nibelungs"
 ability = SubResource("Resource_dc80e")
 powers = Array[ExtResource("4_j0kgf")]([SubResource("Resource_b8yus"), SubResource("Resource_hc7ry")])
+art = ExtResource("8_art")

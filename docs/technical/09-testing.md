@@ -248,7 +248,7 @@ Retained matrix (row deck's win rate, 400 matches each; 8.0–9.5 turns per play
 | Gods | 43 % | 58 % (*Wotans Zorn*: 2 damage, double against Nibelungs, 3 Energy) | 55 % (*Walvater*: 2 damage, 2 Energy) |
 | Nibelungs | 55 % | 55 % (*Des Ringes Herr*: Nibelung Host, 3 Energy) | 72 % (*Verwandlung*: Alberich, the Toad, 2 Energy) |
 | Wälsungs | 53 % | 65 % (*Nothungs Schneide*: 2 damage, double against Gods, 3 Energy) | 62 % (*Furchtlos*: 1 damage, double against Gods, 1 Energy) |
-| Valkyries | 43 % | 60 % (*Walhalls Wahl*: Hero of Valhalla, 3 Energy) | 50 % (*Wunschmaid*: Ortlinde, 2 Energy) |
+| Valkyries | 43 % | 60 % (*Walhalls Wahl*: Hero of Valhalla, 3 Energy; historical) | 50 % (*Wunschmaid*: Ortlinde, 2 Energy) |
 
 On average a power gains about 11 points; over the longer comparison runs *Verwandlung* averaged +15 and *Des Ringes Herr* +9. Summons are judged by the body: *Mime* summoned does not draw (summoning is not playing), and the Valhalla keyword makes *Slain Warrior* (3/3) far stronger than its stats (+30). A draw ability made the Easy AI lose (it drew instead of developing).
 

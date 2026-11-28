@@ -4,9 +4,10 @@
 [ext_resource type="Resource" path="res://data/cards/valkyries/fallen_hero.tres" id="2_w26i2"]
 [ext_resource type="Script" path="res://data/cards/ability_data.gd" id="3_87gu5"]
 [ext_resource type="Script" path="res://data/leaders/leader_power_data.gd" id="4_cxhbi"]
-[ext_resource type="Resource" path="res://data/cards/gods/valhalla_hero.tres" id="5_tdebx"]
+[ext_resource type="Resource" path="res://data/cards/valkyries/slain_warrior.tres" id="5_tdebx"]
 [ext_resource type="Resource" path="res://data/cards/valkyries/ortlinde.tres" id="6_qp7eg"]
 [ext_resource type="Script" path="res://data/leaders/leader_data.gd" id="7_ir201"]
+[ext_resource type="Texture2D" path="res://assets/art/cards/brunnhilde_leader.png" id="8_art"]
 
 [sub_resource type="Resource" id="Resource_0cekn"]
 script = ExtResource("1_oim4q")
@@ -56,3 +57,4 @@ id = &"brunnhilde"
 faction = &"valkyries"
 ability = SubResource("Resource_x1bse")
 powers = Array[ExtResource("4_cxhbi")]([SubResource("Resource_yqsf5"), SubResource("Resource_6184b")])
+art = ExtResource("8_art")

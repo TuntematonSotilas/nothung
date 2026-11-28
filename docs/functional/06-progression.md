@@ -107,7 +107,7 @@ Each Leader has its base ability and **two powers**: other versions of it, a lit
 | Wotan | 3 Energy: 2 damage to a unit | *Wotans Zorn* — 3 Energy: 2 damage, double against Nibelungs | *Walvater* — 2 Energy: 2 damage |
 | Alberich | 2 Energy: summon a Nibelung Miner | *Des Ringes Herr* — 3 Energy: summon a Nibelung Host (2/3, guard) | *Verwandlung* — 2 Energy: summon *Alberich, the Toad* (2/3, invisible) |
 | Siegfried | 2 Energy: 1 damage, double against Gods | *Nothungs Schneide* — 3 Energy: 2 damage, double against Gods | *Furchtlos* — 1 Energy: 1 damage, double against Gods |
-| Brünnhilde | 3 Energy: summon a Fallen Hero (2/3) | *Walhalls Wahl* — 3 Energy: summon a Hero of Valhalla (2/4, guard) | *Wunschmaid* — 2 Energy: summon Ortlinde (1/4, guard) |
+| Brünnhilde | 3 Energy: summon a Fallen Hero (2/3) | *Walhalls Wahl* — 3 Energy: summon a Slain Warrior (3/3, Valhalla) | *Wunschmaid* — 2 Energy: summon Ortlinde (1/4, guard) |
 
 - Power names are the original German names, the same in every language.
 - Source: `cards/leader_powers.md`. Each power wins about **10 points** more often than the base ability against the other starter decks (AI soak, [testing](../technical/09-testing.md#ai-soak)).

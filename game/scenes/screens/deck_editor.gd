@@ -54,7 +54,7 @@ func _ready() -> void:
 	column.add_child(_deck_zone())
 
 	var factions: Array[StringName] = [_leader.faction, &"neutral"]
-	_filter_bar = CardFilterBar.new(factions, {"owned": "owned"})
+	_filter_bar = CardFilterBar.new(factions, {"owned": "owned"}, false)
 	_filter_bar.changed.connect(_apply_filters)
 	column.add_child(_filter_bar)
 	_grid = CardGrid.new(get_viewport_rect().size.x - 2 * MenuUI.SCREEN_MARGIN)
@@ -400,16 +400,16 @@ func _chip(card: CardData, copies: int) -> PanelContainer:
 	remove.icon = load("res://ui/icons/remove.svg") as Texture2D
 	remove.expand_icon = true
 	remove.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	remove.custom_minimum_size = Vector2(56, 56)
+	remove.custom_minimum_size = Vector2(72, 72)
 	remove.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	remove.add_theme_constant_override("icon_max_width", 28)
+	remove.add_theme_constant_override("icon_max_width", 36)
 	# A filled icon looks brighter than red text: the same red, toned down.
 	for state: String in ["icon_normal_color", "icon_hover_color", "icon_pressed_color", "icon_focus_color"]:
 		remove.add_theme_color_override(state, REMOVE_ICON_COLOR)
 	for state: String in ["normal", "hover", "pressed", "focus"]:
 		var disc := StyleBoxFlat.new()
 		disc.bg_color = Palette.SURFACE if state != "pressed" else Palette.BORDER
-		disc.set_corner_radius_all(28)
+		disc.set_corner_radius_all(36)
 		remove.add_theme_stylebox_override(state, disc)
 	PressPick.attach(remove, _chips_scroll).tapped.connect(remove_card.bind(card.id))
 	row.add_child(remove)

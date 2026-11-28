@@ -3,7 +3,7 @@ extends VBoxContainer
 
 ## Card filters shared by the Collection and the deck editor: faction chips (always shown), then a
 ## Filters button with the number of active filters and a count label, unfolding captioned chip rows
-## for cost, type, rarity, trait and owned / missing. One chip per row is pressed, "All" first.
+## for cost, type, rarity, trait and optionally owned / missing. One chip per row is pressed, "All" first.
 
 signal changed
 
@@ -22,13 +22,15 @@ var filters: Dictionary = {"faction": null, "cost": null, "type": null, "rarity"
 var count_label: Label
 var _filter_panel: VBoxContainer
 var _filters_button: Button
+var _show_ownership_filter: bool
 
 
 ## `factions` are the faction chips after "All"; `initial` presets filters (e.g. {"owned": "owned"}).
-func _init(factions: Array[StringName], initial: Dictionary = {}) -> void:
+func _init(factions: Array[StringName], initial: Dictionary = {}, show_ownership_filter: bool = true) -> void:
 	name = "CardFilterBar"
 	add_theme_constant_override("separation", 20)
 	filters.merge(initial, true)
+	_show_ownership_filter = show_ownership_filter
 	add_child(_chip_row("faction", [null] + factions, func(faction: Variant) -> Dictionary:
 		if faction == null:
 			return {"text": "UI_ALL"}
@@ -70,8 +72,9 @@ func _init(factions: Array[StringName], initial: Dictionary = {}) -> void:
 		return {"text": "UI_RARITY_%s" % String(CardData.Rarity.keys()[rarity]), "color": CardPalette.rarity_color(rarity)})))
 	_filter_panel.add_child(_captioned("UI_FILTER_TRAIT", "", _chip_row("trait", [null] + TRAITS, func(trait_id: Variant) -> Dictionary:
 		return {"text": "UI_ALL" if trait_id == null else "UI_TRAIT_%s" % String(trait_id).to_upper()})))
-	_filter_panel.add_child(_captioned("UI_FILTER_OWNED", "", _chip_row("owned", [null] + OWNERSHIP, func(owned: Variant) -> Dictionary:
-		return {"text": "UI_ALL" if owned == null else "UI_%s" % String(owned).to_upper()})))
+	if _show_ownership_filter:
+		_filter_panel.add_child(_captioned("UI_FILTER_OWNED", "", _chip_row("owned", [null] + OWNERSHIP, func(owned: Variant) -> Dictionary:
+			return {"text": "UI_ALL" if owned == null else "UI_%s" % String(owned).to_upper()})))
 	_update_filters_button()
 
 
@@ -155,6 +158,6 @@ func _captioned(caption_key: String, icon_name: String, row: HBoxContainer) -> H
 func _update_filters_button() -> void:
 	var active: int = 0
 	for group: String in filters:
-		if group != "faction" and filters[group] != null:
+		if group != "faction" and (group != "owned" or _show_ownership_filter) and filters[group] != null:
 			active += 1
 	_filters_button.text = tr("UI_FILTERS") + (" (%d)" % active if active > 0 else "")

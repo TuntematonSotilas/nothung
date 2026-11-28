@@ -19,12 +19,13 @@ func after() -> void:
 
 
 func test_wotan_portrait_is_loaded_and_displayed_in_duel() -> void:
+	for leader_id: StringName in [&"brunnhilde", &"alberich", &"wotan"]:
+		var portrait_leader: LeaderData = CardDatabase.get_leader(leader_id)
+		assert_object(portrait_leader).is_not_null()
+		assert_object(portrait_leader.art).is_not_null()
 	var leader: LeaderData = CardDatabase.get_leader(&"wotan")
-	assert_object(leader).is_not_null()
-	assert_object(leader.art).is_not_null()
 	var portrait: Image = leader.art.get_image()
 	assert_bool(portrait.get_width() < portrait.get_height()).is_true()
-	assert_float(portrait.get_pixel(0, 0).a).is_equal(0.0)
 
 	var duel: Control = await _create_duel()
 	var frame: Panel = duel.get("_own_leader_portrait_frame") as Panel

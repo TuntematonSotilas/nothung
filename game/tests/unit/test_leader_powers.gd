@@ -47,6 +47,14 @@ func test_with_power_copies_the_leader_with_that_ability() -> void:
 	assert_object(wotan.with_power(3)).is_same(wotan)
 
 
+func test_brunnhildes_first_power_summons_a_valkyries_faction_hero() -> void:
+	var ability: AbilityData = CardDatabase.get_leader(&"brunnhilde").powers[0].ability
+	var summoned: CardData = ability.effects[0].card
+	assert_str(String(summoned.id)).is_equal("slain_warrior")
+	assert_str(String(summoned.faction)).is_equal("valkyries")
+	assert_bool(summoned.subtypes.has(&"hero")).is_true()
+
+
 func test_unlocking_needs_the_level_then_the_rhinegold() -> void:
 	var wotan: LeaderData = CardDatabase.get_leader(&"wotan")
 	SaveManager.add_rhinegold(1000)

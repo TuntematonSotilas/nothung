@@ -28,6 +28,7 @@ func test_translations_are_loaded() -> void:
 	assert_str(tr("UI_CLOSE")).is_equal("FERMER")
 	assert_str(tr("UI_UNDO_PLAY")).is_equal("ANNULER LA POSE")
 	assert_str(tr("UI_ACHIEVEMENT_CLAIMABLE")).is_equal("À réclamer")
+	assert_str(tr("UI_ACHIEVEMENT_READY_TITLE").format({"count": 3})).is_equal("Succès à réclamer (3)")
 	assert_str(tr("UI_DROP_TO_PLAY")).is_equal("DÉPOSER ICI POUR JOUER")
 	assert_str(tr("CARD_LOGE_NAME")).is_equal("Loge")
 	assert_str(tr("LEADER_WOTAN_RULES")).is_equal("Capacité (3 Énergie) : Inflige 2 dégâts à une unité.")

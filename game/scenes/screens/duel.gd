@@ -1673,21 +1673,37 @@ func _show_results() -> void:
 	content.add_child(home)
 
 
-## The achievements reached by the match, in one gold frame: the trophy, "Achievement to claim", then
-## one line per achievement.
+## The achievements reached by the match, in one gold frame: the trophy, a counted heading, then a
+## spaced bullet for each achievement.
 func _result_achievements_panel(reached: Array) -> PanelContainer:
 	var panel: PanelContainer = _result_frame("ResultAchievements", Palette.ACCENT)
 	var row: HBoxContainer = panel.get_child(0) as HBoxContainer
 	row.add_child(_result_frame_icon("achievements", Palette.ACCENT))
 	var texts := VBoxContainer.new()
-	texts.add_theme_constant_override("separation", roundi(4 * _ui_scale))
+	texts.add_theme_constant_override("separation", roundi(12 * _ui_scale))
 	texts.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	texts.custom_minimum_size.x = roundi(450 * _ui_scale)
 	row.add_child(texts)
-	texts.add_child(_label("UI_ACHIEVEMENT_READY_TITLE", 16, Palette.TEXT_MUTED))
+	var heading := Label.new()
+	heading.name = "AchievementReadyTitle"
+	heading.text = tr("UI_ACHIEVEMENT_READY_TITLE").format({"count": reached.size()})
+	heading.add_theme_font_size_override("font_size", roundi(20 * _ui_scale))
+	heading.add_theme_color_override("font_color", Palette.TEXT_MUTED)
+	texts.add_child(heading)
 	for achievement_id: Variant in reached:
+		var achievement_row := HBoxContainer.new()
+		achievement_row.name = "AchievementRow_%s" % achievement_id
+		achievement_row.add_theme_constant_override("separation", roundi(8 * _ui_scale))
+		achievement_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		texts.add_child(achievement_row)
+		var bullet: Label = _label("•", 24, Palette.ACCENT)
+		bullet.name = "Bullet"
+		achievement_row.add_child(bullet)
 		var line: Label = _label("ACHIEVEMENT_%s_NAME" % str(achievement_id).to_upper(), 24, Palette.ACCENT)
 		line.name = "Achievement_%s" % achievement_id
-		texts.add_child(line)
+		line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		achievement_row.add_child(line)
 	return panel
 
 
